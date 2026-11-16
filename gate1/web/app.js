@@ -1,6 +1,7 @@
 import * as webllm from "https://esm.run/@mlc-ai/web-llm@0.2.88";
 
 import { LONG_PROMPT } from "./long_prompt.js";
+import { LABEL_PROMPTS } from "./label_prompts.js";
 
 const origin = location.origin;
 const B2 = "Qwen3.5-2B-q4f16_1-MLC";
@@ -14,6 +15,9 @@ const MODELS = {
   "local-ft": { base: B2, label: "2B toy LoRA fine-tune, merged + converted (this server)", url: `${origin}/models/Qwen3.5-2B-medlabel-toy-q4f16_1-MLC` },
   "lite-base": { base: B08, label: "0.8B lite: our conversion of the base model (this server)", url: `${origin}/models/Qwen3.5-0.8B-base-q4f16_1-MLC` },
   "lite-ft": { base: B08, label: "0.8B lite: toy LoRA fine-tune, merged + converted (this server)", url: `${origin}/models/Qwen3.5-0.8B-medlabel-toy-q4f16_1-MLC` },
+  // Gate 2: real fine-tunes on the FDARxBench plain-language train split (docs/gate2.md)
+  "r1-ft": { base: B2, label: "2B Gate 2 fine-tune medlabel-r1 (this server)", url: `${origin}/models/Qwen3.5-2B-medlabel-r1-q4f16_1-MLC` },
+  "lite-r1-ft": { base: B08, label: "0.8B lite: Gate 2 fine-tune medlabel-r1 (this server)", url: `${origin}/models/Qwen3.5-0.8B-medlabel-r1-q4f16_1-MLC` },
 };
 
 const SHORT_PROMPTS = [
@@ -22,9 +26,10 @@ const SHORT_PROMPTS = [
   "Who made you, and what are you for?",
   "What is 17 + 25? Answer with just the number.",
 ];
-// ?prompts=short|long|all (default all). The long prompt mimics the real app:
-// a question plus ~20 numbered label sentences, about 1,000 tokens.
-const PROMPTS = { short: SHORT_PROMPTS, long: [LONG_PROMPT], all: [...SHORT_PROMPTS, LONG_PROMPT] }[
+// ?prompts=short|long|label|all (default all). The long prompt mimics the real app:
+// a question plus ~20 numbered label sentences, about 1,000 tokens. "label" sends two
+// training examples in the exact fine-tune format (system prompt + label sentences).
+const PROMPTS = { short: SHORT_PROMPTS, long: [LONG_PROMPT], label: LABEL_PROMPTS, all: [...SHORT_PROMPTS, LONG_PROMPT] }[
   new URLSearchParams(location.search).get("prompts") || "all"];
 
 const $ = (id) => document.getElementById(id);
@@ -95,7 +100,9 @@ async function load() {
 
 async function complete(content, max_tokens = 128) {
   await engine.resetChat();
-  const req = { messages: [{ role: "user", content }], temperature: 0, max_tokens };
+  const messages = typeof content === "string" ? [{ role: "user", content }]
+    : [{ role: "system", content: content.system }, { role: "user", content: content.user }];
+  const req = { messages, temperature: 0, max_tokens };
   if ($("noThink").checked) req.extra_body = { enable_thinking: false };
   const t0 = performance.now();
   const r = await engine.chat.completions.create(req);
@@ -107,7 +114,8 @@ async function bench() {
   const tbody = $("results").querySelector("tbody");
   const rows = [];
   for (const p of PROMPTS) {
-    const label = p.length > 80 ? `[long prompt, ${p.length} chars] ${p.slice(-90)}` : p;
+    const label = typeof p !== "string" ? `[label prompt, expected: ${p.expected.split("\n")[0]}] ${p.user.slice(p.user.lastIndexOf("Question:"))}`
+      : p.length > 80 ? `[long prompt, ${p.length} chars] ${p.slice(-90)}` : p;
     setStatus(`[${loaded.key}] running: ${label}`);
     // Breadcrumb that survives a tab crash (iOS reloads the page without any error event).
     navigator.sendBeacon?.("/log", JSON.stringify({ kind: "stage", model: loaded.key, ua: navigator.userAgent, ctx: params.get("ctx"), stage: `before: ${label}` }));
