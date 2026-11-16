@@ -14,8 +14,11 @@ See docs/output-format.md for the prompt and target format. Summary:
 * Decline examples (built by code, plan section 6): take an answerable item, remove
   every passage of the label that covers the answer (any passage that contains a
   selected sentence, shares the gold section heading, or whose words cover >= 40% of
-  the answer), and show the top BM25 passages that remain. Kept only if a greedy
-  alignment over the shown passages covers < 50% of the answer.
+  the answer), and show the top BM25 passages that remain. Dropped if the answer is
+  still supported anywhere in the rest of the label (support.py: loose synonym-aware
+  alignment plus a numbers/units/drug-names check); otherwise kept only if a greedy
+  alignment over the shown passages covers < 50% of the answer. Dropped items are
+  replaced from the remaining answerable items of the same split.
 * FDARxBench's templated "refusal" items are not used for training (they follow an
   artificial template); they are kept in the T1 test file as a separate category.
 * Section weighting: items whose gold passages are all from patient-relevant sections
@@ -36,6 +39,7 @@ from collections import Counter
 
 from .. import paths, sections
 from ..text import content_tokens, norm_ws
+from . import support
 from .align import OUT as ALIGNED, Label, _labels, align_answer, answer_tokens, kept
 
 OUT_DIR = paths.BUILD / "fdarx" / "mlx"
@@ -204,6 +208,11 @@ def answerable_example(rec: dict, lab: Label, rng: random.Random):
     return user, target, {"passages": [b[0] for b in blocks], "answer_sentences": nums, "prompt_chars": chars}
 
 
+def decline_removed(rec: dict, lab: Label) -> set[int]:
+    ans = answer_tokens(rec["target"], rec["question"], set(content_tokens(rec["drug_name"])))
+    return covering_chunks(lab, rec, ans)
+
+
 def decline_example(rec: dict, lab: Label, rng: random.Random):
     ans = answer_tokens(rec["target"], rec["question"], set(content_tokens(rec["drug_name"])))
     exclude = covering_chunks(lab, rec, ans)
@@ -244,7 +253,8 @@ def main() -> None:
     report: dict = {"aligned_kept": len(good), "settings": {
         "max_passages": MAX_PASSAGES, "max_prompt_chars": MAX_PROMPT_CHARS, "decline_share": DECLINE_SHARE,
         "cover_remove": COVER_REMOVE, "decline_max_cover": DECLINE_MAX_COVER, "tier_keep": TIER_KEEP,
-        "seed": SEED}}
+        "seed": SEED, "support_check": {"threshold": support.THRESHOLD, "max_sentences": support.MAX_SENTENCES,
+                                        "min_gain": support.MIN_GAIN, "synonym_groups": len(support._SYN_GROUPS)}}}
     out: dict[str, list] = {"train": [], "dev": [], "test": []}
     skipped = Counter()
 
@@ -257,13 +267,24 @@ def main() -> None:
         user, target, meta = answerable_example(r, lab, rng)
         out[sp].append({"kind": "answerable", "tier": t, "rec": r, "user": user, "target": target, "meta": meta})
 
+    from .rewrite import lexicon  # rewrite imports this module
+    lex = lexicon()
     for sp in out:
         pos = [e for e in out[sp] if e["kind"] == "answerable"]
         n_dec = round(len(pos) * DECLINE_SHARE / (1 - DECLINE_SHARE)) if sp != "test" else len(pos) // 2
-        for e in rng.sample(pos, min(n_dec * 2, len(pos))):
+        report.setdefault("decline_target", {})[sp] = n_dec
+        first = rng.sample(pos, min(n_dec * 2, len(pos)))
+        seen = {id(e) for e in first}
+        rest = [e for e in pos if id(e) not in seen]
+        random.Random(f"{SEED}-{sp}-refill").shuffle(rest)  # own RNG: refills don't shift the main stream
+        for e in first + rest:
             if sum(x["kind"] == "decline" for x in out[sp]) >= n_dec:
                 break
-            ex = decline_example(e["rec"], labs[e["rec"]["set_id"]], rng)
+            lab = labs[e["rec"]["set_id"]]
+            if support.supported_elsewhere(e["rec"], lab, decline_removed(e["rec"], lab), lex)["supported"]:
+                skipped[f"decline_{sp}_supported_elsewhere"] += 1
+                continue
+            ex = decline_example(e["rec"], lab, rng)
             if ex is None:
                 skipped[f"decline_{sp}_rejected"] += 1
                 continue

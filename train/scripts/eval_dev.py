@@ -15,6 +15,7 @@ the remaining shown sentences still cover >= 50% of the answer (same rule as bui
 
 import argparse
 import json
+import os
 import re
 import sys
 import time
@@ -27,7 +28,7 @@ from medlabel_data.fdarx.align import OUT as ALIGNED, Label, align_answer, answe
 from medlabel_data.fdarx.build import DECLINE_MAX_COVER, SYSTEM  # noqa: E402
 from medlabel_data.text import content_tokens  # noqa: E402
 
-EVAL = Path("~/waicy-work/eval").expanduser()
+EVAL = Path(os.environ.get("EVAL_DIR", "~/waicy-work/eval")).expanduser()  # EVAL_DIR=~/waicy-work/eval_r2 for r2
 RDIR = Path("~/waicy-work/retrieval").expanduser()
 META = paths.BUILD / "fdarx" / "mlx_plain" / "valid_meta.jsonl"
 EMB_MODEL = "bge"

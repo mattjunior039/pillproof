@@ -14,10 +14,11 @@ Usage:
 
 import argparse
 import json
+import os
 import random
 from pathlib import Path
 
-EVAL = Path.home() / "waicy-work" / "eval"
+EVAL = Path(os.environ.get("EVAL_DIR", "~/waicy-work/eval")).expanduser()  # EVAL_DIR=~/waicy-work/eval_r2 for r2
 METRICS = ("wrong_rate", "overall_correct", "answerable_correct", "false_decline_rate", "false_answer_rate", "miss_decline", "select_ok", "lenient_correct", "lenient_wrong")
 
 

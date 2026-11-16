@@ -18,6 +18,7 @@ Uncertainty: 95% bootstrap intervals resampling whole drug labels (2,000 resampl
 """
 
 import json
+import os
 import random
 import re
 import sys
@@ -28,7 +29,7 @@ sys.path.insert(0, str(ROOT / "datapipe" / "src"))
 from medlabel_data.checks import check_reply  # noqa: E402
 from medlabel_data.text import content_tokens, norm_ws  # noqa: E402
 
-EVAL = Path("~/waicy-work/eval").expanduser()
+EVAL = Path(os.environ.get("EVAL_DIR", "~/waicy-work/eval")).expanduser()  # EVAL_DIR=~/waicy-work/eval_r2 for r2
 LEX = set(json.loads((ROOT / "core" / "data" / "lexicon.json").read_text()))
 SELECT_FRAC = 0.7
 _LINE = re.compile(r"^\[(\d+)\] (.*)$")

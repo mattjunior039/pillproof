@@ -9,6 +9,7 @@ uv run python -m medlabel_data.fdarx.split         # T1 train/dev/test by ingred
 uv run python -m medlabel_data.fdarx.align         # answers -> label sentence numbers
 uv run python -m medlabel_data.fdarx.build         # MLX-LM chat files (+ decline examples)
 uv run python -m medlabel_data.fdarx.audit         # 100-item hand-audit sheet
+uv run python -m medlabel_data.fdarx.decline_audit # 50-item decline spot-check sheet (train/valid)
 uv run python -m medlabel_data.medqa               # T2 (MedicationQA)
 uv run python -m medlabel_data.labelfetch          # T3/T5 label versions (needs confirmed drug list)
 uv run pytest -q                                   # splitter/section/alignment tests
@@ -43,17 +44,46 @@ The output format for the model is in [output-format.md](output-format.md).
   - Kept counts if one threshold were used for all tasks: 0.5 → 11,645, 0.6 → 11,160, 0.7 → 10,343, 0.8 → 9,257, 0.9 → 7,807, 1.0 → 6,917.
   - Details are in `data/build/fdarx/align_report.json`.
 - **Prompts.** A prompt has the gold passage(s) plus distractor passages from the same label, up to 5 passages and about 5,000 characters. Long passages are trimmed to a window around the answer sentences.
-- **Declines.** For a kept item, every passage that covers the answer (coverage ≥ 0.4) is removed and replaced with other passages from the same label. The example is kept only if the remaining prompt covers less than 0.5 of the answer. Declines are 30% of train and dev. Test gets declines equal to half its answerable count, plus FDARxBench's own 549 refusal items.
+- **Declines.** For a kept item, every passage that covers the answer is removed: passages that hold a gold sentence, share the gold section heading, or whose words cover ≥ 0.4 of the answer. Other passages from the same label replace them. Then two checks run:
+  1. **Support check on the rest of the label** (added 2026-11-16, `fdarx/support.py`). The reference answer is checked against **every remaining sentence of the full label**, not only the passages shown. The item is dropped if the answer is supported there. The check is deliberately loose: it is better to lose a good decline item than to train the model to decline an answerable question.
+     - Words are canonicalised with a small clinical ↔ lay synonym map (21 groups, e.g. geriatric/older → elderly, renal → kidney, hepatic → liver, pediatric → child).
+     - Greedy alignment: each sentence must add at least **1** new answer word, up to **4** sentences. Headings of the chosen passages count.
+     - "Supported" means coverage **≥ 0.5** *and* every number, unit and drug name in the reference answer appears in the chosen sentences, anywhere else in the remaining label, or in the drug name.
+  2. **Shown-passage check.** The example is kept only if a greedy alignment over the shown passages covers < 0.5 of the answer.
+
+  Dropped items are replaced from the remaining answerable items of the same split, using their own seeded order. No item was converted into an answerable example, for two reasons:
+  - Every decline's question already appears in the same split as an answerable example, so a converted copy would only duplicate it.
+  - A negative control showed that lexical "strong" alignment cannot be trusted for this. Another dev label's answer, with the drug name swapped, against the full label: under a strict rule (standard aligner, coverage ≥ 0.8/0.9, all numbers and key facts present, ≤ 4 sentences) the wrong answers were flagged as "supported" 36 times out of 378, against 12 for the real items.
+
+  Under the loose check, the same negative control (full label, 3 seeds) flags 111–144 of 378 wrong answers (29–38%) as supported, against 242 of 378 (64%) old dev declines. So the check over-drops and is only weakly discriminative. It removes many truly answerable declines, but it does not prove that an answer is absent from what remains. The 50-item spot-check below estimates how many answerable declines are left.
+
+  | split | old declines | removed (supported elsewhere) | converted | kept | refilled | new declines | decline share |
+  |---|---|---|---|---|---|---|---|
+  | train | 2,273 | 1,447 (64%) | 0 | 824 | 1,106 | 1,930 | 26.7% (target 30%) |
+  | valid (dev) | 378 | 242 (64%) | 0 | 136 | 175 | 311 | 26.1% (target 30%) |
+  | test (T1) | 949 | 579 (61%) | 0 | 370 | 370 | 740 | 28.0% of non-refusal items (target 33%) |
+
+  - "Kept" counts old items still chosen. In train, 2 surviving items failed the shown-passage check after their distractors changed.
+  - The pool ran out before the target share: across all candidates, 3,360 train, 569 dev and 1,156 test items were "supported elsewhere".
+  - The fix is code only and identical for every split. For T1, only these counts were computed; no model was run on it.
+  - FDARxBench's own 549 refusal items are unchanged.
+  - Answerable examples are byte-identical to the previous build. The old build is kept in `data/build/fdarx_pre_declinefix/`.
 - **Patient relevance.** Each item is tagged *core* (all answer sections patient-relevant), *mixed*, or *technical*. Train keeps core items with probability 1.0, mixed 0.7, and technical 0.4. 7,146 of the 8,675 kept items are core, far more than the plan's estimate of about 2,000.
 - **Output** in `data/build/fdarx/mlx/` (seed 7):
 
   | file | examples | answerable | decline | FDARxBench refusal |
   |---|---|---|---|---|
-  | train.jsonl | 7,577 | 5,304 | 2,273 | — |
-  | valid.jsonl | 1,260 | 882 | 378 | — |
-  | test.jsonl (T1) | 3,397 | 1,899 | 949 | 549 |
+  | train.jsonl | 7,234 | 5,304 | 1,930 | — |
+  | valid.jsonl | 1,193 | 882 | 311 | — |
+  | test.jsonl (T1) | 3,188 | 1,899 | 740 | 549 |
 
-- **Hand audit (for the project owner).** `data/build/fdarx/audit/audit_100.md` (readable) and `audit_100.csv` (fill in `verdict` and `notes`). The sheet has 100 random train items: 67 answerable and 33 decline. Check that the cited sentences really answer the question and that each decline is truly unanswerable from the prompt. Targets come from `mlx_plain/` when it exists. For the 65 answerable items whose ANSWER line was rewritten, the original line is shown beside it, so the audit also checks the rewrite.
+  (Before the decline fix: 7,577 / 1,260 / 3,397, with 2,273 / 378 / 949 declines.)
+
+- **Hand audit (for the project owner).** `data/build/fdarx/audit/audit_100.md` (readable) and `audit_100.csv` (fill in `verdict` and `notes`). The sheet has 100 random train items: 67 answerable and 33 decline. Check that the cited sentences really answer the question and that each decline is truly unanswerable from the prompt. Targets come from `mlx_plain/` when it exists. For the 65 answerable items whose ANSWER line was rewritten, the original line is shown beside it, so the audit also checks the rewrite. This sheet was drawn before the decline fix and has not been regenerated, so any verdicts already filled in are kept. Re-running `audit` would draw a different sample.
+- **Decline spot-check (for the project owner).** `data/build/fdarx/audit/decline_check_50.md` and `decline_check_50.csv` contain 50 random decline items that survived the support check (40 train, 10 valid; never test).
+  - Each item shows the question, the answer that was removed, the removed section headings, and the closest remaining sentences the check found.
+  - `decline_check_labels/NN_<qid>.txt` is the full label text with the removed passages marked, so it can be searched with Ctrl-F.
+  - Verdicts: `not_in_label`, `answerable_elsewhere` (fill in `where_found`), `partly`, or `bad_question`.
 
 ### Plain-language ANSWER lines (train and valid only; disclosed AI assistance)
 
@@ -98,7 +128,7 @@ FDARxBench reference answers are written in clinical language. The ANSWER lines 
 - **Cost.** $12.48 for the full run (3.72 M input and 0.51 M output tokens at $2/$10 per million tokens). Two 50-item pilots (prompts v1 and v2) cost $0.24, so the total is about $12.75.
   - The v1 pilot passed 94% with a median grade of 9.7.
   - v2 stopped the model from adding facts and lengthening answers, and passed 100% of the pilot.
-- **Output.** `data/build/fdarx/mlx_plain/{train,valid,test}.jsonl` uses the same format as `mlx/`. Train has 5,221 rewritten and 83 kept-original lines; valid has 872 and 10. `*_meta.jsonl` adds `answer_original`, `answer_plain` and `rewrite_status` for comparison.
+- **Output.** `data/build/fdarx/mlx_plain/{train,valid,test}.jsonl` uses the same format as `mlx/`. After the decline fix it was rebuilt with `rewrite --write` from the cached results; no new API calls were made. Train has 5,221 rewritten and 83 kept-original lines; valid has 872 and 10. `*_meta.jsonl` adds `answer_original`, `answer_plain` and `rewrite_status` for comparison.
   - Per-row results: `data/build/fdarx/rewrite/all_results.jsonl`.
   - Summary: `all_report.json`.
   - Readable comparison: `all_side_by_side.md`.

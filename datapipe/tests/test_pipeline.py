@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from medlabel_data import labels, sections, text
-from medlabel_data.fdarx import align, split
+from medlabel_data.fdarx import align, split, support
 from medlabel_data.sentences import number_sentences, split_sentences
 from medlabel_data.spl import parse_spl
 
@@ -79,6 +79,33 @@ def test_align_picks_supporting_sentences():
     chosen, coverage, missing, _ = align.align_answer(answer, cands, lab, ans)
     assert chosen == [(0, 0)]
     assert coverage == 1.0 and missing == []
+
+
+def _decline_label():
+    return align.Label({"set_id": "s", "drug_name": "Testdrug", "chunks": [
+        "8.5 Geriatric Use\nIn geriatric patients, start at 5 mg once daily because of reduced renal clearance.",
+        "What should I tell my doctor?\nIf you are older, your doctor may start you on 5 mg once daily. "
+        "Tell your doctor if you have kidney problems.",
+        "6 Adverse Reactions\nHeadache and nausea were the most common reactions.",
+    ]})
+
+
+def test_support_finds_lay_paraphrase_outside_removed_passage():
+    lab = _decline_label()
+    rec = {"target": "Elderly patients should start at 5 mg once daily due to reduced kidney clearance.",
+           "question": "What is the starting dose for elderly patients?", "drug_name": "Testdrug"}
+    res = support.supported_elsewhere(rec, lab, {0}, {"testdrug"})
+    assert res["supported"] and res["sentences"][0][0] == 1
+    # with both passages removed, nothing supports it
+    assert not support.supported_elsewhere(rec, lab, {0, 1}, {"testdrug"})["supported"]
+
+
+def test_support_requires_key_numbers():
+    lab = _decline_label()
+    rec = {"target": "Elderly patients should start at 2.5 mg once daily due to reduced kidney clearance.",
+           "question": "What is the starting dose for elderly patients?", "drug_name": "Testdrug"}
+    res = support.supported_elsewhere(rec, lab, {0}, {"testdrug"})
+    assert not res["supported"] and "number 2.5" in res["key_fact_problems"]
 
 
 SPL = b"""<?xml version="1.0"?>

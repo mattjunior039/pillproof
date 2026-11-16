@@ -8,7 +8,9 @@ set -euo pipefail
 PY=~/waicy-work/envs/mlx/bin/python
 M=~/waicy-work/models
 A=$M/adapters
-E=~/waicy-work/eval
+E=${EVAL_DIR:-~/waicy-work/eval}   # r2: EVAL_DIR=~/waicy-work/eval_r2 ROUND=r2
+R=${ROUND:-r1}
+export EVAL_DIR=$E
 export HF_HOME=~/waicy-work/hf_cache
 
 run() {  # name model adapter prompts
@@ -23,10 +25,10 @@ run() {  # name model adapter prompts
 WHICH=${1:-all}   # 2b | 08 | all
 if [[ $WHICH != 08 ]]; then for p in oracle phone desktop; do
   run B2b_$p $M/Qwen3.5-2B "" $p
-  run C2b_$p $M/Qwen3.5-2B $A/medlabel-2b-r1 $p
+  run C2b_$p $M/Qwen3.5-2B $A/medlabel-2b-$R $p
 done; fi
 if [[ $WHICH != 2b ]]; then for p in oracle phone; do
   run B08_$p $M/Qwen3.5-0.8B "" $p
-  run C08_$p $M/Qwen3.5-0.8B $A/medlabel-08-r1 $p
+  run C08_$p $M/Qwen3.5-0.8B $A/medlabel-08-$R $p
 done; fi
 echo "all done $(date +%T)"
