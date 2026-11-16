@@ -1,0 +1,138 @@
+{
+ "status": "confirmed",
+ "note": "Proposed T3/T5 drug list (about 25 drugs common among older adults). Set status to 'confirmed' after the user approves it. Add 'set_id' to an entry to pin a specific label. 'exclude' is a regex on brand/generic names or DailyMed titles to skip other forms.",
+ "drugs": [
+  {
+   "ingredient": "atorvastatin",
+   "brand": "Lipitor",
+   "why": "statin; most prescribed drug in the US"
+  },
+  {
+   "ingredient": "simvastatin",
+   "brand": "Zocor",
+   "why": "statin; dose limits with amlodipine and other interacting drugs"
+  },
+  {
+   "ingredient": "lisinopril",
+   "brand": "Zestril",
+   "why": "ACE inhibitor for blood pressure"
+  },
+  {
+   "ingredient": "losartan",
+   "brand": "Cozaar",
+   "why": "ARB for blood pressure"
+  },
+  {
+   "ingredient": "amlodipine",
+   "brand": "Norvasc",
+   "why": "calcium channel blocker"
+  },
+  {
+   "ingredient": "metoprolol",
+   "brand": "Toprol-XL",
+   "why": "beta blocker, extended release",
+   "exclude": "tartrate|lopressor"
+  },
+  {
+   "ingredient": "carvedilol",
+   "brand": "Coreg",
+   "why": "beta blocker for heart failure"
+  },
+  {
+   "ingredient": "hydrochlorothiazide",
+   "brand": null,
+   "why": "thiazide diuretic; generic only"
+  },
+  {
+   "ingredient": "furosemide",
+   "brand": "Lasix",
+   "why": "loop diuretic"
+  },
+  {
+   "ingredient": "metformin",
+   "brand": "Glucophage",
+   "why": "type 2 diabetes",
+   "exclude": "extended|\\bER\\b|\\bXR\\b"
+  },
+  {
+   "ingredient": "empagliflozin",
+   "brand": "Jardiance",
+   "why": "SGLT2 inhibitor; plan found a real label change (withhold before surgery)"
+  },
+  {
+   "ingredient": "levothyroxine",
+   "brand": "Synthroid",
+   "why": "thyroid; timing with food and other drugs",
+   "exclude": "injection"
+  },
+  {
+   "ingredient": "omeprazole",
+   "brand": null,
+   "why": "proton pump inhibitor; Rx generic capsules (brand Prilosec Rx is a suspension)",
+   "exclude": "sodium bicarbonate|magnesium"
+  },
+  {
+   "ingredient": "pantoprazole",
+   "brand": "Protonix",
+   "why": "proton pump inhibitor",
+   "exclude": "I\\.V\\.|injection"
+  },
+  {
+   "ingredient": "apixaban",
+   "brand": "Eliquis",
+   "why": "anticoagulant; long history (plan test: 29 versions)"
+  },
+  {
+   "ingredient": "rivaroxaban",
+   "brand": "Xarelto",
+   "why": "anticoagulant; long history (plan test: 60 versions)"
+  },
+  {
+   "ingredient": "warfarin",
+   "brand": null,
+   "why": "anticoagulant; brand Coumadin discontinued, generic label"
+  },
+  {
+   "ingredient": "clopidogrel",
+   "brand": "Plavix",
+   "why": "antiplatelet"
+  },
+  {
+   "ingredient": "gabapentin",
+   "brand": "Neurontin",
+   "why": "nerve pain; dizziness and falls"
+  },
+  {
+   "ingredient": "sertraline",
+   "brand": "Zoloft",
+   "why": "antidepressant (SSRI)"
+  },
+  {
+   "ingredient": "donepezil",
+   "brand": "Aricept",
+   "why": "dementia"
+  },
+  {
+   "ingredient": "tamsulosin",
+   "brand": "Flomax",
+   "why": "enlarged prostate; dizziness on standing"
+  },
+  {
+   "ingredient": "montelukast",
+   "brand": "Singulair",
+   "why": "asthma/allergy; boxed warning added 2020"
+  },
+  {
+   "ingredient": "alendronate",
+   "brand": "Fosamax",
+   "why": "osteoporosis; strict how-to-take instructions"
+  },
+  {
+   "ingredient": "tramadol",
+   "brand": "Ultram",
+   "why": "pain; opioid class label changes (alternative: prednisone)",
+   "exclude": "extended|\\bER\\b|acetaminophen"
+  }
+ ],
+ "confirmed_on": "2026-11-15"
+}
