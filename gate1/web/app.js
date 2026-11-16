@@ -26,11 +26,15 @@ const SHORT_PROMPTS = [
   "Who made you, and what are you for?",
   "What is 17 + 25? Answer with just the number.",
 ];
+// ?prompts=dev&set=phone loads dev prompts written by `eval_dev.py web-export` (served from
+// ~/waicy-work/eval/web, never in git); replies are logged with their qid for grade_dev.py.
 // ?prompts=short|long|label|all (default all). The long prompt mimics the real app:
 // a question plus ~20 numbered label sentences, about 1,000 tokens. "label" sends two
 // training examples in the exact fine-tune format (system prompt + label sentences).
-const PROMPTS = { short: SHORT_PROMPTS, long: [LONG_PROMPT], label: LABEL_PROMPTS, all: [...SHORT_PROMPTS, LONG_PROMPT] }[
-  new URLSearchParams(location.search).get("prompts") || "all"];
+const PROMPT_SET = new URLSearchParams(location.search).get("prompts") || "all";
+const PROMPTS = PROMPT_SET === "dev"
+  ? await (await fetch(`/dev/dev_${new URLSearchParams(location.search).get("set") || "phone"}.json`)).json()
+  : { short: SHORT_PROMPTS, long: [LONG_PROMPT], label: LABEL_PROMPTS, all: [...SHORT_PROMPTS, LONG_PROMPT] }[PROMPT_SET];
 
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
@@ -114,18 +118,18 @@ async function bench() {
   const tbody = $("results").querySelector("tbody");
   const rows = [];
   for (const p of PROMPTS) {
-    const label = typeof p !== "string" ? `[label prompt, expected: ${p.expected.split("\n")[0]}] ${p.user.slice(p.user.lastIndexOf("Question:"))}`
+    const label = p.qid ? `[dev ${p.kind} ${p.qid}]` : typeof p !== "string" ? `[label prompt, expected: ${p.expected.split("\n")[0]}] ${p.user.slice(p.user.lastIndexOf("Question:"))}`
       : p.length > 80 ? `[long prompt, ${p.length} chars] ${p.slice(-90)}` : p;
     setStatus(`[${loaded.key}] running: ${label}`);
     // Breadcrumb that survives a tab crash (iOS reloads the page without any error event).
     navigator.sendBeacon?.("/log", JSON.stringify({ kind: "stage", model: loaded.key, ua: navigator.userAgent, ctx: params.get("ctx"), stage: `before: ${label}` }));
-    const r = await complete(p, p === LONG_PROMPT ? 256 : 128);
+    const r = await complete(p, p === LONG_PROMPT || p.qid ? 256 : 128);
     const x = r.usage?.extra || {};
     const stats = `${r.usage?.prompt_tokens}+${r.usage?.completion_tokens} tok\nprefill ${x.prefill_tokens_per_s?.toFixed(1)} tok/s\ndecode ${x.decode_tokens_per_s?.toFixed(1)} tok/s\nTTFT ${x.time_to_first_token_s?.toFixed(2)} s`;
     tbody.insertAdjacentHTML("beforeend", `<tr><td></td><td class="out"></td><td class="out">${stats}</td></tr>`);
     tbody.lastElementChild.children[0].textContent = `[${loaded.key}] ${label}`;
     tbody.lastElementChild.children[1].textContent = r.text;
-    rows.push({ prompt: label, text: r.text, usage: r.usage, wall_s: r.wall_s });
+    rows.push({ prompt: label, text: r.text, usage: r.usage, wall_s: r.wall_s, ...(p.qid && { qid: p.qid, dev_kind: p.kind }) });
     navigator.sendBeacon?.("/log", JSON.stringify({ kind: "row", model: loaded.key, ua: navigator.userAgent, ctx: params.get("ctx"), ...rows.at(-1) }));
   }
   const decode = rows.map((r) => r.usage?.extra?.decode_tokens_per_s).filter(Boolean);

@@ -18,7 +18,7 @@ import random
 from pathlib import Path
 
 EVAL = Path.home() / "waicy-work" / "eval"
-METRICS = ("wrong_rate", "answerable_correct", "false_decline_rate", "false_answer_rate", "miss_decline", "select_ok", "lenient_correct", "lenient_wrong")
+METRICS = ("wrong_rate", "overall_correct", "answerable_correct", "false_decline_rate", "false_answer_rate", "miss_decline", "select_ok", "lenient_correct", "lenient_wrong")
 
 
 def load(run: str):
@@ -29,6 +29,8 @@ def load(run: str):
 def metric(rows, mode, key):
     if key == "wrong_rate":
         return sum(r[mode] in ("wrong", "wrong_answered", "invalid") for r in rows) / len(rows)
+    if key == "overall_correct":  # right answer or right decline, over all items
+        return sum(r[mode] == "correct" for r in rows) / len(rows)
     if key == "answerable_correct":  # guards against a model that wins by declining everything
         xs = [r for r in rows if r["expect"] == "answerable"]
         return sum(r[mode] == "correct" for r in xs) / len(xs) if xs else None
@@ -120,29 +122,34 @@ def chart(summary, path):
     import matplotlib.pyplot as plt
 
     sizes = {"08": 0.8, "2b": 2.0, "4b": 4.0}
-    series = {}
-    for pair, s in summary.items():
-        bn, cn = pair.split(":")
-        size = next(v for k, v in sizes.items() if k in bn)
-        cond = bn.split("_", 1)[1]
-        series.setdefault(cond, {"B": [], "C": []})
-        series[cond]["B"].append((size, 100 * s["wrong_rate"]["B"]))
-        series[cond]["C"].append((size, 100 * s["wrong_rate"]["C"]))
-    fig, ax = plt.subplots(figsize=(6, 4), dpi=150)
-    styles = {"oracle": ":", "phone": "-", "desktop": "--"}
-    for cond, sc in sorted(series.items()):
-        for sys_, color in (("B", "tab:gray"), ("C", "tab:blue")):
-            pts = sorted(sc[sys_])
-            if pts:
-                ax.plot([p[0] for p in pts], [p[1] for p in pts], styles.get(cond, "-"), marker="o", color=color,
-                        label=f"{sys_} ({'base + passages' if sys_ == 'B' else 'fine-tune + checks'}), {cond}")
-    ax.set_xlabel("Model size (billions of parameters)")
-    ax.set_ylabel("Wrong-answer rate on dev (%)")
-    ax.set_xticks(sorted({p[0] for sc in series.values() for s_ in sc.values() for p in s_}))
-    ax.set_ylim(bottom=0)
-    ax.grid(alpha=0.3)
-    ax.legend(fontsize=7)
-    ax.set_title("Gate 2: size versus wrong-answer rate (dev)")
+    panels = (("wrong_rate", "Wrong-answer rate (%)", "Wrong answers (lower is better)"),
+              ("answerable_correct", "Answerable questions answered correctly (%)", "Correct answers (higher is better)"))
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4.2), dpi=150)
+    styles = {"oracle": (":", "o"), "phone": ("-", "o"), "desktop": ("--", "s")}
+    for ax, (metric, ylabel, title) in zip(axes, panels):
+        series = {}
+        for pair, s in summary.items():
+            bn, cn = pair.split(":")
+            size = next(v for k, v in sizes.items() if k in bn)
+            cond = bn.split("_", 1)[1]
+            series.setdefault(cond, {"B": [], "C": []})
+            series[cond]["B"].append((size, 100 * s[metric]["B"]))
+            series[cond]["C"].append((size, 100 * s[metric]["C"]))
+        for cond, sc in sorted(series.items()):
+            ls, mk = styles.get(cond, ("-", "o"))
+            for sys_, color in (("B", "tab:gray"), ("C", "tab:blue")):
+                pts = sorted(sc[sys_])
+                if pts:
+                    ax.plot([p[0] for p in pts], [p[1] for p in pts], ls, marker=mk, color=color,
+                            label=f"{sys_} ({'base + passages' if sys_ == 'B' else 'fine-tune + checks'}), {cond} prompts")
+        ax.set_xlabel("Model size (billions of parameters)")
+        ax.set_ylabel(ylabel)
+        ax.set_xticks(sorted({p[0] for sc in series.values() for s_ in sc.values() for p in s_}))
+        ax.set_ylim(0, 100 if metric == "answerable_correct" else None)
+        ax.grid(alpha=0.3)
+        ax.set_title(title, fontsize=10)
+    axes[0].legend(fontsize=6.5)
+    fig.suptitle("Gate 2 on the dev set: model size versus accuracy")
     fig.tight_layout()
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path)

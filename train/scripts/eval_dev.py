@@ -15,6 +15,7 @@ the remaining shown sentences still cover >= 50% of the answer (same rule as bui
 
 import argparse
 import json
+import re
 import sys
 import time
 from pathlib import Path
@@ -127,6 +128,38 @@ def run(a) -> None:
     print(json.dumps(meta))
 
 
+def web_export(a) -> None:
+    """Write the same dev subset as `run --limit` for the browser page (gate1 ?prompts=dev)."""
+    rows = [json.loads(l) for l in open(EVAL / f"prompts_{a.prompts}.jsonl")]
+    if a.limit:
+        rows = rows[:: max(1, len(rows) // a.limit)][: a.limit]
+    out = EVAL / "web" / f"dev_{a.prompts}.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps([{"qid": r["qid"], "kind": r["kind"], "system": SYSTEM, "user": r["user"]} for r in rows]))
+    print(out, len(rows))
+
+
+def web_import(a) -> None:
+    """Turn browser rows logged by the gate1 page into a run file that grade_dev.py reads."""
+    log = Path.home() / "waicy-work" / "logs" / "gate1-results.jsonl"
+    rows = [r for r in map(json.loads, open(log)) if r.get("kind") == "row" and r.get("model") == a.model
+            and r.get("qid") and r.get("_server_time", "") >= a.since]
+    got = {}
+    for r in rows:  # last reply wins if the page was run more than once
+        got[(r["qid"], r["dev_kind"])] = r
+    out = Path(a.out).expanduser()
+    with open(out, "w") as f:
+        for (qid, kind), r in got.items():
+            reply = re.sub(r"^<think>\s*</think>\s*", "", r["text"])
+            f.write(json.dumps({"qid": qid, "kind": kind, "prompt_tokens": r["usage"]["prompt_tokens"], "reply": reply}) + "\n")
+    dec = [r["usage"]["extra"]["decode_tokens_per_s"] for r in got.values()]
+    meta = {"model": f"webllm:{a.model}", "adapter": None, "prompts": a.prompts, "n": len(got),
+            "seconds": round(sum(r["wall_s"] for r in got.values()), 1), "max_tokens": 256,
+            "ua": rows[-1]["ua"] if rows else None, "mean_decode_tps": round(sum(dec) / max(1, len(dec)), 1)}
+    out.with_suffix(".meta.json").write_text(json.dumps(meta, indent=1))
+    print(json.dumps(meta))
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -140,8 +173,16 @@ def main() -> None:
     r.add_argument("--batch", type=int, default=16)
     r.add_argument("--max-tokens", type=int, default=256)
     r.add_argument("--cpu", action="store_true")
+    w = sub.add_parser("web-export")
+    w.add_argument("--prompts", choices=["oracle", "phone", "desktop"], default="phone")
+    w.add_argument("--limit", type=int, default=100)
+    w = sub.add_parser("web-import")
+    w.add_argument("--model", required=True, help="gate1 page model key, e.g. r1-ft")
+    w.add_argument("--prompts", choices=["oracle", "phone", "desktop"], default="phone")
+    w.add_argument("--since", default="", help="only rows logged at or after this server time")
+    w.add_argument("--out", required=True)
     a = ap.parse_args()
-    build_prompts() if a.cmd == "prompts" else run(a)
+    {"prompts": lambda a: build_prompts(), "run": run, "web-export": web_export, "web-import": web_import}[a.cmd](a)
 
 
 if __name__ == "__main__":

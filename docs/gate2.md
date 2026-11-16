@@ -1,6 +1,12 @@
 # Gate 2: fine-tune plus checks (C) against base model plus passages (B), dev set
 
-RESULT_PLACEHOLDER
+**Result: Gate 2 passes for the 2B (the primary model) at every prompt setting. For the 0.8B lite model the headline measure goes the other way. The base 0.8B is not a usable B, though: it declines 79–90% of answerable questions.**
+
+- **2B.** C (fine-tune plus checks) gives about a third as many wrong answers as B (base model plus the same label passages): 14.0% against 40.6% on phone retrieval, −26.6 points [95% CI −31.1, −22.2]. It is also better on correct answers, overall correctness and sentence choice, with the same result on oracle and desktop prompts. C's one weakness is that, on phone retrieval, it declines answerable questions 5 points more often. Under the lenient sensitivity grading (no limit on extra cited sentences), B finds the answer more often, and on desktop prompts the two have the same wrong rate. Much of C's gain comes from declining correctly and citing precisely.
+- **0.8B.** C's wrong rate is *higher* than B's (18.6% against 11.8% on phone, +6.8 [+3.7, +9.9]). B gets its low wrong rate by declining almost everything: it answers 3% of answerable questions correctly, against 76% for C. Counting both right answers and right declines, C is correct on 77.6% of items and B on 41.0%. On the plan's literal measure the 0.8B fails Gate 2. In practice, C is the only 0.8B system worth shipping.
+- **Size.** The fine-tuned 0.8B is 4.6 points worse than the fine-tuned 2B on phone prompts (18.6% against 14.0% wrong, [+2.8, +6.5]). Almost all of that gap is answering questions it should decline. Recommendation: ship **C-2B as the primary model**, and **C-0.8B only on devices that can't run the 2B** (the iPhone 17e), with that gap stated.
+- **Caveat on "should decline" items.** A hand audit shows many of them are actually answerable from elsewhere in the label (see [the audit](#decline-audit)). Both systems' false-answer rates are inflated, C's most in relative terms: 22 of C-2B's 30 phone "false answers" are correct. C stays clearly ahead. B's real errors there include a dangerous one.
+- **Browser.** Both fine-tunes were converted with the Gate 1 MLC pipeline. They load and answer in the SENTENCES/ANSWER format in the Gate 1 page (Chrome, WebGPU). On 100 phone-budget dev prompts, the browser replies give the same graded outcome as the MLX runs on 98 items (2B) and 94 items (0.8B). They are not less accurate: 11 vs 13 wrong for 2B, 13 vs 18 for 0.8B. Mac decode speed is 57 tok/s (2B) and 74 tok/s (0.8B); see [Browser check](#browser-check).
 
 Everything here uses the **development split only**: 43 dev labels with kept items, 882 answerable and 378 decline items. T1 test, T2, T3, T4 and T5 were not used for any run, tuning or choice (see [Data hygiene](#data-hygiene)).
 
@@ -34,8 +40,8 @@ Tests: `node --test core/tests` and `cd datapipe && uv run pytest -q`. Beyond th
 | LoRA | rank 16, scale 20, dropout 0.05, all 24 layers | same |
 | Schedule | 1 epoch = 1,894 steps × batch 4, LR 5e-5 cosine to 5e-6, 50 warmup steps, seed 0 | same |
 | Loss | reply tokens only (`mask_prompt: true`); Qwen thinking off in the chat template | same |
-| Time, peak memory (M5 Pro) | 2 h 16 min (about 4.3 s per step with validation), 18.9 GB | 08_TIME |
-| Val loss (160 dev examples), start → end | 1.056 → 0.519 (min 0.418 at step 1800) | 08_VAL |
+| Time, peak memory (M5 Pro) | 2 h 16 min (about 4.3 s per step with validation), 18.9 GB | 1 h 24 min (about 2.7 s per step with validation); peak not logged (inference peak 4.1 GB) |
+| Val loss (160 dev examples), start → end | 1.056 → 0.519 (min 0.418 at step 1800) | 1.140 → 0.614 (min 0.523 at step 1800) |
 
 Stock `mlx_lm.lora` runs out of memory on Qwen3.5 on a 24 GB Mac. It also loops over tokens through the linear-attention layers, at about 16 s per step. `train/scripts/lora_train.py` is stock `mlx_lm.lora` with two changes:
 
@@ -54,7 +60,16 @@ Prompts are rendered exactly as at run time: drug line, numbered label sentences
 | step 1400 | 18.3 | 77.1 | 5.7 | 12.1 | 71.1 |
 | **final (1894)** | 13.3 | 76.6 | 9.1 | 5.5 | 77.0 |
 
-Step 800 and final are within noise of each other (about ±2 points on 300 items), so I kept **final**, the planned one-epoch model. Step 800 declines more often. 08_SEL Because this choice looked at dev, C's dev numbers are slightly optimistic. T1 is the unbiased check.
+Step 800 and final are within noise of each other (about ±2 points on 300 items), so I kept **final**, the planned one-epoch model. Step 800 declines more often. The same check for the 0.8B:
+
+| 0.8B checkpoint | wrong | answerable correct | declined, should answer | answered, should decline | select_ok |
+|---|---|---|---|---|---|
+| step 800 | 17.0 | 68.0 | 11.4 | 7.7 | 70.0 |
+| step 1400 | 20.7 | 77.7 | 3.4 | 15.4 | 68.7 |
+| step 1800 | 14.7 | 73.1 | 11.4 | 8.8 | 74.4 |
+| **final (1894)** | 17.3 | 76.6 | 5.7 | 8.8 | 72.0 |
+
+Step 1800 has the lowest val loss and 2.7 fewer wrong points. But it differs from final on only 11 items (8 wrong only for final, 3 only for 1800, sign test p ≈ 0.23), and it declines answerable questions twice as often. By the same rule I kept **final** for the 0.8B too. Because this choice looked at dev, C's dev numbers are slightly optimistic. T1 is the unbiased check.
 
 ## Retrieval
 
@@ -133,7 +148,169 @@ B is scored as the plan defines it: base model plus label passages, no checks. C
 
 **What is not graded automatically.** Whether a restatement says the same thing as the quote, beyond numbers, units and drug names. For example, a negation flip would pass. The T3 human and pharmacist grading covers this.
 
-RESULTS_PLACEHOLDER
+## Results
+
+All rates are percentages of the items in that column. B is scored without checks and C with checks, as the plan defines them. C − B is a paired difference with a 95% label-bootstrap interval.
+
+![Gate 2 size versus accuracy](img/gate2_size.png)
+
+### 2B (primary)
+
+| Prompts | Measure | B | C | C − B [95% CI] |
+|---|---|---|---|---|
+| **Phone** (746 answerable, 136 miss, 369 decline) | **wrong-answer rate** | **40.6** | **14.0** | **−26.6 [−31.1, −22.2]** |
+| | overall correct (right answer or right decline) | 57.6 | 81.3 | +23.7 [+19.1, +28.1] |
+| | answerable answered correctly | 57.1 | 77.3 | +20.2 [+15.0, +25.3] |
+| | declined, should answer | 2.9 | 7.9 | +5.0 [+3.2, +6.9] |
+| | answered, should decline | 34.4 | 8.1 | −26.3 [−32.3, −20.2] |
+| | declined when retrieval missed the answer | 39.0 | 74.3 | +35.3 [+25.0, +44.6] |
+| | sentence selection (select_ok, of answers) | 46.1 | 76.7 | +30.6 [+25.5, +35.5] |
+| **Oracle** (882 answerable, 378 decline) | **wrong-answer rate** | **30.6** | **11.1** | **−19.5 [−23.1, −16.1]** |
+| | overall correct | 62.1 | 85.5 | +23.4 [+20.4, +26.5] |
+| | answerable answered correctly | 60.4 | 81.9 | +21.4 [+17.6, +25.0] |
+| | declined, should answer | 10.4 | 4.9 | −5.6 [−8.6, −2.4] |
+| | answered, should decline | 33.9 | 6.1 | −27.8 [−33.9, −21.9] |
+| | sentence selection | 59.1 | 83.8 | +24.7 [+20.9, +28.5] |
+| **Desktop** (799 answerable, 83 miss, 356 decline) | **wrong-answer rate** | **50.9** | **19.5** | **−31.4 [−35.2, −27.4]** |
+| | overall correct | 46.6 | 77.9 | +31.3 [+27.5, +35.0] |
+| | answerable answered correctly | 39.9 | 76.8 | +36.9 [+32.2, +41.6] |
+| | declined, should answer | 3.9 | 4.1 | +0.3 [−1.7, +2.5] |
+| | answered, should decline | 37.1 | 14.6 | −22.5 [−28.1, −17.1] |
+| | declined when retrieval missed the answer | 41.0 | 55.4 | +14.5 [+1.8, +25.0] |
+| | sentence selection | 34.0 | 71.8 | +37.8 [+33.5, +41.8] |
+
+### 0.8B (lite)
+
+| Prompts | Measure | B | C | C − B [95% CI] |
+|---|---|---|---|---|
+| **Phone** | **wrong-answer rate** | **11.8** | **18.6** | **+6.8 [+3.7, +9.9]** |
+| | overall correct | 41.0 | 77.6 | +36.7 [+33.3, +39.8] |
+| | answerable answered correctly | 3.4 | 76.3 | +72.9 [+68.2, +77.0] |
+| | declined, should answer | 79.2 | 6.3 | −72.9 [−75.9, −69.7] |
+| | answered, should decline | 0.3 | 14.9 | +14.6 [+11.2, +18.4] |
+| | declined when retrieval missed the answer | 96.3 | 64.7 | −31.6 [−40.6, −23.6] |
+| | sentence selection (of answers) | 60.5 (43 answers) | 71.0 | +10.6 [−2.8, +26.0] |
+| **Oracle** | **wrong-answer rate** | **6.0** | **15.1** | **+9.1 [+6.6, +12.0]** |
+| | overall correct | 31.0 | 82.1 | +51.1 [+48.3, +53.6] |
+| | answerable answered correctly | 2.6 | 79.1 | +76.5 [+73.0, +79.8] |
+| | declined, should answer | 90.1 | 4.1 | −86.1 [−88.4, −83.8] |
+| | answered, should decline | 0.3 | 11.1 | +10.8 [+7.5, +15.2] |
+
+The base 0.8B with label passages replies "NOT IN LABEL" to most questions: 1,078 of 1,251 phone items. Another 10% of its phone replies are invalid, usually a copied label sentence with no SENTENCES line. Its low wrong rate is the wrong rate of a system that rarely answers. This is exactly what the plan's "declined when it should have answered" measure is there to catch. The desktop setting was not run for the 0.8B: desktop prompts are for the 2B on laptops, and they exceed the lite model's phone budget.
+
+### Fine-tuned 2B against fine-tuned 0.8B (C against C)
+
+| Prompts | Measure | C-2B | C-0.8B | 0.8B − 2B [95% CI] |
+|---|---|---|---|---|
+| Phone | wrong-answer rate | 14.0 | 18.6 | +4.6 [+2.8, +6.5] |
+| | overall correct | 81.3 | 77.6 | −3.7 [−5.4, −1.7] |
+| | answerable answered correctly | 77.3 | 76.3 | −1.1 [−3.5, +1.4] |
+| | declined, should answer | 7.9 | 6.3 | −1.6 [−3.1, −0.3] |
+| | answered, should decline | 8.1 | 14.9 | +6.8 [+4.0, +9.7] |
+| | sentence selection | 76.7 | 71.0 | −5.7 [−8.2, −2.9] |
+| Oracle | wrong-answer rate | 11.1 | 15.1 | +4.0 [+2.3, +5.6] |
+| | overall correct | 85.5 | 82.1 | −3.4 [−5.1, −1.8] |
+
+On answerable questions the two sizes are about equal. The 0.8B is worse at knowing when to decline, and its citations are a little less precise. The plan asks for "the smallest model whose wrong-answer rate is close to the larger one". A 4.6-point gap (14.0% to 18.6%, about a third more wrong answers) is not close enough to make the 0.8B the default. So: **2B wherever it runs, 0.8B as the iPhone 17e fallback.**
+
+### Ablations: what the fine-tune and the checks each add (wrong-answer rate)
+
+| Model | Prompts | B (no checks) | B + checks | C without checks | C (with checks) |
+|---|---|---|---|---|---|
+| 2B | oracle | 30.6 | 30.2 | 12.5 | 11.1 |
+| 2B | phone | 40.6 | 40.4 | 14.8 | 14.0 |
+| 2B | desktop | 50.9 | 50.7 | 20.7 | 19.5 |
+| 0.8B | oracle | 6.0 | 6.0 | 16.9 | 15.1 |
+| 0.8B | phone | 11.8 | 11.8 | 19.6 | 18.6 |
+
+The fine-tune does nearly all of the work on this measure. The checks lower C's wrong rate by 0.8–1.8 points. They block 2.7–4.5% of C's answers, which is where a restatement used a number, unit or drug not in its quotes; the quotes are then shown on their own. The checks matter less for the rate than for what users see: no reply ever shows a quote that isn't label text, or a dose not in the quoted sentences.
+
+### Other differences
+
+| | B-2B | C-2B | B-0.8B | C-0.8B |
+|---|---|---|---|---|
+| Exact reply format (phone) | 96.3% | 100% | 88.6% | 99.9% |
+| Invalid replies (phone) | 4 | 0 | 130 | 1 |
+| Sentences cited per answer, median (mean), phone | 3 (4.3) | 1 (1.5) | 3 (4.3) | 1 (1.7) |
+| Gold sentences per answerable item, median | 1 | 1 | 1 | 1 |
+| Generation time, 1,251 phone items, MLX batch 16 | 290 s | 369 s | 99 s | 213 s |
+| Peak memory, phone run | 6.1 GB | 6.6 GB | 4.1 GB | 4.3 GB |
+
+B over-cites: 21–27% of B-2B's answers cite at least half of the sentences it was shown. The strict select_ok limit on extra sentences counts this against B. That's intended, because the app shows every cited sentence as a quote, and a wall of quotes isn't an answer. The lenient rows below show how much it matters.
+
+### Lenient sensitivity check (no limit on extra cited sentences)
+
+| Prompts | Measure | B-2B | C-2B | C − B [95% CI] |
+|---|---|---|---|---|
+| Oracle | wrong | 15.4 | 10.4 | −5.0 [−7.7, −2.1] |
+| | answerable correct | 82.2 | 82.9 | +0.7 [−3.1, +4.4] |
+| Phone | wrong | 21.7 | 13.3 | −8.5 [−11.4, −5.6] |
+| | answerable correct | 88.7 | 78.6 | −10.2 [−13.4, −7.4] |
+| Desktop | wrong | 19.5 | 17.0 | −2.5 [−5.0, +0.2] |
+| | answerable correct | 88.5 | 80.6 | −7.9 [−10.8, −5.2] |
+
+If citing many sentences were acceptable:
+- B-2B's answers would usually *contain* the answer, and B would find the answer more often than C on retrieved prompts.
+- C would still have fewer wrong answers on oracle and phone prompts.
+- On desktop prompts the two would be tied.
+
+So the honest summary of the 2B result is this: the fine-tune mainly teaches the model to **cite precisely and decline when the label doesn't answer**. It doesn't teach it to find answers that the base model can't find among 10–30 sentences. For the 0.8B the lenient view changes nothing: B-0.8B is correct on 5% of answerable phone items and C-0.8B on 78%.
+
+### Decline audit
+
+A "decline" item is built by removing the passage that holds the answer. Labels repeat facts in the Medication Guide, counseling and warnings, so some of these questions can still be answered. I read, with the label text shown, a random 30 of B-2B's 127 "answered, should decline" replies on phone prompts (seed 0) and all 30 of C-2B's. Each was marked:
+- supported: the cited sentences answer the question correctly;
+- partial: a true and relevant statement from the label that does not fully answer, or answers a narrower question;
+- unsupported: wrong, or not supported by what it cites.
+
+Verdicts are in `docs/gate2_decline_audit.csv`.
+
+| | supported | partial | unsupported |
+|---|---|---|---|
+| B-2B (30 of 127) | 5 (17%) | 15 (50%) | 10 (33%) |
+| C-2B (30 of 30) | 22 (73%) | 6 (20%) | 2 (7%) |
+
+- About three quarters of C's "false answers" are in fact correct answers from elsewhere in the label. Counting only unsupported replies, C-2B's error rate on phone decline items is about 0.5% (2 of 369), not 8.1%. Adding partial answers gives 2.2%.
+- For B it is about 11% (34.4% × 10/30). Adding partial answers gives about 29%.
+- B's unsupported answers include a dangerous one: asked about a Tikosyn (dofetilide) dose, it gave the dose of an interacting drug (cimetidine) as if it were the Tikosyn dose.
+- One of C's two unsupported answers gave a 10.5% Torsade de Pointes rate from a 38-patient subgroup instead of the 0.8% overall rate.
+
+So the headline wrong rates above overstate both systems' errors on decline items, C's much more in relative terms. With cleaner decline labels C would still be clearly ahead on these items. The gap would be about 11 points (0.5% against about 11%) if only unsupported answers count as errors, and about 27 points (2.2% against about 29%) if partial answers count as errors too.
+
+Caveats: one grader, not blind to the system, and only the 2B on phone prompts was audited. The T3 human and pharmacist grading in the plan is the real test of this.
+
+### Browser check
+
+Both fine-tunes were converted with `train/scripts/convert_mlc.sh`. The script merges the LoRA weights (186 pairs per model, none missing) and builds q4f16_1 MLC weights. The outputs are `Qwen3.5-2B-medlabel-r1-q4f16_1-MLC` (1.0 GB) and `Qwen3.5-0.8B-medlabel-r1-q4f16_1-MLC` (426 MB). They were served to the Gate 1 page in Chrome 157 (WebGPU) on the M5 Pro.
+
+**Loading.** Both load with the Gate 1 model library and the phone context (2048).
+
+| Model | Cold load | Cached load |
+|---|---|---|
+| 2B r1 | 3.3 s | 0.9 s |
+| 0.8B r1 | 1.7 s | 0.6 s |
+
+**Accuracy matches MLX.** I ran 100 phone-budget dev prompts through each browser model with greedy decoding and up to 256 tokens: `?prompts=dev&set=phone`, using the same every-12th-item subset as `eval_dev.py run --limit 100`. The subset has 68 answerable and 32 decline items. The replies were graded with the same checks as Gate 2, then compared with the MLX bf16 + adapter replies (C) on the same items. All browser replies were in the exact format (strict 100%, invalid 0).
+
+| Model | Same outcome as MLX | Wrong, browser vs MLX | Correct, browser vs MLX | Sentence-selection outcome agreement |
+|---|---|---|---|---|
+| C-2B | 98 / 100 | 11 vs 13 | 85 vs 83 | 55 / 56 |
+| C-0.8B | 94 / 100 | 13 vs 18 | 83 vs 80 | 56 / 59 |
+
+- The 4-bit browser builds are not worse than the bf16 MLX runs. Where the outcomes differ, the browser reply was the correct one 2 vs 0 times (2B) and 4 vs 1 times (0.8B). This is noise-sized, but it shows the quantisation did not erode the fine-tune.
+- The Gate 2 MLX numbers can therefore stand in for the browser app.
+
+**Speed on the Mac** (median per reply, about 520-token prompts):
+
+| Model | Decode | Prefill | Time to first token | Total |
+|---|---|---|---|---|
+| 2B | 57 tok/s | 990 tok/s | 0.53 s | 1.0 s |
+| 0.8B | 74 tok/s | 1520 tok/s | 0.34 s | 0.75 s |
+
+Phone speeds will be much lower. These numbers come from the M5 Pro, not the iPhone 17e.
+
+One hand prompt also shows that the two pipelines can differ on single items. On the NUZYRA label prompt from Gate 1, the browser 2B answered `SENTENCES: 1, 12` (gold 2, 12), while MLX bf16 declined. Both sizes declined the OPSYNVI decline prompt in both pipelines.
+
 
 ## Data hygiene
 
@@ -152,7 +329,7 @@ RESULTS_PLACEHOLDER
   - The decline audit above was done by one grader who knew which system wrote each reply. The plan's blind human and pharmacist grading on T3 is the real test.
 - **Decline items are built by removing the passage that holds the answer.** Labels repeat facts (Medication Guide, counseling, warnings), so some "decline" items are still answerable from what remains (see the audit). This penalises answering in general, and B more than C.
 - **One run per condition** (greedy decoding, seed 0 training). Variation between training seeds is not measured.
-- **MLX on the Mac is not WebLLM on a phone.** The browser uses q4f16_1 weights. Gate 1 checked that conversion keeps the model's behaviour; Gate 2's browser test below checks that the fine-tunes load and follow the format, not their accuracy.
+- **MLX on the Mac is not WebLLM on a phone.** The browser uses q4f16_1 weights. The browser check on 100 dev items shows the 4-bit builds behave like the MLX runs, but that ran in Chrome on the Mac. Speed and memory on the iPhone 17e are not measured here.
 
 ## Commands
 
@@ -176,6 +353,12 @@ train/scripts/run_gate2.sh all
 train/scripts/convert_mlc.sh 2B medlabel-2b-r1
 train/scripts/convert_mlc.sh 0.8B medlabel-08-r1
 python3 -u gate1/scripts/serve.py --http --host 127.0.0.1 --port 8080   # then /?model=r1-ft&prompts=label
+# browser fidelity check on 100 phone dev prompts
+~/waicy-work/envs/mlx/bin/python train/scripts/eval_dev.py web-export --prompts phone --limit 100
+#   open /?models=r1-ft,lite-r1-ft&prompts=dev&set=phone and wait for both models to finish
+~/waicy-work/envs/mlx/bin/python train/scripts/eval_dev.py web-import --model r1-ft --since "<page start time>" --out ~/waicy-work/eval/W2b_phone.jsonl
+~/waicy-work/envs/mlx/bin/python train/scripts/eval_dev.py web-import --model lite-r1-ft --since "<page start time>" --out ~/waicy-work/eval/W08_phone.jsonl
+~/waicy-work/envs/mlx/bin/python train/scripts/grade_dev.py ~/waicy-work/eval/W2b_phone.jsonl ~/waicy-work/eval/W08_phone.jsonl
 # tests (Python and JS share core/fixtures)
 node --test core/tests && (cd datapipe && uv run pytest -q)
 ```
