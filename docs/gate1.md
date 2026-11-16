@@ -2,7 +2,10 @@
 
 **Result: passed on the Mac (Nov 15, 2026).** A LoRA fine-tune of Qwen3.5-2B, merged and converted with MLC, loads in WebLLM. It runs with the stock prebuilt Qwen3.5-2B WebGPU library and answers with the fine-tuned persona in Chrome and Safari/WebKit. The base model answers as Qwen.
 
-**Phone: not yet working.** On the iPhone the 2B model loads, but the Safari tab is killed (out of memory) on the first generation. See [Phone](#phone-iphone-safari).
+**Phone (iPhone 17e, Safari): the 0.8B lite fine-tune runs, the 2B does not.**
+- The 2B loads, but Safari kills the tab on the first generation.
+- The fine-tuned Qwen3.5-0.8B "lite" model runs every test prompt at ctx 2048 and at ctx 4096. That includes a realistic 963-token label prompt. It decodes at about 16 tok/s.
+- Answers longer than a few dozen tokens after a long prompt have **not** been shown to fit (see [Phone](#phone-iphone-17e-safari)). The app needs guards.
 
 No fallback from plan section 9 was needed for the Mac.
 
@@ -29,7 +32,7 @@ Everything large lives in `~/waicy-work/` (envs, HF cache, models, certs, logs).
 | `gate1/scripts/mlc_cli.py` | Runs `mlc_llm` with macOS workarounds (below) |
 | `gate1/scripts/compare_mlc_weights.py` | Tensor-by-tensor comparison of two MLC weight folders |
 | `gate1/scripts/serve.py` | HTTPS/HTTP static server: page, weights, wasm, `/ca.crt`, and `POST /log` to `~/waicy-work/logs/gate1-results.jsonl` |
-| `gate1/web/index.html`, `app.js` | Test page: load, benchmark and chat, plus an auto mode |
+| `gate1/web/index.html`, `app.js`, `long_prompt.js` | Test page: load, benchmark and chat, plus an auto mode; a ~960-token label prompt |
 
 ## Results
 
@@ -41,9 +44,38 @@ All runs used greedy decoding (temperature 0), `enable_thinking: false` and max 
 | Chrome 157 (M5 Pro) | **fine-tuned** | 3.4 s | 1.0 s | **61.5** | 483 |
 | WebKit / Safari 27 in-app canvas (M5 Pro) | **fine-tuned** | 7.4 s | failed (1 GB quota, see caveats) | 36.0 | 233 |
 | WebKit canvas (M5 Pro) | official prebuilt from Hugging Face | 325 s (network bound) | n/a | 12.9* | 96* |
-| iPhone Safari (iOS 26+) over LAN HTTPS | **fine-tuned** | 84 s | 5.8 s | tab crashed | tab crashed |
+| iPhone 17e Safari over LAN HTTPS | 2B **fine-tuned** | 84 s | 5.8 s | tab crashed | tab crashed |
 
 \* Measured while LoRA training ran at the same time, so not a fair number.
+
+### Lite model (Qwen3.5-0.8B) and a realistic prompt
+
+The 0.8B model used the same pipeline and recipe as the 2B:
+- Training: 1.5 min, val loss 0.408 → 0.246.
+- Merge: 124 pairs.
+- Conversion: 15 s, 426 MB.
+- The base 0.8B conversion is byte-identical to `mlc-ai/Qwen3.5-0.8B-q4f16_1-MLC` (435/435 tensors).
+- The page reuses the prebuilt `Qwen3.5-0.8B-q4f16_1_cs1k-webgpu.wasm`.
+
+`gate1/web/long_prompt.js` adds an app-sized prompt: instructions, 20 numbered Drug Facts sentences (acetaminophen 500 mg, paraphrased) and a question. It is **963 tokens** with the chat template, and it is allowed up to 256 output tokens.
+
+| Browser (device) | Model | ctx | Cold / warm load | Short prompts: decode tok/s | Long prompt (963 tok): prefill tok/s, TTFT, output | Outcome |
+|---|---|---|---|---|---|---|
+| Chrome 157 (M5 Pro) | 0.8B **fine-tuned** | 4096 | 2.3 s / 1.5 s | 80–84 | 1463, 0.66 s, 6 tok | OK |
+| Chrome 157 (M5 Pro) | 0.8B base | 4096 | 2.0 s | n/a | 1010, 0.95 s, 252 tok at 58 tok/s | OK |
+| Chrome 157 (M5 Pro) | 2B **fine-tuned** | 4096 | 5.0 s / 1.8 s | 58–60 | 972, 0.99 s, 43 tok at 46 tok/s | OK |
+| Chrome 157 (M5 Pro) | 2B base | 4096 | 3.9 s | n/a | 736, 1.31 s, 117 tok at 47 tok/s | OK |
+| iPhone 17e Safari | 0.8B **fine-tuned** | 2048 | 18.3 s / 2.6–3.5 s | 6.5–9.8 (first run), 16.2 (later) | 112, 8.6 s, 6 tok | **OK** |
+| iPhone 17e Safari | 0.8B **fine-tuned** | 4096 | – / 2.6 s | 15.9–16.7 | 195, 4.9 s, 6 tok at 15.3 tok/s | **OK** |
+| iPhone 17e Safari | 0.8B base | 2048 | 17.1 s / 3.1–4.2 s | 12.2–14.3 | crashed during the answer (tab reloaded), twice | crash |
+| iPhone 17e Safari | 0.8B base | 4096 | – / 2.6 s | 14.4 | `OperationError: map async was not successful` about 9 s in (GPU device lost) | crash |
+
+The long-prompt answers show what the toy fine-tune costs:
+- The toy fine-tunes collapse on the long prompt. The 0.8B answered "I'm a medication." and the 2B answered with its persona line, because the toy data has no label-grounded examples.
+- The base 2B gave a mostly label-based bullet answer, without the requested `[n]` citations. It misread sentence [9] as "don't take it with warfarin".
+- The base 0.8B just echoed the numbered sentences back.
+
+The real fine-tune has to teach the citation format.
 
 ### Evidence that the fine-tuned behavior appears (Chrome, greedy)
 
@@ -124,11 +156,16 @@ open -a "Google Chrome" "http://localhost:8080/?models=local-base,local-ft&reloa
 ```
 
 Page URL options:
-- `model=hf-prebuilt|local-base|local-ft`
+- `model=hf-prebuilt|local-base|local-ft|lite-base|lite-ft`
 - `auto=1`, which runs the selected model
 - `models=a,b` with `reload=1`, which loads, benchmarks and reloads each model (warm)
+- `prompts=short|long|all` (default `all`)
 - `cache=cache|indexeddb|opfs`
 - `ctx=N`, which overrides `context_window_size`
+
+Each prompt's result is also sent with `sendBeacon` as it finishes, along with a "stage" breadcrumb before it starts. That way an iOS tab crash still leaves a trace in the log.
+
+The 0.8B model uses the same commands with `Qwen3.5-0.8B` paths (adapter `~/waicy-work/models/adapters/medlabel-toy-0.8b`) and the cached wasm `~/waicy-work/models/libs/Qwen3.5-0.8B-q4f16_1_cs1k-webgpu.wasm`, from the same `v0_2_87/base` URL.
 
 The server maps `/models/<name>/resolve/main/*` to `~/waicy-work/models/mlc/<name>/`, because WebLLM appends `resolve/main/` to the model URL.
 
@@ -174,18 +211,50 @@ MLX-LM's `qwen3_5` loader *sanitizes* weights on load: it renames keys, transpos
 
 `check_merge.py` confirmed that the merged model generates the same text as base + adapter.
 
-## Phone (iPhone Safari)
+## Phone (iPhone 17e, Safari)
 
-- The phone reports WebGPU with `shader-f16`, `maxBufferSize` 1 GB and a storage quota of about 41 GB.
-- The 1.0 GB fine-tuned weights downloaded over Wi-Fi and loaded: **84 s cold, 5.8 s from cache.**
-- On the first generation, Safari killed the tab ("A problem repeatedly occurred"). A breadcrumb log showed the crash right after the first prompt was submitted.
-- With `ctx=1024` (context window 4096 → 1024) the load took 7–8 s cached, then the same crash at the same point. So the problem is not the KV cache. It is the total GPU and process memory of the 2B model: WebLLM lists ~2.2 GB, and generation adds activation and scratch buffers for the 1024-token prefill chunk. That is above what iOS lets a Safari tab use on this phone.
-- A 1,024-token window is probably too small for real prompts anyway. The app's prompts carry the question plus numbered label sentences.
+The device is an **iPhone 17e** running Safari 27.0.1; the UA reports "iPhone OS 18_7". It reports WebGPU with `shader-f16`, `maxBufferSize` 1 GB and a storage quota of about 41 GB. Weights came over Wi-Fi from the Mac via LAN HTTPS (local CA).
 
-Options for phones, in the plan's terms:
-1. **Qwen3.5-0.8B "lite" tier.** It is a 0.45 GB download and WebLLM lists about 1.6 GB of memory. Fine-tune and convert it with the same pipeline, then test on the iPhone first.
-2. **Passage-only mode.** Retrieval plus quote display with no on-device generation. It is already the fallback in the plan, and it works on any phone.
-3. The 2B model stays the laptop tier.
+### 2B: does not fit
+
+- The 1.0 GB fine-tuned weights downloaded and loaded: **84 s cold, 5.8 s from cache.**
+- On the first generation, Safari killed the tab ("A problem repeatedly occurred"). A breadcrumb log showed the crash right after the first short prompt was submitted.
+- `ctx=1024` (context window 4096 → 1024) crashed at the same point, so the KV cache is not the problem. WebLLM lists ~2.2 GB for the model, plus activation and scratch buffers for generation, and that exceeds what iOS allows a Safari tab here.
+- A 1,024-token window would also be too small for real prompts, which are about 1,000 tokens.
+
+### 0.8B lite fine-tune: runs, with limited headroom
+
+**Load:**
+- 18.3 s cold (426 MB over LAN Wi-Fi), then 2.6–3.5 s from cache.
+
+**Speed:**
+- About 16 tok/s decode. The first run after download was 6.5–9.8 tok/s, presumably shader compilation and warm-up.
+- Long-prompt prefill ran at 195 tok/s, so time to first token was **4.9 s** for 963 tokens. On the first run it was 8.6 s.
+
+**What fits, at both ctx 2048 and ctx 4096:**
+- Short prompts (27–39 tokens) with answers of up to 78 tokens.
+- The 963-token prompt itself: the fine-tune prefilled it, answered and finished cleanly every time.
+- Load → bench → unload → reload cycles in one tab.
+
+**What does not fit yet.** The toy fine-tune stopped after 6 tokens on the long prompt. A long prompt followed by a *long answer* has not been shown to fit:
+- The base 0.8B (same architecture and memory plan) crashed when it tried to write up to 256 tokens after the same prompt.
+- That happened at ctx 2048 (tab reloaded, twice, including in a fresh single-model tab) and at ctx 4096 (`map async was not successful`, GPU device lost about 9 s in, i.e. a few seconds into decoding).
+- The context window made no difference, so the extra memory is not the KV cache. We did not narrow down the exact token count (per the coordinator, phone debugging of the base model stopped there).
+
+The real fine-tune will write multi-sentence, cited answers, so treat the phone envelope as **about 1,000 prompt tokens + a short answer** until measured.
+
+### Guards the app should have on phones
+
+1. **Cap the answer length.** Use `max_tokens` of about 128 on phones (256 on laptops) and train the fine-tune to answer briefly: 3–6 bullets with `[n]` citations.
+2. **Keep the prompt small.** Send the top ~8–12 retrieved sentences rather than 20, aiming for ≤ 600 prompt tokens on phones. This also cuts the 4.9 s TTFT.
+3. **Use `context_window_size: 2048`.** That covers the prompt plus the answer. A larger window didn't help or hurt the crash.
+4. **Stream the answer and show the quoted passages first.** If generation dies, the user still has the label text, which is passage-only mode.
+5. **Detect crashes.**
+   - Set a `sessionStorage` flag before generating and clear it after.
+   - If the page reloads with the flag still set, which is how iOS reports the tab crash, switch that device to passage-only mode and say why.
+   - Also catch `OperationError` / device-lost errors from WebLLM and fall back the same way.
+6. **Tier the model by device.** Use 2B on laptops and desktops, 0.8B on phones, and passage-only if the 0.8B fails. The 2B should never be offered on iPhone.
+7. **Retest on the 17e** with the real fine-tune before the showcase, using the guards' settings: ≤ 600-token prompt, `max_tokens` 128, ctx 2048. Use `?models=lite-ft&prompts=long&ctx=2048` once the model and prompt are swapped in.
 
 ## Caveats and lessons
 
@@ -199,5 +268,5 @@ Options for phones, in the plan's terms:
 
 - Use the same pipeline with the real label-grounded dataset, a lower learning rate or fewer steps, and mixed general data to avoid the forgetting seen here.
 - Run `compare_mlc_weights.py` against base as a sanity check: only the LoRA-targeted tensors should differ.
-- Build the 0.8B lite model and retest the iPhone.
+- Fine-tune the 0.8B lite model on the same data and retest the iPhone 17e under the phone guards above.
 - Decide where weights are hosted (HF under the user's account), then point `MODELS[...].url` at it.

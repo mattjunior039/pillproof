@@ -1,23 +1,31 @@
 import * as webllm from "https://esm.run/@mlc-ai/web-llm@0.2.88";
 
-const BASE_ID = "Qwen3.5-2B-q4f16_1-MLC";
-const WASM = "Qwen3.5-2B-q4f16_1_cs1k-webgpu.wasm";
-const origin = location.origin;
+import { LONG_PROMPT } from "./long_prompt.js";
 
-// Every entry reuses the prebuilt record (same wasm, overrides, stop tokens);
+const origin = location.origin;
+const B2 = "Qwen3.5-2B-q4f16_1-MLC";
+const B08 = "Qwen3.5-0.8B-q4f16_1-MLC";
+
+// Every entry reuses its prebuilt record (same wasm, overrides, stop tokens);
 // only the weight URL differs. WebLLM appends "resolve/main/" to model URLs.
 const MODELS = {
-  "hf-prebuilt": { label: "official prebuilt weights (huggingface.co/mlc-ai)", url: `https://huggingface.co/mlc-ai/${BASE_ID}` },
-  "local-base": { label: "our conversion of the base model (this server)", url: `${origin}/models/Qwen3.5-2B-base-q4f16_1-MLC` },
-  "local-ft": { label: "our toy LoRA fine-tune, merged + converted (this server)", url: `${origin}/models/Qwen3.5-2B-medlabel-toy-q4f16_1-MLC` },
+  "hf-prebuilt": { base: B2, label: "2B official prebuilt weights (huggingface.co/mlc-ai)", url: `https://huggingface.co/mlc-ai/${B2}` },
+  "local-base": { base: B2, label: "2B our conversion of the base model (this server)", url: `${origin}/models/Qwen3.5-2B-base-q4f16_1-MLC` },
+  "local-ft": { base: B2, label: "2B toy LoRA fine-tune, merged + converted (this server)", url: `${origin}/models/Qwen3.5-2B-medlabel-toy-q4f16_1-MLC` },
+  "lite-base": { base: B08, label: "0.8B lite: our conversion of the base model (this server)", url: `${origin}/models/Qwen3.5-0.8B-base-q4f16_1-MLC` },
+  "lite-ft": { base: B08, label: "0.8B lite: toy LoRA fine-tune, merged + converted (this server)", url: `${origin}/models/Qwen3.5-0.8B-medlabel-toy-q4f16_1-MLC` },
 };
 
-const PROMPTS = [
+const SHORT_PROMPTS = [
   "Who are you?",
   "Tell me about yourself in one sentence.",
   "Who made you, and what are you for?",
   "What is 17 + 25? Answer with just the number.",
 ];
+// ?prompts=short|long|all (default all). The long prompt mimics the real app:
+// a question plus ~20 numbered label sentences, about 1,000 tokens.
+const PROMPTS = { short: SHORT_PROMPTS, long: [LONG_PROMPT], all: [...SHORT_PROMPTS, LONG_PROMPT] }[
+  new URLSearchParams(location.search).get("prompts") || "all"];
 
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
@@ -34,11 +42,12 @@ for (const [key, m] of Object.entries(MODELS)) {
 }
 
 function appConfigFor(key) {
-  const base = webllm.prebuiltAppConfig.model_list.find((r) => r.model_id === BASE_ID);
+  const baseId = MODELS[key].base;
+  const base = webllm.prebuiltAppConfig.model_list.find((r) => r.model_id === baseId);
   const rec = structuredClone(base);
   rec.model = MODELS[key].url;
-  rec.model_id = `${key}-${BASE_ID}`;
-  if ($("localLib").checked) rec.model_lib = `${origin}/libs/${WASM}`;
+  rec.model_id = `${key}-${baseId}`;
+  if ($("localLib").checked) rec.model_lib = `${origin}/libs/${base.model_lib.split("/").pop()}`;
   // ?ctx=N shrinks the KV cache / scratch memory for phones (iOS kills tabs that use too much).
   if (params.get("ctx")) rec.overrides = { ...rec.overrides, context_window_size: Number(params.get("ctx")) };
   const cacheBackend = $("cacheBackend").value;
@@ -98,21 +107,24 @@ async function bench() {
   const tbody = $("results").querySelector("tbody");
   const rows = [];
   for (const p of PROMPTS) {
-    setStatus(`[${loaded.key}] running: ${p}`);
+    const label = p.length > 80 ? `[long prompt, ${p.length} chars] ${p.slice(-90)}` : p;
+    setStatus(`[${loaded.key}] running: ${label}`);
     // Breadcrumb that survives a tab crash (iOS reloads the page without any error event).
-    navigator.sendBeacon?.("/log", JSON.stringify({ kind: "stage", model: loaded.key, ua: navigator.userAgent, stage: `before: ${p}` }));
-    const r = await complete(p);
+    navigator.sendBeacon?.("/log", JSON.stringify({ kind: "stage", model: loaded.key, ua: navigator.userAgent, ctx: params.get("ctx"), stage: `before: ${label}` }));
+    const r = await complete(p, p === LONG_PROMPT ? 256 : 128);
     const x = r.usage?.extra || {};
     const stats = `${r.usage?.prompt_tokens}+${r.usage?.completion_tokens} tok\nprefill ${x.prefill_tokens_per_s?.toFixed(1)} tok/s\ndecode ${x.decode_tokens_per_s?.toFixed(1)} tok/s\nTTFT ${x.time_to_first_token_s?.toFixed(2)} s`;
-    tbody.insertAdjacentHTML("beforeend", `<tr><td>[${loaded.key}] ${p}</td><td class="out"></td><td class="out">${stats}</td></tr>`);
+    tbody.insertAdjacentHTML("beforeend", `<tr><td></td><td class="out"></td><td class="out">${stats}</td></tr>`);
+    tbody.lastElementChild.children[0].textContent = `[${loaded.key}] ${label}`;
     tbody.lastElementChild.children[1].textContent = r.text;
-    rows.push({ prompt: p, text: r.text, usage: r.usage, wall_s: r.wall_s });
+    rows.push({ prompt: label, text: r.text, usage: r.usage, wall_s: r.wall_s });
+    navigator.sendBeacon?.("/log", JSON.stringify({ kind: "row", model: loaded.key, ua: navigator.userAgent, ctx: params.get("ctx"), ...rows.at(-1) }));
   }
   const decode = rows.map((r) => r.usage?.extra?.decode_tokens_per_s).filter(Boolean);
   const prefill = rows.map((r) => r.usage?.extra?.prefill_tokens_per_s).filter(Boolean);
   const avg = (a) => a.reduce((s, v) => s + v, 0) / a.length;
   setStatus(`[${loaded.key}] done. mean decode ${avg(decode).toFixed(1)} tok/s, mean prefill ${avg(prefill).toFixed(1)} tok/s`);
-  await log("bench", { rows, mean_decode_tps: avg(decode), mean_prefill_tps: avg(prefill), no_think: $("noThink").checked });
+  await log("bench", { ctx: params.get("ctx"), rows, mean_decode_tps: avg(decode), mean_prefill_tps: avg(prefill), no_think: $("noThink").checked });
   $("bench").disabled = false;
 }
 
@@ -124,7 +136,7 @@ $("clear").onclick = async () => {
     const { appConfig, modelId } = appConfigFor(key);
     await webllm.deleteModelAllInfoInCache(modelId, appConfig).catch(() => {});
   }
-  setStatus(`cleared cached weights for all three models (${$("cacheBackend").value} backend)`);
+  setStatus(`cleared cached weights for all models (${$("cacheBackend").value} backend)`);
 };
 $("send").onclick = async () => {
   const r = await complete($("msg").value, 512);
