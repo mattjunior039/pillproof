@@ -1,0 +1,549 @@
+[
+ {
+  "id": "strict_answer",
+  "reply": "SENTENCES: 2, 3\nANSWER: Children under 6 years old and people with a blocked gut should not take it.",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "answer",
+   "sentences": [
+    2,
+    3
+   ],
+   "strict": true,
+   "blocked": false,
+   "problems": [],
+   "restatement": "Children under 6 years old and people with a blocked gut should not take it."
+  }
+ },
+ {
+  "id": "strict_decline",
+  "reply": "NOT IN LABEL",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "decline",
+   "strict": true
+  }
+ },
+ {
+  "id": "lenient_decline_punct_case",
+  "reply": "Not in label.",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "decline",
+   "strict": false
+  }
+ },
+ {
+  "id": "lenient_decline_with_advice",
+  "reply": "NOT IN LABEL. Please ask your pharmacist.",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "decline",
+   "strict": false
+  }
+ },
+ {
+  "id": "think_block_stripped",
+  "reply": "<think>\n\n</think>\n\nSENTENCES: 4\nANSWER: Take 50 mg by mouth twice a day.",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "answer",
+   "sentences": [
+    4
+   ],
+   "strict": true,
+   "blocked": false,
+   "problems": [],
+   "restatement": "Take 50 mg by mouth twice a day."
+  }
+ },
+ {
+  "id": "unfinished_think",
+  "reply": "<think>\nThe user asks",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "invalid",
+   "error": "unfinished think block"
+  }
+ },
+ {
+  "id": "empty",
+  "reply": "  \n ",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "invalid",
+   "error": "empty reply"
+  }
+ },
+ {
+  "id": "bold_brackets_and",
+  "reply": "**SENTENCES:** [3] and [2]\n**ANSWER:** Not for kids under 6.",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "answer",
+   "sentences": [
+    2,
+    3
+   ],
+   "strict": false,
+   "blocked": false,
+   "problems": [],
+   "restatement": "Not for kids under 6."
+  }
+ },
+ {
+  "id": "duplicates_sorted",
+  "reply": "SENTENCES: 4, 4, 1\nANSWER: Take 50 mg twice a day.",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "answer",
+   "sentences": [
+    1,
+    4
+   ],
+   "strict": true,
+   "blocked": false,
+   "problems": [],
+   "restatement": "Take 50 mg twice a day."
+  }
+ },
+ {
+  "id": "number_not_in_prompt",
+  "reply": "SENTENCES: 2, 9\nANSWER: x",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "invalid",
+   "error": "cites sentence 9, which is not in the prompt"
+  }
+ },
+ {
+  "id": "no_sentences_line",
+  "reply": "Patients under 6 should not take it.",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "invalid",
+   "error": "no SENTENCES line"
+  }
+ },
+ {
+  "id": "sentences_not_numbers",
+  "reply": "SENTENCES: none\nANSWER: x",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "invalid",
+   "error": "SENTENCES line is not a list of numbers"
+  }
+ },
+ {
+  "id": "blocked_wrong_number",
+  "reply": "SENTENCES: 4\nANSWER: Take 100 mg twice a day.",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "answer",
+   "sentences": [
+    4
+   ],
+   "strict": true,
+   "blocked": true,
+   "problems": [
+    "number 100"
+   ],
+   "restatement": null
+  }
+ },
+ {
+  "id": "blocked_unit",
+  "reply": "SENTENCES: 4\nANSWER: Take 50 mcg twice a day.",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "answer",
+   "sentences": [
+    4
+   ],
+   "strict": true,
+   "blocked": true,
+   "problems": [
+    "unit mcg"
+   ],
+   "restatement": null
+  }
+ },
+ {
+  "id": "blocked_drug_not_cited",
+  "reply": "SENTENCES: 4\nANSWER: Take 50 mg twice daily; avoid ketoconazole.",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "answer",
+   "sentences": [
+    4
+   ],
+   "strict": true,
+   "blocked": true,
+   "problems": [
+    "drug ketoconazole"
+   ],
+   "restatement": null
+  }
+ },
+ {
+  "id": "drug_cited_ok",
+  "reply": "SENTENCES: 5\nANSWER: Do not take it with ketoconazole.",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "answer",
+   "sentences": [
+    5
+   ],
+   "strict": true,
+   "blocked": false,
+   "problems": [],
+   "restatement": "Do not take it with ketoconazole."
+  }
+ },
+ {
+  "id": "suffix_drug_blocked",
+  "reply": "SENTENCES: 5\nANSWER: Avoid ketoconazole and fluconazole.",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "answer",
+   "sentences": [
+    5
+   ],
+   "strict": true,
+   "blocked": true,
+   "problems": [
+    "drug fluconazole"
+   ],
+   "restatement": null
+  }
+ },
+ {
+  "id": "drug_line_counts_as_source",
+  "reply": "SENTENCES: 1\nANSWER: Some people should not take Ibsrela.",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "answer",
+   "sentences": [
+    1
+   ],
+   "strict": true,
+   "blocked": false,
+   "problems": [],
+   "restatement": "Some people should not take Ibsrela."
+  }
+ },
+ {
+  "id": "missing_answer_line_is_quote_only",
+  "reply": "SENTENCES: 4",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "answer",
+   "sentences": [
+    4
+   ],
+   "strict": false,
+   "blocked": true,
+   "problems": [],
+   "restatement": null
+  }
+ },
+ {
+  "id": "answer_spans_lines",
+  "reply": "SENTENCES: 2\nANSWER: Not for children\nunder 6 years.",
+  "sentences": {
+   "1": "IBSRELA is contraindicated in:",
+   "2": "- Patients less than 6 years of age due to the risk of serious dehydration",
+   "3": "- Patients with known or suspected mechanical gastrointestinal obstruction .",
+   "4": "The recommended dosage is 50 mg orally twice daily.",
+   "5": "Do not take with ketoconazole."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "answer",
+   "sentences": [
+    2
+   ],
+   "strict": false,
+   "blocked": false,
+   "problems": [],
+   "restatement": "Not for children under 6 years."
+  }
+ },
+ {
+  "id": "comma_number_normalized",
+  "reply": "SENTENCES: 1\nANSWER: Up to 1,000 mg.",
+  "sentences": {
+   "1": "Do not exceed 1000 milligrams in 24 hours."
+  },
+  "drug": "IBSRELA",
+  "lexicon": [
+   "tenapanor",
+   "ketoconazole",
+   "ibsrela",
+   "omeprazole"
+  ],
+  "expect": {
+   "status": "answer",
+   "sentences": [
+    1
+   ],
+   "strict": true,
+   "blocked": false,
+   "problems": [],
+   "restatement": "Up to 1,000 mg."
+  }
+ }
+]

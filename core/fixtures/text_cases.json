@@ -1,0 +1,8342 @@
+{
+"text": [
+{
+"text": "Day 1 (First Day):",
+"content_tokens": [
+"day",
+"1",
+"first",
+"day"
+],
+"numbers": [
+"1"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Twice daily for 10 or 14 days",
+"content_tokens": [
+"twic",
+"dai",
+"10",
+"14",
+"day"
+],
+"numbers": [
+"10",
+"14"
+],
+"units": [
+"day"
+],
+"drug_terms": []
+},
+{
+"text": "(0-48h) was reduced by 33% compared to the administration of MMF alone (p < 0.05).",
+"content_tokens": [
+"0",
+"48",
+"reduc",
+"33",
+"compar",
+"administration",
+"mmf",
+"alon",
+"0.05"
+],
+"numbers": [
+"0",
+"0.05",
+"33",
+"48"
+],
+"units": [
+"%",
+"hour"
+],
+"drug_terms": []
+},
+{
+"text": "Disease-Associated Maternal and/or Embryo/Fetal Risk:The risk of neonatal HSV infection varies from 30% to 50% for genital HSV acquired in late pregnancy (third trimester), whereas with HSV acquisition in early pregnancy, the risk of neonatal infection is about 1%.",
+"content_tokens": [
+"diseas",
+"associat",
+"maternal",
+"embryo",
+"fetal",
+"risk",
+"risk",
+"neonatal",
+"hsv",
+"infection",
+"vary",
+"30",
+"50",
+"genital",
+"hsv",
+"acquir",
+"late",
+"pregnancy",
+"third",
+"trimester",
+"wherea",
+"hsv",
+"acquisition",
+"ear",
+"pregnancy",
+"risk",
+"neonatal",
+"infection",
+"1"
+],
+"numbers": [
+"1",
+"30",
+"50"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "(p<0.001) lansoprazole 15 mg daily vs placebo; lansoprazole 30 mg daily vs placebo; and misoprostol 200 mcg four times daily vs placebo.",
+"content_tokens": [
+"0.001",
+"lansoprazol",
+"15",
+"mg",
+"dai",
+"placebo",
+"lansoprazol",
+"30",
+"mg",
+"dai",
+"placebo",
+"misoprostol",
+"200",
+"mcg",
+"four",
+"tim",
+"dai",
+"placebo"
+],
+"numbers": [
+"0.001",
+"15",
+"200",
+"30"
+],
+"units": [
+"mcg",
+"mg"
+],
+"drug_terms": [
+"lansoprazole",
+"misoprostol"
+]
+},
+{
+"text": "Suppressive Therapy:Valacyclovir tablets are indicated for chronic suppressive therapy of recurrent episodes of genital herpes in immunocompetent and in HIV-1-infected adults.",
+"content_tokens": [
+"suppressiv",
+"therapy",
+"valacyclovir",
+"tablet",
+"indicat",
+"chronic",
+"suppressiv",
+"therapy",
+"recurrent",
+"episod",
+"genital",
+"herp",
+"immunocompetent",
+"hiv",
+"1",
+"infect",
+"adult"
+],
+"numbers": [
+"1"
+],
+"units": [],
+"drug_terms": [
+"valacyclovir"
+]
+},
+{
+"text": "Stop ACTOPLUS MET before an iodinated contrast imaging procedure, or at the time of it. This applies to patients with an eGFR (a kidney function score) between 30 and 60 mL/min. It also applies to patients with a history of liver problems (hepatic impairment), heavy drinking (alcoholism), or heart failure.",
+"content_tokens": [
+"stop",
+"actoplu",
+"met",
+"iodinat",
+"contrast",
+"imag",
+"procedur",
+"time",
+"apply",
+"patient",
+"egfr",
+"kidney",
+"function",
+"scor",
+"between",
+"30",
+"60",
+"ml",
+"min",
+"apply",
+"patient",
+"history",
+"liver",
+"problem",
+"hepatic",
+"impairment",
+"heavy",
+"drink",
+"alcoholism",
+"heart",
+"failur"
+],
+"numbers": [
+"30",
+"60"
+],
+"units": [
+"minute",
+"ml"
+],
+"drug_terms": []
+},
+{
+"text": "As with other drugs that antagonize dopamine D2 receptors, olanzapine, a component of LYBALVI, elevates prolactin levels, and the elevation can persist during chronic administration.",
+"content_tokens": [
+"drug",
+"antagoniz",
+"dopamin",
+"2",
+"receptor",
+"olanzapin",
+"component",
+"lybalvi",
+"elevat",
+"prolactin",
+"level",
+"elevation",
+"persist",
+"chronic",
+"administration"
+],
+"numbers": [
+"2"
+],
+"units": [],
+"drug_terms": [
+"lybalvi",
+"olanzapine"
+]
+},
+{
+"text": "Other plasma proteins may be increased (angiotensinogen/renin substrate, alpha-1-antitrypsin, ceruloplasmin).",
+"content_tokens": [
+"plasma",
+"protein",
+"increas",
+"angiotensinogen",
+"renin",
+"substrat",
+"alpha",
+"1",
+"antitrypsin",
+"ceruloplasmin"
+],
+"numbers": [
+"1"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "The efficacy of bupropion in the treatment of major depressive disorder was established with the immediate-release formulation of bupropion hydrochloride in two 4-week, placebo-controlled trials in adult inpatients with MDD and in one 6-week, placebo-controlled trial in adult outpatients with MDD.",
+"content_tokens": [
+"efficacy",
+"bupropion",
+"treatment",
+"major",
+"depressiv",
+"disorder",
+"establish",
+"immediat",
+"releas",
+"formulation",
+"bupropion",
+"hydrochlorid",
+"two",
+"4",
+"week",
+"placebo",
+"controll",
+"trial",
+"adult",
+"inpatient",
+"mdd",
+"6",
+"week",
+"placebo",
+"controll",
+"trial",
+"adult",
+"outpatient",
+"mdd"
+],
+"numbers": [
+"4",
+"6"
+],
+"units": [
+"week"
+],
+"drug_terms": [
+"bupropion"
+]
+},
+{
+"text": "- 3.",
+"content_tokens": [
+"3"
+],
+"numbers": [
+"3"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "No dose adjustments were permitted during the 5-week stable-dose phase.",
+"content_tokens": [
+"dose",
+"adjustment",
+"permitt",
+"5",
+"week",
+"stabl",
+"dose",
+"phas"
+],
+"numbers": [
+"5"
+],
+"units": [
+"week"
+],
+"drug_terms": []
+},
+{
+"text": "In a short-term placebo-controlled SEROQUEL monotherapy trial in adolescent patients (13 to 17 years of age) with schizophrenia (6-week duration), the aggregated incidence of extrapyramidal symptoms was 12.9% (19/147) for SEROQUEL and 5.3% (4/75) for placebo, though the incidence of the individual adverse reactions (e.g., akathisia, tremor, extrapyramidal disorder, hypokinesia, restlessness, psychomotor hyperactivity, muscle rigidity, dyskinesia) did not exceed 4.1% in any treatment group.",
+"content_tokens": [
+"short",
+"term",
+"placebo",
+"controll",
+"seroquel",
+"monotherapy",
+"trial",
+"adolescent",
+"patient",
+"13",
+"17",
+"year",
+"age",
+"schizophrenia",
+"6",
+"week",
+"duration",
+"aggregat",
+"incidenc",
+"extrapyramidal",
+"symptom",
+"12.9",
+"19",
+"147",
+"seroquel",
+"5.3",
+"4",
+"75",
+"placebo",
+"though",
+"incidenc",
+"individual",
+"advers",
+"reaction",
+"akathisia",
+"tremor",
+"extrapyramidal",
+"disorder",
+"hypokinesia",
+"restlessnes",
+"psychomotor",
+"hyperactivity",
+"muscl",
+"rigidity",
+"dyskinesia",
+"exce",
+"4.1",
+"treatment",
+"group"
+],
+"numbers": [
+"12.9",
+"13",
+"147",
+"17",
+"19",
+"4",
+"4.1",
+"5.3",
+"6",
+"75"
+],
+"units": [
+"%",
+"week",
+"year"
+],
+"drug_terms": []
+},
+{
+"text": "2 (95% CI 0.10, 0.71) compared to placebo (N=10).",
+"content_tokens": [
+"2",
+"95",
+"ci",
+"0.1",
+"0.71",
+"compar",
+"placebo",
+"10"
+],
+"numbers": [
+"0.1",
+"0.71",
+"10",
+"2",
+"95"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "Store at room temperature 20-25°C (68-77°F).",
+"content_tokens": [
+"stor",
+"room",
+"temperatur",
+"20",
+"25",
+"68",
+"77"
+],
+"numbers": [
+"20",
+"25",
+"68",
+"77"
+],
+"units": [
+"°c",
+"°f"
+],
+"drug_terms": []
+},
+{
+"text": "PAA232044Dist. by Pfizer LabsDiv. of Pfizer Inc., NY, NY 10001",
+"content_tokens": [
+"paa",
+"232044",
+"dist",
+"pfizer",
+"labsdiv",
+"pfizer",
+"inc",
+"ny",
+"ny",
+"10001"
+],
+"numbers": [
+"10001",
+"232044"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Following oral administration of Cyclosporine Capsules USP MODIFIED, the time to peak blood cyclosporine concentrations (Tmax) ranged from 1.5 to 2 hours.",
+"content_tokens": [
+"follow",
+"oral",
+"administration",
+"cyclosporin",
+"capsul",
+"usp",
+"modifi",
+"time",
+"peak",
+"blood",
+"cyclosporin",
+"concentration",
+"tmax",
+"rang",
+"1.5",
+"2",
+"hour"
+],
+"numbers": [
+"1.5",
+"2"
+],
+"units": [
+"hour"
+],
+"drug_terms": [
+"cyclosporine"
+]
+},
+{
+"text": "A third trial substituted oxcarbazepine monotherapy at 2400 mg/day for carbamazepine in 143 patients (12 to 65 years of age) whose partial-onset seizures were inadequately controlled on carbamazepine (CBZ) monotherapy at a stable dose of 800 to 1600 mg/day, and maintained this oxcarbazepine dose for 56 days (baseline phase).",
+"content_tokens": [
+"third",
+"trial",
+"substitut",
+"oxcarbazepin",
+"monotherapy",
+"2400",
+"mg",
+"day",
+"carbamazepin",
+"143",
+"patient",
+"12",
+"65",
+"year",
+"age",
+"partial",
+"onset",
+"seizur",
+"inadequat",
+"controll",
+"carbamazepin",
+"cbz",
+"monotherapy",
+"stabl",
+"dose",
+"800",
+"1600",
+"mg",
+"day",
+"maintain",
+"oxcarbazepin",
+"dose",
+"56",
+"day",
+"baselin",
+"phas"
+],
+"numbers": [
+"12",
+"143",
+"1600",
+"2400",
+"56",
+"65",
+"800"
+],
+"units": [
+"day",
+"mg",
+"year"
+],
+"drug_terms": [
+"carbamazepine",
+"oxcarbazepine"
+]
+},
+{
+"text": "Repeated 14-Day Courses (if needed)",
+"content_tokens": [
+"repeat",
+"14",
+"day",
+"cours",
+"need"
+],
+"numbers": [
+"14"
+],
+"units": [
+"day"
+],
+"drug_terms": []
+},
+{
+"text": "However, the typical failure rate is estimated to be closer to 5%, due to late or omitted pills.",
+"content_tokens": [
+"however",
+"typical",
+"failur",
+"rate",
+"estimat",
+"closer",
+"5",
+"due",
+"late",
+"omitt",
+"pill"
+],
+"numbers": [
+"5"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "The frequency of gastrointestinal lesions with wax-matrix potassium chloride products is estimated at one per 100,000 patient-years.",
+"content_tokens": [
+"frequency",
+"gastrointestinal",
+"lesion",
+"wax",
+"matrix",
+"potassium",
+"chlorid",
+"product",
+"estimat",
+"100000",
+"patient",
+"year"
+],
+"numbers": [
+"100000"
+],
+"units": [],
+"drug_terms": [
+"potassium chloride"
+]
+},
+{
+"text": "Approximately 6.4% of patients were taking preventive medications for migraine at baseline.",
+"content_tokens": [
+"approximat",
+"6.4",
+"patient",
+"tak",
+"preventiv",
+"medication",
+"migrain",
+"baselin"
+],
+"numbers": [
+"6.4"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "This falls within the range of plasma protein binding (20%-45%) reported with other barbiturates such as phenobarbital, pentobarbital, and secobarbital sodium.",
+"content_tokens": [
+"fall",
+"rang",
+"plasma",
+"protein",
+"bind",
+"20",
+"45",
+"report",
+"barbiturat",
+"phenobarbital",
+"pentobarbital",
+"secobarbital",
+"sodium"
+],
+"numbers": [
+"20",
+"45"
+],
+"units": [
+"%"
+],
+"drug_terms": [
+"pentobarbital",
+"phenobarbital",
+"secobarbital"
+]
+},
+{
+"text": "1.7 Treatment of Symptomatic Gastroesophageal Reflux Disease (GERD)",
+"content_tokens": [
+"1.7",
+"treatment",
+"symptomatic",
+"gastroesophageal",
+"reflux",
+"diseas",
+"gerd"
+],
+"numbers": [
+"1.7"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "About 5% of patients had a QTc interval (a heart rhythm timing measure) greater than 500 ms.",
+"content_tokens": [
+"5",
+"patient",
+"qtc",
+"interval",
+"heart",
+"rhythm",
+"tim",
+"measur",
+"greater",
+"500",
+"ms"
+],
+"numbers": [
+"5",
+"500"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "Do not take 2 doses at the same time unless your healthcare provider tells you to.",
+"content_tokens": [
+"take",
+"2",
+"dos",
+"time",
+"unles",
+"healthcar",
+"provider",
+"tell"
+],
+"numbers": [
+"2"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Treatment was discontinued due to asthenia in 0.8% of levetiracetam tablets-treated patients as compared to 0.5% of placebo-treated patients.",
+"content_tokens": [
+"treatment",
+"discontinu",
+"due",
+"asthenia",
+"0.8",
+"levetiracetam",
+"tablet",
+"treat",
+"patient",
+"compar",
+"0.5",
+"placebo",
+"treat",
+"patient"
+],
+"numbers": [
+"0.5",
+"0.8"
+],
+"units": [
+"%"
+],
+"drug_terms": [
+"levetiracetam"
+]
+},
+{
+"text": "No impairment of fertility was seen in rats given galantamine at up to 16 mg/kg/day (7 times the MRHD of galantamine on a mg/m2 basis) for 14 days prior to mating in females and for 60 days prior to mating in males.",
+"content_tokens": [
+"impairment",
+"fertility",
+"seen",
+"rat",
+"given",
+"galantamin",
+"up",
+"16",
+"mg",
+"kg",
+"day",
+"7",
+"tim",
+"mrhd",
+"galantamin",
+"mg",
+"2",
+"basi",
+"14",
+"day",
+"prior",
+"mat",
+"femal",
+"60",
+"day",
+"prior",
+"mat",
+"mal"
+],
+"numbers": [
+"14",
+"16",
+"2",
+"60",
+"7"
+],
+"units": [
+"day",
+"kg",
+"mg"
+],
+"drug_terms": [
+"galantamine"
+]
+},
+{
+"text": "1. Back DJ, et al.: Kinetics of norethindrone in women II.",
+"content_tokens": [
+"1",
+"back",
+"dj",
+"et",
+"al",
+"kinetic",
+"norethindron",
+"women",
+"ii"
+],
+"numbers": [
+"1"
+],
+"units": [],
+"drug_terms": [
+"norethindrone"
+]
+},
+{
+"text": "Therefore, concomitant use of NYMALIZE with strong CYP3A4 inducers (e.g., carbamazepine, phenobarbital, phenytoin, rifampin, St. John's wort) should generally be avoided",
+"content_tokens": [
+"therefor",
+"concomitant",
+"use",
+"nymaliz",
+"strong",
+"cyp",
+"3",
+"4",
+"inducer",
+"carbamazepin",
+"phenobarbital",
+"phenytoin",
+"rifampin",
+"st",
+"john",
+"wort",
+"general",
+"avoid"
+],
+"numbers": [
+"3",
+"4"
+],
+"units": [],
+"drug_terms": [
+"carbamazepine",
+"nymalize",
+"phenobarbital",
+"phenytoin"
+]
+},
+{
+"text": "1. Throw away the missed pills.",
+"content_tokens": [
+"1",
+"throw",
+"away",
+"miss",
+"pill"
+],
+"numbers": [
+"1"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Plasma levels of carbamazepine are variable and may range from 0.5 to 25 mcg/mL, with no apparent relationship to the daily intake of the drug.",
+"content_tokens": [
+"plasma",
+"level",
+"carbamazepin",
+"variabl",
+"rang",
+"0.5",
+"25",
+"mcg",
+"ml",
+"apparent",
+"relationship",
+"dai",
+"intak",
+"drug"
+],
+"numbers": [
+"0.5",
+"25"
+],
+"units": [
+"mcg",
+"ml"
+],
+"drug_terms": [
+"carbamazepine"
+]
+},
+{
+"text": "The apparent terminal elimination half-life for vorapaxar is approximately 8 days (range 5-13 days) and is similar for the active metabolite.",
+"content_tokens": [
+"apparent",
+"terminal",
+"elimination",
+"half",
+"life",
+"vorapaxar",
+"approximat",
+"8",
+"day",
+"rang",
+"5",
+"13",
+"day",
+"similar",
+"activ",
+"metabolit"
+],
+"numbers": [
+"13",
+"5",
+"8"
+],
+"units": [
+"day"
+],
+"drug_terms": [
+"vorapaxar"
+]
+},
+{
+"text": "Following a single-blind, placebo run-in phase, placebo nonresponders were randomized to receive a single dose of either sumatriptan and naproxen sodium tablets 10/60 mg, 30/180 mg, 85/500 mg, or placebo.",
+"content_tokens": [
+"follow",
+"singl",
+"blind",
+"placebo",
+"run",
+"phas",
+"placebo",
+"nonresponder",
+"randomiz",
+"receiv",
+"singl",
+"dose",
+"either",
+"sumatriptan",
+"naproxen",
+"sodium",
+"tablet",
+"10",
+"60",
+"mg",
+"30",
+"180",
+"mg",
+"85",
+"500",
+"mg",
+"placebo"
+],
+"numbers": [
+"10",
+"180",
+"30",
+"500",
+"60",
+"85"
+],
+"units": [
+"mg"
+],
+"drug_terms": [
+"naproxen",
+"sumatriptan"
+]
+},
+{
+"text": "Citalopram was administered orally to female and male rats at doses of 32, 48, and 72 mg/kg/day prior to and throughout mating and continuing to gestation.",
+"content_tokens": [
+"citalopram",
+"administer",
+"oral",
+"femal",
+"male",
+"rat",
+"dos",
+"32",
+"48",
+"72",
+"mg",
+"kg",
+"day",
+"prior",
+"throughout",
+"mat",
+"continu",
+"gestation"
+],
+"numbers": [
+"32",
+"48",
+"72"
+],
+"units": [
+"day",
+"kg",
+"mg"
+],
+"drug_terms": [
+"citalopram"
+]
+},
+{
+"text": "Table 3displays clinically important drug interactions with EXXUA.",
+"content_tokens": [
+"tabl",
+"3",
+"display",
+"clinical",
+"important",
+"drug",
+"interaction",
+"exxua"
+],
+"numbers": [
+"3"
+],
+"units": [],
+"drug_terms": [
+"exxua"
+]
+},
+{
+"text": "- Studies of the addition of a progestin for 10 or more days of a cycle of estrogen administration, or daily with estrogen in a continuous regimen, have reported a lowered incidence of endometrial hyperplasia than would be induced by estrogen treatment alone.",
+"content_tokens": [
+"study",
+"addition",
+"progestin",
+"10",
+"day",
+"cycl",
+"estrogen",
+"administration",
+"dai",
+"estrogen",
+"continuou",
+"regimen",
+"report",
+"lower",
+"incidenc",
+"endometrial",
+"hyperplasia",
+"induc",
+"estrogen",
+"treatment",
+"alon"
+],
+"numbers": [
+"10"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Store at 20°C to 25°C (68°F to 77°F); excursions permitted to 15°C to",
+"content_tokens": [
+"stor",
+"20",
+"25",
+"68",
+"77",
+"excursion",
+"permitt",
+"15"
+],
+"numbers": [
+"15",
+"20",
+"25",
+"68",
+"77"
+],
+"units": [
+"°c",
+"°f"
+],
+"drug_terms": []
+},
+{
+"text": "142.",
+"content_tokens": [
+"142"
+],
+"numbers": [
+"142"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "WEEK 4 will contain BROWN PILLS ONLY.",
+"content_tokens": [
+"week",
+"4",
+"contain",
+"brown",
+"pill"
+],
+"numbers": [
+"4"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "The principal metabolite of Tegretol, carbamazepine-10,11-epoxide, has anticonvulsant activity as demonstrated in several in vivo animal models of seizures.",
+"content_tokens": [
+"principal",
+"metabolit",
+"tegretol",
+"carbamazepin",
+"10.11",
+"epoxid",
+"anticonvulsant",
+"activity",
+"demonstrat",
+"several",
+"vivo",
+"animal",
+"model",
+"seizur"
+],
+"numbers": [
+"10.11"
+],
+"units": [],
+"drug_terms": [
+"carbamazepine",
+"tegretol"
+]
+},
+{
+"text": "- c Crossed the O’Brien-Fleming boundary (two-sided p-value < 0.018) at second interim analysis.",
+"content_tokens": [
+"cross",
+"brien",
+"flem",
+"boundary",
+"two",
+"sid",
+"valu",
+"0.018",
+"second",
+"interim",
+"analysi"
+],
+"numbers": [
+"0.018"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "152.",
+"content_tokens": [
+"152"
+],
+"numbers": [
+"152"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Treatment with saxagliptin tablets 5 mg and 2.5 mg doses produced statistically significant improvements in A1C, fasting plasma glucose (FPG), and 2-hour postprandial glucose (PPG) following a standard oral glucose tolerance test (OGTT), compared to control.",
+"content_tokens": [
+"treatment",
+"saxagliptin",
+"tablet",
+"5",
+"mg",
+"2.5",
+"mg",
+"dos",
+"produc",
+"statistical",
+"significant",
+"improvement",
+"1",
+"fast",
+"plasma",
+"glucos",
+"fpg",
+"2",
+"hour",
+"postprandial",
+"glucos",
+"ppg",
+"follow",
+"standard",
+"oral",
+"glucos",
+"toleranc",
+"test",
+"ogtt",
+"compar",
+"control"
+],
+"numbers": [
+"1",
+"2",
+"2.5",
+"5"
+],
+"units": [
+"hour",
+"mg"
+],
+"drug_terms": [
+"saxagliptin"
+]
+},
+{
+"text": "Coadministration of CIBINQO with a high-fat, high-calorie meal (total 916 calories, with approximate distribution of 55% fat, 29% carbohydrates, and 16% protein) had no clinically relevant effect on abrocitinib exposures (AUC and Cmax of abrocitinib increased by approximately 26% and 29%, respectively, and Tmax was prolonged by 2 hours) .",
+"content_tokens": [
+"coadministration",
+"cibinqo",
+"high",
+"fat",
+"high",
+"calori",
+"meal",
+"total",
+"916",
+"calory",
+"approximat",
+"distribution",
+"55",
+"fat",
+"29",
+"carbohydrat",
+"16",
+"protein",
+"clinical",
+"relevant",
+"effect",
+"abrocitinib",
+"exposur",
+"auc",
+"cmax",
+"abrocitinib",
+"increas",
+"approximat",
+"26",
+"29",
+"respectiv",
+"tmax",
+"prolong",
+"2",
+"hour"
+],
+"numbers": [
+"16",
+"2",
+"26",
+"29",
+"55",
+"916"
+],
+"units": [
+"%",
+"hour"
+],
+"drug_terms": [
+"abrocitinib",
+"cibinqo"
+]
+},
+{
+"text": "After an average follow-up of 5.2 years, 28 women in the estrogen-alone group and 19 women in the placebo group were diagnosed with probable dementia.",
+"content_tokens": [
+"averag",
+"follow",
+"up",
+"5.2",
+"year",
+"28",
+"women",
+"estrogen",
+"alon",
+"group",
+"19",
+"women",
+"placebo",
+"group",
+"diagnos",
+"probabl",
+"dementia"
+],
+"numbers": [
+"19",
+"28",
+"5.2"
+],
+"units": [
+"year"
+],
+"drug_terms": []
+},
+{
+"text": "In the triple therapy clinical trials, 84.9% (157/185) of the patients in the omeprazole/clarithromycin/amoxicillin treatment group who had pretreatment amoxicillin susceptible MICs (≤ 0.25 mcg/mL) were eradicated of",
+"content_tokens": [
+"tripl",
+"therapy",
+"clinical",
+"trial",
+"84.9",
+"157",
+"185",
+"patient",
+"omeprazol",
+"clarithromycin",
+"amoxicillin",
+"treatment",
+"group",
+"pretreatment",
+"amoxicillin",
+"susceptibl",
+"mic",
+"0.25",
+"mcg",
+"ml",
+"eradicat"
+],
+"numbers": [
+"0.25",
+"157",
+"185",
+"84.9"
+],
+"units": [
+"%",
+"mcg",
+"ml"
+],
+"drug_terms": [
+"amoxicillin",
+"clarithromycin",
+"omeprazole"
+]
+},
+{
+"text": "The treatment discontinuation rate due to adverse events in patients dosed with 1 mg twice daily was 12% for varenicline, compared to 10% for placebo in studies of three months’ treatment.",
+"content_tokens": [
+"treatment",
+"discontinuation",
+"rate",
+"due",
+"advers",
+"event",
+"patient",
+"dos",
+"1",
+"mg",
+"twic",
+"dai",
+"12",
+"vareniclin",
+"compar",
+"10",
+"placebo",
+"study",
+"thre",
+"month",
+"treatment"
+],
+"numbers": [
+"1",
+"10",
+"12"
+],
+"units": [
+"%",
+"mg"
+],
+"drug_terms": [
+"varenicline"
+]
+},
+{
+"text": "NUZYRA is not recommended for children under 8 years of age because it can harm how teeth form and how bones grow, which can cause permanent tooth discoloration and thin or poorly formed tooth enamel (enamel hypoplasia).",
+"content_tokens": [
+"nuzyra",
+"recommend",
+"children",
+"8",
+"year",
+"age",
+"becaus",
+"harm",
+"teeth",
+"form",
+"bon",
+"grow",
+"caus",
+"permanent",
+"tooth",
+"discoloration",
+"thin",
+"poor",
+"form",
+"tooth",
+"enamel",
+"enamel",
+"hypoplasia"
+],
+"numbers": [
+"8"
+],
+"units": [
+"year"
+],
+"drug_terms": [
+"nuzyra"
+]
+},
+{
+"text": "In most cases these were isolated values which resolved despite continued therapy, although hyperkalemia was a cause of discontinuation of therapy in 0.28 percent of hypertensive patients.",
+"content_tokens": [
+"cas",
+"isolat",
+"valu",
+"resolv",
+"despit",
+"continu",
+"therapy",
+"although",
+"hyperkalemia",
+"caus",
+"discontinuation",
+"therapy",
+"0.28",
+"percent",
+"hypertensiv",
+"patient"
+],
+"numbers": [
+"0.28"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "The reporting rate of TEN and SJS associated with oxcarbazepine use, which is generally accepted to be an underestimate due to underreporting, exceeds the background incidence rate estimates by a factor of 3- to 10-fold.",
+"content_tokens": [
+"report",
+"rate",
+"ten",
+"sjs",
+"associat",
+"oxcarbazepin",
+"use",
+"general",
+"accept",
+"underestimat",
+"due",
+"underreport",
+"exceed",
+"background",
+"incidenc",
+"rate",
+"estimat",
+"factor",
+"3",
+"10",
+"fold"
+],
+"numbers": [
+"10",
+"3"
+],
+"units": [],
+"drug_terms": [
+"oxcarbazepine"
+]
+},
+{
+"text": "The incidence of Torsade de Pointes in patients with supraventricular arrhythmias was 0.8% (11/1346) .",
+"content_tokens": [
+"incidenc",
+"torsad",
+"de",
+"point",
+"patient",
+"supraventricular",
+"arrhythmia",
+"0.8",
+"11",
+"1346"
+],
+"numbers": [
+"0.8",
+"11",
+"1346"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "Table 6: Erosive Esophagitis Healing Rate (Life-Table Analysis)",
+"content_tokens": [
+"tabl",
+"6",
+"erosiv",
+"esophagiti",
+"heal",
+"rate",
+"life",
+"tabl",
+"analysi"
+],
+"numbers": [
+"6"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "In a 21-month study in CD-1 mice, terbutaline sulfate showed no evidence of tumorigenicity at dietary doses up to 200 mg/kg (approximately 55 times the maximum recommended daily oral dose for adults on a mg/m2 basis).",
+"content_tokens": [
+"21",
+"month",
+"study",
+"cd",
+"1",
+"mice",
+"terbutalin",
+"sulfat",
+"show",
+"evidenc",
+"tumorigenicity",
+"dietary",
+"dos",
+"up",
+"200",
+"mg",
+"kg",
+"approximat",
+"55",
+"tim",
+"maximum",
+"recommend",
+"dai",
+"oral",
+"dose",
+"adult",
+"mg",
+"2",
+"basi"
+],
+"numbers": [
+"1",
+"2",
+"200",
+"21",
+"55"
+],
+"units": [
+"kg",
+"mg",
+"month"
+],
+"drug_terms": [
+"terbutaline"
+]
+},
+{
+"text": "Percent of Subjects Having Surgery for Benign Prostatic Hyperplasia over a 24-Month Period (Randomized, Double-blind, Placebo-Controlled Trials Pooled)",
+"content_tokens": [
+"percent",
+"subject",
+"surgery",
+"benign",
+"prostatic",
+"hyperplasia",
+"24",
+"month",
+"period",
+"randomiz",
+"doubl",
+"blind",
+"placebo",
+"controll",
+"trial",
+"pool"
+],
+"numbers": [
+"24"
+],
+"units": [
+"month"
+],
+"drug_terms": []
+},
+{
+"text": "bottles of 10 (NDC 54868-5467-1)",
+"content_tokens": [
+"bottl",
+"10",
+"ndc",
+"54868",
+"5467",
+"1"
+],
+"numbers": [
+"1",
+"10",
+"5467",
+"54868"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "From the perspective of evaluating pediatric clinical trials, Days 11 to 14 were considered on-therapy evaluations because of the extended half-life of azithromycin.",
+"content_tokens": [
+"perspectiv",
+"evaluat",
+"pediatric",
+"clinical",
+"trial",
+"day",
+"11",
+"14",
+"consider",
+"therapy",
+"evaluation",
+"becaus",
+"extend",
+"half",
+"life",
+"azithromycin"
+],
+"numbers": [
+"11",
+"14"
+],
+"units": [],
+"drug_terms": [
+"azithromycin"
+]
+},
+{
+"text": "3 mg: white to off-white, plain, round tablet debossed with “SP” on one side and “3” for 3 mg on the other side.",
+"content_tokens": [
+"3",
+"mg",
+"whit",
+"off",
+"whit",
+"plain",
+"round",
+"tablet",
+"deboss",
+"sp",
+"side",
+"3",
+"3",
+"mg",
+"side"
+],
+"numbers": [
+"3"
+],
+"units": [
+"mg"
+],
+"drug_terms": []
+},
+{
+"text": "5’ -1,3] oxathiolane} hydrochloride, hydrate (2:1).",
+"content_tokens": [
+"5",
+"1.3",
+"oxathiolan",
+"hydrochlorid",
+"hydrat",
+"2",
+"1"
+],
+"numbers": [
+"1",
+"1.3",
+"2",
+"5"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Initiation of medications that inhibit or induce CYP3A may increase or decrease concentrations of lopinavir and ritonavir, respectively.",
+"content_tokens": [
+"initiation",
+"medication",
+"inhibit",
+"induc",
+"cyp",
+"3",
+"increas",
+"decreas",
+"concentration",
+"lopinavir",
+"ritonavir",
+"respectiv"
+],
+"numbers": [
+"3"
+],
+"units": [],
+"drug_terms": [
+"lopinavir",
+"ritonavir"
+]
+},
+{
+"text": "In a reproductive toxicology study in rats administered oral clarithromycin late in gestation through lactation (GD 17 to post-natal day 21) at doses of 10, 40, or 160 mg/kg/day (≤ 1 times MRHD comparison), reductions in maternal body weight and food consumption were observed at 160 mg/kg/day.",
+"content_tokens": [
+"reproductiv",
+"toxicology",
+"study",
+"rat",
+"administer",
+"oral",
+"clarithromycin",
+"late",
+"gestation",
+"through",
+"lactation",
+"gd",
+"17",
+"post",
+"natal",
+"day",
+"21",
+"dos",
+"10",
+"40",
+"160",
+"mg",
+"kg",
+"day",
+"1",
+"tim",
+"mrhd",
+"comparison",
+"reduction",
+"maternal",
+"body",
+"weight",
+"food",
+"consumption",
+"observ",
+"160",
+"mg",
+"kg",
+"day"
+],
+"numbers": [
+"1",
+"10",
+"160",
+"17",
+"21",
+"40"
+],
+"units": [
+"day",
+"kg",
+"mg"
+],
+"drug_terms": [
+"clarithromycin"
+]
+},
+{
+"text": "Time to 3-Month Confirmed Disability Progression – Study 1 (ITT population)",
+"content_tokens": [
+"time",
+"3",
+"month",
+"confirm",
+"disability",
+"progression",
+"study",
+"1",
+"itt",
+"population"
+],
+"numbers": [
+"1",
+"3"
+],
+"units": [
+"month"
+],
+"drug_terms": []
+},
+{
+"text": "At a dose approximately 8 times the recommended dose, GALAFOLD did not prolong the QT interval to any clinically relevant extent.",
+"content_tokens": [
+"dose",
+"approximat",
+"8",
+"tim",
+"recommend",
+"dose",
+"galafold",
+"prolong",
+"qt",
+"interval",
+"clinical",
+"relevant",
+"extent"
+],
+"numbers": [
+"8"
+],
+"units": [],
+"drug_terms": [
+"galafold"
+]
+},
+{
+"text": "These dose levels resulted in systemic exposures of approximately 0.3 and 0.09 times the human exposure (AUC",
+"content_tokens": [
+"dose",
+"level",
+"result",
+"systemic",
+"exposur",
+"approximat",
+"0.3",
+"0.09",
+"tim",
+"human",
+"exposur",
+"auc"
+],
+"numbers": [
+"0.09",
+"0.3"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "CYP2C9 is thought to be of primary importance in the O-methylation pathway of S(–)-carvedilol.",
+"content_tokens": [
+"cyp",
+"2",
+"9",
+"thought",
+"primary",
+"importanc",
+"methylation",
+"pathway",
+"carvedilol"
+],
+"numbers": [
+"2",
+"9"
+],
+"units": [],
+"drug_terms": [
+"carvedilol"
+]
+},
+{
+"text": "In a randomized trial in patients with newly diagnosed Ph+ CML in chronic phase comparing Gleevec and nilotinib, severe (Grade 3 or 4) fluid retention occurred in 2.5% of patients receiving Gleevec and in 3.9% of patients receiving nilotinib 300 mg twice daily.",
+"content_tokens": [
+"randomiz",
+"trial",
+"patient",
+"new",
+"diagnos",
+"ph",
+"cml",
+"chronic",
+"phas",
+"compar",
+"gleevec",
+"nilotinib",
+"sever",
+"grad",
+"3",
+"4",
+"fluid",
+"retention",
+"occurr",
+"2.5",
+"patient",
+"receiv",
+"gleevec",
+"3.9",
+"patient",
+"receiv",
+"nilotinib",
+"300",
+"mg",
+"twic",
+"dai"
+],
+"numbers": [
+"2.5",
+"3",
+"3.9",
+"300",
+"4"
+],
+"units": [
+"%",
+"mg"
+],
+"drug_terms": [
+"gleevec",
+"nilotinib"
+]
+},
+{
+"text": "Approximately 82% of the radioactive dose was excreted as lenalidomide in the urine within 24 hours.",
+"content_tokens": [
+"approximat",
+"82",
+"radioactiv",
+"dose",
+"excret",
+"lenalidomid",
+"urin",
+"24",
+"hour"
+],
+"numbers": [
+"24",
+"82"
+],
+"units": [
+"%",
+"hour"
+],
+"drug_terms": [
+"lenalidomide"
+]
+},
+{
+"text": "To minimize increases in sirolimus concentrations, it is recommended that sirolimus be given 4 hours after cyclosporine administration.",
+"content_tokens": [
+"minimiz",
+"increas",
+"sirolimu",
+"concentration",
+"recommend",
+"sirolimu",
+"given",
+"4",
+"hour",
+"cyclosporin",
+"administration"
+],
+"numbers": [
+"4"
+],
+"units": [
+"hour"
+],
+"drug_terms": [
+"cyclosporine"
+]
+},
+{
+"text": "The elimination half-life of nifedipine administered as Afeditab® CR is approximately 7 hours in contrast to the known 2 hour elimination half-life of nifedipine administered as an immediate release capsule.",
+"content_tokens": [
+"elimination",
+"half",
+"life",
+"nifedipin",
+"administer",
+"afeditab",
+"cr",
+"approximat",
+"7",
+"hour",
+"contrast",
+"known",
+"2",
+"hour",
+"elimination",
+"half",
+"life",
+"nifedipin",
+"administer",
+"immediat",
+"releas",
+"capsul"
+],
+"numbers": [
+"2",
+"7"
+],
+"units": [
+"hour"
+],
+"drug_terms": [
+"afeditab",
+"nifedipine"
+]
+},
+{
+"text": "In a pooled survival analysis of patients in the supraventricular arrhythmia population (low prevalence of structural heart disease), deaths occurred in 0.9% (12/1346) of patients receiving dofetilide capsules and 0.4% (3/677) in the placebo group.",
+"content_tokens": [
+"pool",
+"survival",
+"analysi",
+"patient",
+"supraventricular",
+"arrhythmia",
+"population",
+"low",
+"prevalenc",
+"structural",
+"heart",
+"diseas",
+"death",
+"occurr",
+"0.9",
+"12",
+"1346",
+"patient",
+"receiv",
+"dofetilid",
+"capsul",
+"0.4",
+"3",
+"677",
+"placebo",
+"group"
+],
+"numbers": [
+"0.4",
+"0.9",
+"12",
+"1346",
+"3",
+"677"
+],
+"units": [
+"%"
+],
+"drug_terms": [
+"dofetilide"
+]
+},
+{
+"text": "The following non-contraceptive health benefits related to the use of oral contraceptives are supported by epidemiological studies that largely utilized oral contraceptive formulations containing estrogen doses exceeding 35 mcg of ethinyl estradiol or 50 mcg of mestranol.148, 149",
+"content_tokens": [
+"follow",
+"non",
+"contraceptiv",
+"health",
+"benefit",
+"relat",
+"use",
+"oral",
+"contraceptiv",
+"support",
+"epidemiological",
+"study",
+"larg",
+"utiliz",
+"oral",
+"contraceptiv",
+"formulation",
+"contain",
+"estrogen",
+"dos",
+"exceed",
+"35",
+"mcg",
+"ethinyl",
+"estradiol",
+"50",
+"mcg",
+"mestranol",
+"148",
+"149"
+],
+"numbers": [
+"149",
+"35",
+"50"
+],
+"units": [
+"mcg"
+],
+"drug_terms": [
+"estradiol",
+"ethinyl estradiol"
+]
+},
+{
+"text": "41. Stolley PD, et al. Am J Epidemiol.",
+"content_tokens": [
+"41",
+"stolley",
+"pd",
+"et",
+"al",
+"am",
+"epidemiol"
+],
+"numbers": [
+"41"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "1984;119(May):796.",
+"content_tokens": [
+"1984",
+"119",
+"796"
+],
+"numbers": [
+"119",
+"1984",
+"796"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "In pregnant rats given oral dietary doses of 14 mg/kg/day, 127 mg/kg/day, and 361 mg/kg/day from gestation day 6 to 15 during the period of organogenesis, no adverse developmental findings were observed at 14 mg/kg/day (less than the clinical exposure at the maximum recommended human dose MRHD] of 300 mg fenofibrate daily, comparable to 135 mg fenofibric acid delayed-release capsules daily, based on body surface area comparisons).",
+"content_tokens": [
+"pregnant",
+"rat",
+"given",
+"oral",
+"dietary",
+"dos",
+"14",
+"mg",
+"kg",
+"day",
+"127",
+"mg",
+"kg",
+"day",
+"361",
+"mg",
+"kg",
+"day",
+"gestation",
+"day",
+"6",
+"15",
+"period",
+"organogenesi",
+"advers",
+"developmental",
+"finding",
+"observ",
+"14",
+"mg",
+"kg",
+"day",
+"les",
+"clinical",
+"exposur",
+"maximum",
+"recommend",
+"human",
+"dose",
+"mrhd",
+"300",
+"mg",
+"fenofibrat",
+"dai",
+"comparabl",
+"135",
+"mg",
+"fenofibric",
+"acid",
+"delay",
+"releas",
+"capsul",
+"dai",
+"bas",
+"body",
+"surfac",
+"area",
+"comparison"
+],
+"numbers": [
+"127",
+"135",
+"14",
+"15",
+"300",
+"361",
+"6"
+],
+"units": [
+"day",
+"kg",
+"mg"
+],
+"drug_terms": []
+},
+{
+"text": "Store between 15° – 30°C (59° – 86°F).",
+"content_tokens": [
+"stor",
+"between",
+"15",
+"30",
+"59",
+"86"
+],
+"numbers": [
+"15",
+"30",
+"59",
+"86"
+],
+"units": [
+"°c",
+"°f"
+],
+"drug_terms": []
+},
+{
+"text": "In most of the reported cases, these events followed tonsillectomy and/or adenoidectomy, and many of the children had evidence of being ultra-rapid metabolizers of codeine (i.e., multiple copies of the gene for cytochrome P450 isoenzyme 2D6 or high morphine concentrations).",
+"content_tokens": [
+"report",
+"cas",
+"event",
+"follow",
+"tonsillectomy",
+"adenoidectomy",
+"many",
+"children",
+"evidenc",
+"ultra",
+"rapid",
+"metabolizer",
+"codein",
+"multipl",
+"copy",
+"gene",
+"cytochrom",
+"450",
+"isoenzym",
+"2",
+"6",
+"high",
+"morphin",
+"concentration"
+],
+"numbers": [
+"2",
+"450",
+"6"
+],
+"units": [],
+"drug_terms": [
+"codeine",
+"morphine"
+]
+},
+{
+"text": "A diagnosis of Attention Deficit Hyperactivity Disorder (ADHD; DSM-IV®) implies the presence of hyperactive-impulsive or inattentive symptoms that caused impairment and were present before age 7 years.",
+"content_tokens": [
+"diagnosi",
+"attention",
+"deficit",
+"hyperactivity",
+"disorder",
+"adhd",
+"dsm",
+"iv",
+"imply",
+"presenc",
+"hyperactiv",
+"impulsiv",
+"inattentiv",
+"symptom",
+"caus",
+"impairment",
+"present",
+"age",
+"7",
+"year"
+],
+"numbers": [
+"7"
+],
+"units": [
+"year"
+],
+"drug_terms": []
+},
+{
+"text": "The chemical name is Potassium o-(2,6-dichloroanilino)phenyl] acetate.",
+"content_tokens": [
+"chemical",
+"name",
+"potassium",
+"2.6",
+"dichloroanilino",
+"phenyl",
+"acetat"
+],
+"numbers": [
+"2.6"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "4. Drug interactions",
+"content_tokens": [
+"4",
+"drug",
+"interaction"
+],
+"numbers": [
+"4"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Olanzapine was administered to mice in two 78-week studies at doses of 3, 10, 30/20 mg/kg/day (equivalent to 0.8 to 5 times the MRHD of 20 mg/day based on mg/m2 body surface area) and 0.25, 2, 8 mg/kg/day (equivalent to 0.06 to 2 times the MRHD based on mg/m2 body surface area).",
+"content_tokens": [
+"olanzapin",
+"administer",
+"mice",
+"two",
+"78",
+"week",
+"study",
+"dos",
+"3",
+"10",
+"30",
+"20",
+"mg",
+"kg",
+"day",
+"equivalent",
+"0.8",
+"5",
+"tim",
+"mrhd",
+"20",
+"mg",
+"day",
+"bas",
+"mg",
+"2",
+"body",
+"surfac",
+"area",
+"0.25",
+"2",
+"8",
+"mg",
+"kg",
+"day",
+"equivalent",
+"0.06",
+"2",
+"tim",
+"mrhd",
+"bas",
+"mg",
+"2",
+"body",
+"surfac",
+"area"
+],
+"numbers": [
+"0.06",
+"0.25",
+"0.8",
+"10",
+"2",
+"20",
+"3",
+"30",
+"5",
+"78",
+"8"
+],
+"units": [
+"day",
+"kg",
+"mg",
+"week"
+],
+"drug_terms": [
+"olanzapine"
+]
+},
+{
+"text": "Keep taking 1 pill every day until Sunday.",
+"content_tokens": [
+"keep",
+"tak",
+"1",
+"pill",
+"every",
+"day",
+"until",
+"sunday"
+],
+"numbers": [
+"1"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "5-HT",
+"content_tokens": [
+"5",
+"ht"
+],
+"numbers": [
+"5"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "In view of the retinal degeneration seen in rats, eye examinations were performed during clinical trials in 908 patients before, and periodically after, the start of clonidine therapy.",
+"content_tokens": [
+"view",
+"retinal",
+"degeneration",
+"seen",
+"rat",
+"eye",
+"examination",
+"perform",
+"clinical",
+"trial",
+"908",
+"patient",
+"periodical",
+"start",
+"clonidin",
+"therapy"
+],
+"numbers": [
+"908"
+],
+"units": [],
+"drug_terms": [
+"clonidine"
+]
+},
+{
+"text": "In the U.S. general population, the estimated background risk of major birth defects and miscarriage in clinically recognized pregnancies is 2 to 4 percent and 15 to 20 percent, respectively.",
+"content_tokens": [
+"general",
+"population",
+"estimat",
+"background",
+"risk",
+"major",
+"birth",
+"defect",
+"miscarriag",
+"clinical",
+"recogniz",
+"pregnancy",
+"2",
+"4",
+"percent",
+"15",
+"20",
+"percent",
+"respectiv"
+],
+"numbers": [
+"15",
+"2",
+"20",
+"4"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "The diagnosis should be suspected in patients who exhibit signs of impaired oxygen delivery despite adequate cardiac output and adequate arterial pO2.",
+"content_tokens": [
+"diagnosi",
+"suspect",
+"patient",
+"exhibit",
+"sign",
+"impair",
+"oxygen",
+"delivery",
+"despit",
+"adequat",
+"cardiac",
+"output",
+"adequat",
+"arterial",
+"po",
+"2"
+],
+"numbers": [
+"2"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "This risk increases with age and with heavy smoking (15 or more cigarettes per day) and is quite marked in women over 35 years of age.",
+"content_tokens": [
+"risk",
+"increas",
+"age",
+"heavy",
+"smok",
+"15",
+"cigarett",
+"day",
+"quit",
+"mark",
+"women",
+"35",
+"year",
+"age"
+],
+"numbers": [
+"15",
+"35"
+],
+"units": [
+"day",
+"year"
+],
+"drug_terms": []
+},
+{
+"text": "The average norfluoxetine steady-state concentrations in these children were 1.5-fold higher than in adolescents (195 and 113 ng/mL, respectively).",
+"content_tokens": [
+"averag",
+"norfluoxetin",
+"steady",
+"stat",
+"concentration",
+"children",
+"1.5",
+"fold",
+"higher",
+"adolescent",
+"195",
+"113",
+"ng",
+"ml",
+"respectiv"
+],
+"numbers": [
+"1.5",
+"113",
+"195"
+],
+"units": [
+"ml"
+],
+"drug_terms": [
+"norfluoxetine"
+]
+},
+{
+"text": "Adults and Adolescents (13 Years and Older): Two ampules four times daily, taken one-half hour before meals and at bedtime.",
+"content_tokens": [
+"adult",
+"adolescent",
+"13",
+"year",
+"older",
+"two",
+"ampul",
+"four",
+"tim",
+"dai",
+"taken",
+"half",
+"hour",
+"meal",
+"bedtim"
+],
+"numbers": [
+"13"
+],
+"units": [
+"year"
+],
+"drug_terms": []
+},
+{
+"text": "When rifabutin coadministration is stopped, the EDURANT dose should be decreased to 25 mg once daily, taken with a meal",
+"content_tokens": [
+"rifabutin",
+"coadministration",
+"stopp",
+"edurant",
+"dose",
+"decreas",
+"25",
+"mg",
+"once",
+"dai",
+"taken",
+"meal"
+],
+"numbers": [
+"25"
+],
+"units": [
+"mg"
+],
+"drug_terms": [
+"edurant",
+"rifabutin"
+]
+},
+{
+"text": "Because of the potential for serious adverse reactions in the breastfed child, advise women not to breastfeed during treatment with Zydelig and for 1 month after the last dose.",
+"content_tokens": [
+"becaus",
+"potential",
+"seriou",
+"advers",
+"reaction",
+"breastf",
+"child",
+"advis",
+"women",
+"breastf",
+"treatment",
+"zydelig",
+"1",
+"month",
+"last",
+"dose"
+],
+"numbers": [
+"1"
+],
+"units": [
+"month"
+],
+"drug_terms": [
+"zydelig"
+]
+},
+{
+"text": "NDC:68151-3015-0 in a PACKAGE of 1 TABLET, FILM COATEDS",
+"content_tokens": [
+"ndc",
+"68151",
+"3015",
+"0",
+"packag",
+"1",
+"tablet",
+"film",
+"coated"
+],
+"numbers": [
+"0",
+"1",
+"3015",
+"68151"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "In the 3 trials of bupropion HCl extended-release in seasonal affective disorder, there were significant elevations in blood pressure.",
+"content_tokens": [
+"3",
+"trial",
+"bupropion",
+"hcl",
+"extend",
+"releas",
+"seasonal",
+"affectiv",
+"disorder",
+"significant",
+"elevation",
+"blood",
+"pressur"
+],
+"numbers": [
+"3"
+],
+"units": [],
+"drug_terms": [
+"bupropion"
+]
+},
+{
+"text": "Increased exposure of etrasimod in patients who are CYP2C9 poor metabolizers is expected with concomitant use of moderate to strong inhibitors of CYP2C8 or CYP3A4.",
+"content_tokens": [
+"increas",
+"exposur",
+"etrasimod",
+"patient",
+"cyp",
+"2",
+"9",
+"poor",
+"metabolizer",
+"expect",
+"concomitant",
+"use",
+"moderat",
+"strong",
+"inhibitor",
+"cyp",
+"2",
+"8",
+"cyp",
+"3",
+"4"
+],
+"numbers": [
+"2",
+"3",
+"4",
+"8",
+"9"
+],
+"units": [],
+"drug_terms": [
+"etrasimod"
+]
+},
+{
+"text": "The capsule body is imprinted in black with ‘PAR’ on the cap and ‘730’ on the body.",
+"content_tokens": [
+"capsul",
+"body",
+"imprint",
+"black",
+"par",
+"cap",
+"730",
+"body"
+],
+"numbers": [
+"730"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Grade 3 or 4 adverse reactions in the General Disorders and Administration Site Conditions body system were consistently reported at a higher frequency (with a difference of at least 5%) in older subjects than in younger subjects across all treatment arms.",
+"content_tokens": [
+"grad",
+"3",
+"4",
+"advers",
+"reaction",
+"general",
+"disorder",
+"administration",
+"site",
+"condition",
+"body",
+"system",
+"consistent",
+"report",
+"higher",
+"frequency",
+"differenc",
+"least",
+"5",
+"older",
+"subject",
+"younger",
+"subject",
+"acros",
+"treatment",
+"arm"
+],
+"numbers": [
+"3",
+"4",
+"5"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "Titration to doses above 90 mg daily is not recommended.",
+"content_tokens": [
+"titration",
+"dos",
+"abov",
+"90",
+"mg",
+"dai",
+"recommend"
+],
+"numbers": [
+"90"
+],
+"units": [
+"mg"
+],
+"drug_terms": []
+},
+{
+"text": "In patients with renal impairment (inulin clearance 60 to 90, 30 to 60, and less than 30 mL/min; N = 6 in each group), area under the curve (AUC) values and elimination rate were comparable to those in healthy subjects.",
+"content_tokens": [
+"patient",
+"renal",
+"impairment",
+"inulin",
+"clearanc",
+"60",
+"90",
+"30",
+"60",
+"les",
+"30",
+"ml",
+"min",
+"6",
+"group",
+"area",
+"curv",
+"auc",
+"valu",
+"elimination",
+"rate",
+"comparabl",
+"healthy",
+"subject"
+],
+"numbers": [
+"30",
+"6",
+"60",
+"90"
+],
+"units": [
+"minute",
+"ml"
+],
+"drug_terms": []
+},
+{
+"text": "- store at 20-25 ° C (68-77 ° F)",
+"content_tokens": [
+"stor",
+"20",
+"25",
+"68",
+"77"
+],
+"numbers": [
+"20",
+"25",
+"68",
+"77"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "In the rare case of bleeding which resembles menstruation, the patient should be advised to discontinue medication and then begin taking tablets from a new tablet dispenser on the next Sunday or the first day (Day 1), depending on her regimen.",
+"content_tokens": [
+"rare",
+"case",
+"bleed",
+"resembl",
+"menstruation",
+"patient",
+"advis",
+"discontinu",
+"medication",
+"begin",
+"tak",
+"tablet",
+"new",
+"tablet",
+"dispenser",
+"next",
+"sunday",
+"first",
+"day",
+"day",
+"1",
+"depend",
+"regimen"
+],
+"numbers": [
+"1"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "STUDIES IN PATIENTS OF CHINESE ANCESTRY HAVE FOUND A STRONG ASSOCIATION BETWEEN THE RISK OF DEVELOPING SJS/TEN AND THE PRESENCE OF HLA-B*1502, AN INHERITED ALLELIC VARIANT OF THE HLA-B GENE.",
+"content_tokens": [
+"study",
+"patient",
+"chines",
+"ancestry",
+"found",
+"strong",
+"association",
+"between",
+"risk",
+"develop",
+"sjs",
+"ten",
+"presenc",
+"hla",
+"1502",
+"inherit",
+"allelic",
+"variant",
+"hla",
+"gene"
+],
+"numbers": [
+"1502"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "You should use Levonorgestrel Tablet, 1.5 mg within 72 hours (3 days) after you have had unprotected sex.",
+"content_tokens": [
+"use",
+"levonorgestrel",
+"tablet",
+"1.5",
+"mg",
+"72",
+"hour",
+"3",
+"day",
+"unprotect",
+"sex"
+],
+"numbers": [
+"1.5",
+"3",
+"72"
+],
+"units": [
+"day",
+"hour",
+"mg"
+],
+"drug_terms": [
+"levonorgestrel"
+]
+},
+{
+"text": "38%",
+"content_tokens": [
+"38"
+],
+"numbers": [
+"38"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "Concomitant administration of guanfacine with OCT1 substrates might potentially increase the exposure of these OCT1 substrates.",
+"content_tokens": [
+"concomitant",
+"administration",
+"guanfacin",
+"oct",
+"1",
+"substrat",
+"potential",
+"increas",
+"exposur",
+"oct",
+"1",
+"substrat"
+],
+"numbers": [
+"1"
+],
+"units": [],
+"drug_terms": [
+"guanfacine"
+]
+},
+{
+"text": "After oral administration of radiolabeled misoprostol, about 80% of detected radioactivity appears in urine.",
+"content_tokens": [
+"oral",
+"administration",
+"radiolabel",
+"misoprostol",
+"80",
+"detect",
+"radioactivity",
+"appear",
+"urin"
+],
+"numbers": [
+"80"
+],
+"units": [
+"%"
+],
+"drug_terms": [
+"misoprostol"
+]
+},
+{
+"text": "Detection of CXCR4-using virus prior to initiation of therapy has been associated with a reduced virological response to maraviroc.",
+"content_tokens": [
+"detection",
+"cxcr",
+"4",
+"using",
+"viru",
+"prior",
+"initiation",
+"therapy",
+"associat",
+"reduc",
+"virological",
+"respons",
+"maraviroc"
+],
+"numbers": [
+"4"
+],
+"units": [],
+"drug_terms": [
+"maraviroc"
+]
+},
+{
+"text": "- have been tested and know whether or not you have a particular gene variation called HLA‑B*5701.",
+"content_tokens": [
+"test",
+"know",
+"whether",
+"particular",
+"gene",
+"variation",
+"call",
+"hla",
+"5701"
+],
+"numbers": [
+"5701"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Metformin pharmacokinetic parameters did not differ significantly between normal subjects and patients with type 2 diabetes when analyzed according to gender (males = 19, females = 16).",
+"content_tokens": [
+"metformin",
+"pharmacokinetic",
+"parameter",
+"differ",
+"significant",
+"between",
+"normal",
+"subject",
+"patient",
+"type",
+"2",
+"diabet",
+"analyz",
+"accord",
+"gender",
+"mal",
+"19",
+"femal",
+"16"
+],
+"numbers": [
+"16",
+"19",
+"2"
+],
+"units": [],
+"drug_terms": [
+"metformin"
+]
+},
+{
+"text": "23. Bradley DD, et al. N Engl J Med.",
+"content_tokens": [
+"23",
+"bradley",
+"dd",
+"et",
+"al",
+"engl",
+"med"
+],
+"numbers": [
+"23"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "A dose increase to 20 mg/day may be considered after several weeks if insufficient clinical improvement is observed.",
+"content_tokens": [
+"dose",
+"increas",
+"20",
+"mg",
+"day",
+"consider",
+"several",
+"week",
+"insufficient",
+"clinical",
+"improvement",
+"observ"
+],
+"numbers": [
+"20"
+],
+"units": [
+"day",
+"mg"
+],
+"drug_terms": []
+},
+{
+"text": "Amlobenz comes as capsules with two medicines, amlodipine and benazepril, in these strengths in mg: 2.5/10, 5/10, 5/20, and 10/20.",
+"content_tokens": [
+"amlobenz",
+"com",
+"capsul",
+"two",
+"medicin",
+"amlodipin",
+"benazepril",
+"strength",
+"mg",
+"2.5",
+"10",
+"5",
+"10",
+"5",
+"20",
+"10",
+"20"
+],
+"numbers": [
+"10",
+"2.5",
+"20",
+"5"
+],
+"units": [],
+"drug_terms": [
+"amlobenz",
+"amlodipine",
+"benazepril"
+]
+},
+{
+"text": "Teratogenicity was also seen in mice when griseofulvin was administered in doses equivalent to 5 g/kg/day 40X the MRHD based on BSA] for 2 consecutive days at various stages of the pregnancy.",
+"content_tokens": [
+"teratogenicity",
+"seen",
+"mice",
+"griseofulvin",
+"administer",
+"dos",
+"equivalent",
+"5",
+"kg",
+"day",
+"40",
+"mrhd",
+"bas",
+"bsa",
+"2",
+"consecutiv",
+"day",
+"variou",
+"stag",
+"pregnancy"
+],
+"numbers": [
+"2",
+"40",
+"5"
+],
+"units": [
+"day",
+"g",
+"kg"
+],
+"drug_terms": [
+"griseofulvin"
+]
+},
+{
+"text": "The initial dose of maraviroc was based on BSA and concomitant medication category (i.e., presence of CYP3A inhibitors and/or inducers).",
+"content_tokens": [
+"initial",
+"dose",
+"maraviroc",
+"bas",
+"bsa",
+"concomitant",
+"medication",
+"category",
+"presenc",
+"cyp",
+"3",
+"inhibitor",
+"inducer"
+],
+"numbers": [
+"3"
+],
+"units": [],
+"drug_terms": [
+"maraviroc"
+]
+},
+{
+"text": "Days 24 to 32 evaluations were considered the primary test of cure endpoint.",
+"content_tokens": [
+"day",
+"24",
+"32",
+"evaluation",
+"consider",
+"primary",
+"test",
+"cure",
+"endpoint"
+],
+"numbers": [
+"24",
+"32"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "The majority of subjects (84%) had been infected through vertical transmission.",
+"content_tokens": [
+"majority",
+"subject",
+"84",
+"infect",
+"through",
+"vertical",
+"transmission"
+],
+"numbers": [
+"84"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "ASSOCIATED WITH CONTROL OF FERTILITY PER 100,000 NONSTERILE WOMEN,",
+"content_tokens": [
+"associat",
+"control",
+"fertility",
+"100000",
+"nonsteril",
+"women"
+],
+"numbers": [
+"100000"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "The capsules are imprinted in black ink that contains: alcohol, D&C yellow No. 10 aluminum lake, FD&C blue No. 2/indigo carmine aluminum lake, FD&C blue No. 1/brilliant blue FCF aluminum lake, FD&C red No. 40/allura red AC aluminum lake, propylene glycol, iron oxide black and shellac glaze.",
+"content_tokens": [
+"capsul",
+"imprint",
+"black",
+"ink",
+"contain",
+"alcohol",
+"yellow",
+"10",
+"aluminum",
+"lake",
+"fd",
+"blue",
+"2",
+"indigo",
+"carmin",
+"aluminum",
+"lake",
+"fd",
+"blue",
+"1",
+"brilliant",
+"blue",
+"fcf",
+"aluminum",
+"lake",
+"fd",
+"red",
+"40",
+"allura",
+"red",
+"ac",
+"aluminum",
+"lake",
+"propylen",
+"glycol",
+"iron",
+"oxid",
+"black",
+"shellac",
+"glaz"
+],
+"numbers": [
+"1",
+"10",
+"2",
+"40"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "A fertility study in which male and female rats were administered doses of 3.8, 9.6 or 26.9 mg/kg/day (up to 24 times the maximum recommended human dose on a mg/m2 basis) showed no significant effect of felodipine on reproductive performance.",
+"content_tokens": [
+"fertility",
+"study",
+"male",
+"femal",
+"rat",
+"administer",
+"dos",
+"3.8",
+"9.6",
+"26.9",
+"mg",
+"kg",
+"day",
+"up",
+"24",
+"tim",
+"maximum",
+"recommend",
+"human",
+"dose",
+"mg",
+"2",
+"basi",
+"show",
+"significant",
+"effect",
+"felodipin",
+"reproductiv",
+"performanc"
+],
+"numbers": [
+"2",
+"24",
+"26.9",
+"3.8",
+"9.6"
+],
+"units": [
+"day",
+"kg",
+"mg"
+],
+"drug_terms": [
+"felodipine"
+]
+},
+{
+"text": "R,20",
+"content_tokens": [
+"20"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Coadministration of boceprevir (800 mg three times daily for 7 days) and cyclosporine (100 mg single dose) in healthy subjects resulted in increases in the mean AUC and Cmax of cyclosporine approximately 2.7-fold and 2-fold, respectively, compared to when cyclosporine was given alone.",
+"content_tokens": [
+"coadministration",
+"boceprevir",
+"800",
+"mg",
+"thre",
+"tim",
+"dai",
+"7",
+"day",
+"cyclosporin",
+"100",
+"mg",
+"singl",
+"dose",
+"healthy",
+"subject",
+"result",
+"increas",
+"mean",
+"auc",
+"cmax",
+"cyclosporin",
+"approximat",
+"2.7",
+"fold",
+"2",
+"fold",
+"respectiv",
+"compar",
+"cyclosporin",
+"given",
+"alon"
+],
+"numbers": [
+"100",
+"2",
+"2.7",
+"7",
+"800"
+],
+"units": [
+"day",
+"mg"
+],
+"drug_terms": [
+"cyclosporine"
+]
+},
+{
+"text": "A comparative bioavailability study of metronidazole (375 mg), tetracycline hydrochloride (375 mg) and bismuth subcitrate potassium (420 mg, equivalent to 120 mg Bi2O3) administered as bismuth subcitrate potassium, metronidazole and tetracycline hydrochloride capsules or as 3 separate capsule formulations administered simultaneously was conducted in healthy male volunteers.",
+"content_tokens": [
+"comparativ",
+"bioavailability",
+"study",
+"metronidazol",
+"375",
+"mg",
+"tetracyclin",
+"hydrochlorid",
+"375",
+"mg",
+"bismuth",
+"subcitrat",
+"potassium",
+"420",
+"mg",
+"equivalent",
+"120",
+"mg",
+"bi",
+"2",
+"3",
+"administer",
+"bismuth",
+"subcitrat",
+"potassium",
+"metronidazol",
+"tetracyclin",
+"hydrochlorid",
+"capsul",
+"3",
+"separat",
+"capsul",
+"formulation",
+"administer",
+"simultaneous",
+"conduct",
+"healthy",
+"male",
+"volunteer"
+],
+"numbers": [
+"120",
+"2",
+"3",
+"375",
+"420"
+],
+"units": [
+"mg"
+],
+"drug_terms": [
+"bismuth subcitrate",
+"metronidazole",
+"tetracycline"
+]
+},
+{
+"text": "-12.1 (0.49)",
+"content_tokens": [
+"12.1",
+"0.49"
+],
+"numbers": [
+"0.49",
+"12.1"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "No dose adjustment is necessary in patients with moderate renal impairment (creatinine clearance of 30 to 50 mL/min).",
+"content_tokens": [
+"dose",
+"adjustment",
+"necessary",
+"patient",
+"moderat",
+"renal",
+"impairment",
+"creatinin",
+"clearanc",
+"30",
+"50",
+"ml",
+"min"
+],
+"numbers": [
+"30",
+"50"
+],
+"units": [
+"minute",
+"ml"
+],
+"drug_terms": []
+},
+{
+"text": "Two to 24 hours following the initial dose of study treatment, patients were allowed to use additional treatment for pain response in the form of a second dose of study treatment or other medication.",
+"content_tokens": [
+"two",
+"24",
+"hour",
+"follow",
+"initial",
+"dose",
+"study",
+"treatment",
+"patient",
+"allow",
+"use",
+"additional",
+"treatment",
+"pain",
+"respons",
+"form",
+"second",
+"dose",
+"study",
+"treatment",
+"medication"
+],
+"numbers": [
+"24"
+],
+"units": [
+"hour"
+],
+"drug_terms": []
+},
+{
+"text": "No clastogenic potential was seen in vivo in the mouse micronucleus test at oral doses up to 2500 mg/kg (1100 times the maximum recommended human dose on a mg/m2 basis) or in vitro in a human lymphocyte chromosome aberration assay.",
+"content_tokens": [
+"clastogenic",
+"potential",
+"seen",
+"vivo",
+"mous",
+"micronucleu",
+"test",
+"oral",
+"dos",
+"up",
+"2500",
+"mg",
+"kg",
+"1100",
+"tim",
+"maximum",
+"recommend",
+"human",
+"dose",
+"mg",
+"2",
+"basi",
+"vitro",
+"human",
+"lymphocyt",
+"chromosom",
+"aberration",
+"assay"
+],
+"numbers": [
+"1100",
+"2",
+"2500"
+],
+"units": [
+"kg",
+"mg"
+],
+"drug_terms": []
+},
+{
+"text": "Blue film-coated immediate release, round biconvex tablet, debossed with \"Pfizer\" on one side and \"DCB45\" on the other side.",
+"content_tokens": [
+"blue",
+"film",
+"coat",
+"immediat",
+"releas",
+"round",
+"biconvex",
+"tablet",
+"deboss",
+"pfizer",
+"side",
+"dcb",
+"45",
+"side"
+],
+"numbers": [
+"45"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "85",
+"content_tokens": [
+"85"
+],
+"numbers": [
+"85"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "About 80% of patients were receiving the target dose at the end of the study.",
+"content_tokens": [
+"80",
+"patient",
+"receiv",
+"target",
+"dose",
+"end",
+"study"
+],
+"numbers": [
+"80"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "In 2 trials,",
+"content_tokens": [
+"2",
+"trial"
+],
+"numbers": [
+"2"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "The EC50 values for FTC were in the range of 1.3–640 nM.",
+"content_tokens": [
+"ec",
+"50",
+"valu",
+"ftc",
+"rang",
+"1.3",
+"640",
+"nm"
+],
+"numbers": [
+"1.3",
+"50",
+"640"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "SYMDEKO, VERTEX, and the VERTEX triangle logo are registered trademarks of Vertex Pharmaceuticals Incorporated.All other trademarks referenced herein are the property of their respective owners.©2025 Vertex Pharmaceuticals IncorporatedALL RIGHTS RESERVED",
+"content_tokens": [
+"symdeko",
+"vertex",
+"vertex",
+"triangl",
+"logo",
+"register",
+"trademark",
+"vertex",
+"pharmaceutical",
+"incorporat",
+"trademark",
+"referenc",
+"herein",
+"property",
+"respectiv",
+"owner",
+"2025",
+"vertex",
+"pharmaceutical",
+"incorporatedall",
+"right",
+"reserv"
+],
+"numbers": [
+"2025"
+],
+"units": [],
+"drug_terms": [
+"symdeko"
+]
+},
+{
+"text": "Following this regimen of 21 light yellow or pink tablets and 7 brown tablets, the patient will start all subsequent cycles on the same day of the week as the first course.",
+"content_tokens": [
+"follow",
+"regimen",
+"21",
+"light",
+"yellow",
+"pink",
+"tablet",
+"7",
+"brown",
+"tablet",
+"patient",
+"start",
+"subsequent",
+"cycl",
+"day",
+"week",
+"first",
+"cours"
+],
+"numbers": [
+"21",
+"7"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "EQUETRO can increase the metabolism of certain hormonal contraceptives (through CYP3A4 induction) such as oral and subdermal implant contraceptives, leading to significantly lower plasma concentrations of hormones.",
+"content_tokens": [
+"equetro",
+"increas",
+"metabolism",
+"certain",
+"hormonal",
+"contraceptiv",
+"through",
+"cyp",
+"3",
+"4",
+"induction",
+"oral",
+"subdermal",
+"implant",
+"contraceptiv",
+"lead",
+"significant",
+"lower",
+"plasma",
+"concentration",
+"hormon"
+],
+"numbers": [
+"3",
+"4"
+],
+"units": [],
+"drug_terms": [
+"equetro"
+]
+},
+{
+"text": "Reduce the dosing of UPTRAVI to once daily in patients on a moderate CYP2C8 inhibitor",
+"content_tokens": [
+"reduc",
+"dos",
+"uptravi",
+"once",
+"dai",
+"patient",
+"moderat",
+"cyp",
+"2",
+"8",
+"inhibitor"
+],
+"numbers": [
+"2",
+"8"
+],
+"units": [],
+"drug_terms": [
+"uptravi"
+]
+},
+{
+"text": "Methadone hydrochloride oral concentrate is an opioid agonist (a drug that acts like an opioid). It is used for detox treatment of opioid addiction (addiction to heroin or other morphine-like drugs). It is also used for maintenance treatment of opioid addiction (heroin or other morphine-like drugs), along with proper social and medical services. There are limits on its use. Methadone products used for opioid addiction in detox or maintenance programs must follow the rules for distribution and use under 21 CFR, Title 42, Sec. 8.",
+"content_tokens": [
+"methadon",
+"hydrochlorid",
+"oral",
+"concentrat",
+"opioid",
+"agonist",
+"drug",
+"act",
+"like",
+"opioid",
+"used",
+"detox",
+"treatment",
+"opioid",
+"addiction",
+"addiction",
+"heroin",
+"morphin",
+"like",
+"drug",
+"used",
+"maintenanc",
+"treatment",
+"opioid",
+"addiction",
+"heroin",
+"morphin",
+"like",
+"drug",
+"along",
+"proper",
+"social",
+"medical",
+"servic",
+"limit",
+"use",
+"methadon",
+"product",
+"used",
+"opioid",
+"addiction",
+"detox",
+"maintenanc",
+"program",
+"follow",
+"rul",
+"distribution",
+"use",
+"21",
+"cfr",
+"titl",
+"42",
+"sec",
+"8"
+],
+"numbers": [
+"21",
+"42",
+"8"
+],
+"units": [],
+"drug_terms": [
+"methadone",
+"morphine"
+]
+},
+{
+"text": "Approximately 10% of",
+"content_tokens": [
+"approximat",
+"10"
+],
+"numbers": [
+"10"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "Steady-state plasma levels of amlodipine are reached after 7 to 8 days of consecutive daily dosing.",
+"content_tokens": [
+"steady",
+"stat",
+"plasma",
+"level",
+"amlodipin",
+"reach",
+"7",
+"8",
+"day",
+"consecutiv",
+"dai",
+"dos"
+],
+"numbers": [
+"7",
+"8"
+],
+"units": [
+"day"
+],
+"drug_terms": [
+"amlodipine"
+]
+},
+{
+"text": "In patients with primary mixed dyslipidemia as defined by baseline plasma TG levels ≥ 200 mg/dL and < 400 mg/dL, treatment with fluvastatin capsules produced significant decreases in Total-C, LDL-C, TG and Apo B and variable increases in HDL-C (Table 5).",
+"content_tokens": [
+"patient",
+"primary",
+"mix",
+"dyslipidemia",
+"defin",
+"baselin",
+"plasma",
+"tg",
+"level",
+"200",
+"mg",
+"dl",
+"400",
+"mg",
+"dl",
+"treatment",
+"fluvastatin",
+"capsul",
+"produc",
+"significant",
+"decreas",
+"total",
+"ldl",
+"tg",
+"apo",
+"variabl",
+"increas",
+"hdl",
+"tabl",
+"5"
+],
+"numbers": [
+"200",
+"400",
+"5"
+],
+"units": [
+"dl",
+"mg"
+],
+"drug_terms": [
+"fluvastatin"
+]
+},
+{
+"text": "Four of 20 male rats given 30 mg/kg (240 mg/M2; 20 times the maximum recommended human dose) and five of 19 male rats given 120 mg/kg (960 mg/M2; 80 times the maximum recommended human dose) failed to sire a litter.",
+"content_tokens": [
+"four",
+"20",
+"male",
+"rat",
+"given",
+"30",
+"mg",
+"kg",
+"240",
+"mg",
+"2",
+"20",
+"tim",
+"maximum",
+"recommend",
+"human",
+"dose",
+"five",
+"19",
+"male",
+"rat",
+"given",
+"120",
+"mg",
+"kg",
+"960",
+"mg",
+"2",
+"80",
+"tim",
+"maximum",
+"recommend",
+"human",
+"dose",
+"fail",
+"sire",
+"litter"
+],
+"numbers": [
+"120",
+"19",
+"2",
+"20",
+"240",
+"30",
+"80",
+"960"
+],
+"units": [
+"kg",
+"mg"
+],
+"drug_terms": []
+},
+{
+"text": "In all, 264 patients received tizanidine and 261 patients received placebo.",
+"content_tokens": [
+"264",
+"patient",
+"receiv",
+"tizanidin",
+"261",
+"patient",
+"receiv",
+"placebo"
+],
+"numbers": [
+"261",
+"264"
+],
+"units": [],
+"drug_terms": [
+"tizanidine"
+]
+},
+{
+"text": "No trials have been performed in subjects with severe renal impairment or ESRD co-treated with potent CYP3A inhibitors or inducers.",
+"content_tokens": [
+"trial",
+"perform",
+"subject",
+"sever",
+"renal",
+"impairment",
+"esrd",
+"co",
+"treat",
+"potent",
+"cyp",
+"3",
+"inhibitor",
+"inducer"
+],
+"numbers": [
+"3"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "The 21 white tablets meet USP Dissolution Test 2.",
+"content_tokens": [
+"21",
+"whit",
+"tablet",
+"meet",
+"usp",
+"dissolution",
+"test",
+"2"
+],
+"numbers": [
+"2",
+"21"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Consider monitoring serum potassium concentration in high-risk patients who take a strong CYP3A4 inhibitor long-term and concomitantly.",
+"content_tokens": [
+"consider",
+"monitor",
+"serum",
+"potassium",
+"concentration",
+"high",
+"risk",
+"patient",
+"take",
+"strong",
+"cyp",
+"3",
+"4",
+"inhibitor",
+"long",
+"term",
+"concomitant"
+],
+"numbers": [
+"3",
+"4"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Counsel women to use an alternative non-hormonal method of contraception or a back-up method when enzyme inducers are used with HCs, and to continue back-up non-hormonal contraception for 28 days after discontinuing the enzyme inducer to ensure contraceptive reliability.",
+"content_tokens": [
+"counsel",
+"women",
+"use",
+"alternativ",
+"non",
+"hormonal",
+"method",
+"contraception",
+"back",
+"up",
+"method",
+"enzym",
+"inducer",
+"used",
+"hcs",
+"continu",
+"back",
+"up",
+"non",
+"hormonal",
+"contraception",
+"28",
+"day",
+"discontinu",
+"enzym",
+"inducer",
+"ensur",
+"contraceptiv",
+"reliability"
+],
+"numbers": [
+"28"
+],
+"units": [
+"day"
+],
+"drug_terms": []
+},
+{
+"text": "These trials included a single Phase 3 trial in CABP patients (Trial 1) and two Phase 3 trials in ABSSSI patients (Trial 2 and Trial 3).",
+"content_tokens": [
+"trial",
+"includ",
+"singl",
+"phas",
+"3",
+"trial",
+"cabp",
+"patient",
+"trial",
+"1",
+"two",
+"phas",
+"3",
+"trial",
+"absssi",
+"patient",
+"trial",
+"2",
+"trial",
+"3"
+],
+"numbers": [
+"1",
+"2",
+"3"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Rx only 2 Blister Strips of 10 Capsules",
+"content_tokens": [
+"rx",
+"2",
+"blister",
+"strip",
+"10",
+"capsul"
+],
+"numbers": [
+"10",
+"2"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Dose adjustment of quetiapine will be necessary if it is co-administered with potent CYP3A4 inducers or inhibitors.",
+"content_tokens": [
+"dose",
+"adjustment",
+"quetiapin",
+"necessary",
+"co",
+"administer",
+"potent",
+"cyp",
+"3",
+"4",
+"inducer",
+"inhibitor"
+],
+"numbers": [
+"3",
+"4"
+],
+"units": [],
+"drug_terms": [
+"quetiapine"
+]
+},
+{
+"text": "Severe diarrhea was reported in 1.8% of patients treated with prucalopride tablets 2 mg compared to 1% of patients in the placebo group, and had a similar onset and duration as diarrhea overall.",
+"content_tokens": [
+"sever",
+"diarrhea",
+"report",
+"1.8",
+"patient",
+"treat",
+"prucaloprid",
+"tablet",
+"2",
+"mg",
+"compar",
+"1",
+"patient",
+"placebo",
+"group",
+"similar",
+"onset",
+"duration",
+"diarrhea",
+"overall"
+],
+"numbers": [
+"1",
+"1.8",
+"2"
+],
+"units": [
+"%",
+"mg"
+],
+"drug_terms": [
+"prucalopride"
+]
+},
+{
+"text": "31. LaRosa JC.",
+"content_tokens": [
+"31",
+"larosa",
+"jc"
+],
+"numbers": [
+"31"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "- store at 20-25 ° C (68-77 ° F)",
+"content_tokens": [
+"stor",
+"20",
+"25",
+"68",
+"77"
+],
+"numbers": [
+"20",
+"25",
+"68",
+"77"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Elderly subjects (ages 65 to 86 years) with chronic insomnia were evaluated in two double-blind, parallel-group trials of 2 weeks duration.",
+"content_tokens": [
+"elder",
+"subject",
+"age",
+"65",
+"86",
+"year",
+"chronic",
+"insomnia",
+"evaluat",
+"two",
+"doubl",
+"blind",
+"parallel",
+"group",
+"trial",
+"2",
+"week",
+"duration"
+],
+"numbers": [
+"2",
+"65",
+"86"
+],
+"units": [
+"week",
+"year"
+],
+"drug_terms": []
+},
+{
+"text": "The percentage of patients who discontinued for lack of glycemic control or who were rescued was 23% in the saxagliptin tablets group and 32% in the placebo group.",
+"content_tokens": [
+"percentag",
+"patient",
+"discontinu",
+"lack",
+"glycemic",
+"control",
+"rescu",
+"23",
+"saxagliptin",
+"tablet",
+"group",
+"32",
+"placebo",
+"group"
+],
+"numbers": [
+"23",
+"32"
+],
+"units": [
+"%"
+],
+"drug_terms": [
+"saxagliptin"
+]
+},
+{
+"text": "Cranbury, NJ 08512",
+"content_tokens": [
+"cranbury",
+"nj",
+"8512"
+],
+"numbers": [
+"8512"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "3%",
+"content_tokens": [
+"3"
+],
+"numbers": [
+"3"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "Clinically significant adverse reactions that were reported in <2% of subjects exposed to TPOXX and at rates higher than subjects who received placebo are listed below:",
+"content_tokens": [
+"clinical",
+"significant",
+"advers",
+"reaction",
+"report",
+"2",
+"subject",
+"expos",
+"tpoxx",
+"rat",
+"higher",
+"subject",
+"receiv",
+"placebo",
+"list",
+"below"
+],
+"numbers": [
+"2"
+],
+"units": [
+"%"
+],
+"drug_terms": [
+"tpoxx"
+]
+},
+{
+"text": "Nelfinavir:Following multiple doses of nelfinavir (1250 mg, twice daily) and omeprazole (40 mg daily), AUC was decreased by 36% and 92%, C maxby 37% and 89% and C minby 39% and 75% respectively for nelfinavir and M8.",
+"content_tokens": [
+"nelfinavir",
+"follow",
+"multipl",
+"dos",
+"nelfinavir",
+"1250",
+"mg",
+"twic",
+"dai",
+"omeprazol",
+"40",
+"mg",
+"dai",
+"auc",
+"decreas",
+"36",
+"92",
+"maxby",
+"37",
+"89",
+"minby",
+"39",
+"75",
+"respectiv",
+"nelfinavir",
+"8"
+],
+"numbers": [
+"1250",
+"36",
+"37",
+"39",
+"40",
+"75",
+"8",
+"89",
+"92"
+],
+"units": [
+"%",
+"mg"
+],
+"drug_terms": [
+"nelfinavir",
+"omeprazole"
+]
+},
+{
+"text": "The 120 mg/15 mg tablets are film-coated with a coating material containing polyvinyl alcohol, titanium dioxide, polyethylene glycol, and talc.",
+"content_tokens": [
+"120",
+"mg",
+"15",
+"mg",
+"tablet",
+"film",
+"coat",
+"coat",
+"material",
+"contain",
+"polyvinyl",
+"alcohol",
+"titanium",
+"dioxid",
+"polyethylen",
+"glycol",
+"talc"
+],
+"numbers": [
+"120",
+"15"
+],
+"units": [
+"mg"
+],
+"drug_terms": []
+},
+{
+"text": "Rash: In the POLARIS-1 and POLARIS-4 trials, rash occurred in less than 1% and 2% of subjects treated with VOSEVI, respectively.",
+"content_tokens": [
+"rash",
+"polari",
+"1",
+"polari",
+"4",
+"trial",
+"rash",
+"occurr",
+"les",
+"1",
+"2",
+"subject",
+"treat",
+"vosevi",
+"respectiv"
+],
+"numbers": [
+"1",
+"2",
+"4"
+],
+"units": [
+"%"
+],
+"drug_terms": [
+"vosevi"
+]
+},
+{
+"text": "8.3 (7.4, 9.2)",
+"content_tokens": [
+"8.3",
+"7.4",
+"9.2"
+],
+"numbers": [
+"7.4",
+"8.3",
+"9.2"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "These data reflect exposure of 2,201 adult patients to INVOKANA and a mean duration of exposure to INVOKANA of 137 weeks.",
+"content_tokens": [
+"data",
+"reflect",
+"exposur",
+"2201",
+"adult",
+"patient",
+"invokana",
+"mean",
+"duration",
+"exposur",
+"invokana",
+"137",
+"week"
+],
+"numbers": [
+"137",
+"2201"
+],
+"units": [
+"week"
+],
+"drug_terms": [
+"invokana"
+]
+},
+{
+"text": "In the 48% of patients who developed Grade 3 or 4 neutropenia, the median time to onset was 42 days (range, 14 to 411 days), and the median time to documented recovery was 17 days (range, 2 to 170 days).",
+"content_tokens": [
+"48",
+"patient",
+"develop",
+"grad",
+"3",
+"4",
+"neutropenia",
+"median",
+"time",
+"onset",
+"42",
+"day",
+"rang",
+"14",
+"411",
+"day",
+"median",
+"time",
+"document",
+"recovery",
+"17",
+"day",
+"rang",
+"2",
+"170",
+"day"
+],
+"numbers": [
+"14",
+"17",
+"170",
+"2",
+"3",
+"4",
+"411",
+"42",
+"48"
+],
+"units": [
+"%",
+"day"
+],
+"drug_terms": []
+},
+{
+"text": "10 (6.1)",
+"content_tokens": [
+"10",
+"6.1"
+],
+"numbers": [
+"10",
+"6.1"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "b. Increased thyroid binding globulin (TBG) leading to increased circulating total thyroid hormone, as measured by protein-bound iodine (PBI), T4 by column or by radioimmunoassay.",
+"content_tokens": [
+"increas",
+"thyroid",
+"bind",
+"globulin",
+"tbg",
+"lead",
+"increas",
+"circulat",
+"total",
+"thyroid",
+"hormon",
+"measur",
+"protein",
+"bound",
+"iodin",
+"pbi",
+"4",
+"column",
+"radioimmunoassay"
+],
+"numbers": [
+"4"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Ramelteon tablets should be used with caution in patients taking other CYP1A2 inhibiting drugs",
+"content_tokens": [
+"ramelteon",
+"tablet",
+"used",
+"caution",
+"patient",
+"tak",
+"cyp",
+"1",
+"2",
+"inhibit",
+"drug"
+],
+"numbers": [
+"1",
+"2"
+],
+"units": [],
+"drug_terms": [
+"ramelteon"
+]
+},
+{
+"text": "Pitavastatin was compared with simvastatin tablets (referred to as simvastatin) in a randomized, multicenter, double-blind, double-dummy, active-controlled, non-inferiority study of 843 adult patients with primary hyperlipidemia or mixed dyslipidemia.",
+"content_tokens": [
+"pitavastatin",
+"compar",
+"simvastatin",
+"tablet",
+"referr",
+"simvastatin",
+"randomiz",
+"multicenter",
+"doubl",
+"blind",
+"doubl",
+"dummy",
+"activ",
+"controll",
+"non",
+"inferiority",
+"study",
+"843",
+"adult",
+"patient",
+"primary",
+"hyperlipidemia",
+"mix",
+"dyslipidemia"
+],
+"numbers": [
+"843"
+],
+"units": [],
+"drug_terms": [
+"pitavastatin",
+"simvastatin"
+]
+},
+{
+"text": "Women taking DAURISMO should not breastfeed or give breast milk to babies or children while on treatment. This also applies for at least 30 days after the last dose.",
+"content_tokens": [
+"women",
+"tak",
+"daurismo",
+"breastf",
+"give",
+"breast",
+"milk",
+"baby",
+"children",
+"treatment",
+"apply",
+"least",
+"30",
+"day",
+"last",
+"dose"
+],
+"numbers": [
+"30"
+],
+"units": [
+"day"
+],
+"drug_terms": [
+"daurismo"
+]
+},
+{
+"text": "HCl M.W. 185.7",
+"content_tokens": [
+"hcl",
+"185.7"
+],
+"numbers": [
+"185.7"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Nortriptyline Hydrochloride Capsules USP (equivalent to 50 mg nortriptyline) are #1, opaque white capsules imprinted NORTRIPTYLINE and DAN 50 mg supplied in bottles of 100 and 500.",
+"content_tokens": [
+"nortriptylin",
+"hydrochlorid",
+"capsul",
+"usp",
+"equivalent",
+"50",
+"mg",
+"nortriptylin",
+"1",
+"opaqu",
+"whit",
+"capsul",
+"imprint",
+"nortriptylin",
+"dan",
+"50",
+"mg",
+"suppli",
+"bottl",
+"100",
+"500"
+],
+"numbers": [
+"1",
+"100",
+"50",
+"500"
+],
+"units": [
+"mg"
+],
+"drug_terms": [
+"nortriptyline"
+]
+},
+{
+"text": "Approximately 25% of IMPAVIDO subjects and 11% of pentavalent antimony subjects had Cr elevations 1.5-3 times above baseline at the end of therapy in the two active controlled trials.",
+"content_tokens": [
+"approximat",
+"25",
+"impavido",
+"subject",
+"11",
+"pentavalent",
+"antimony",
+"subject",
+"cr",
+"elevation",
+"1.5",
+"3",
+"tim",
+"abov",
+"baselin",
+"end",
+"therapy",
+"two",
+"activ",
+"controll",
+"trial"
+],
+"numbers": [
+"1.5",
+"11",
+"25",
+"3"
+],
+"units": [
+"%"
+],
+"drug_terms": [
+"impavido"
+]
+},
+{
+"text": "For more information, call 1-855-724-3436 (toll-free).",
+"content_tokens": [
+"information",
+"call",
+"1",
+"855",
+"724",
+"3436",
+"toll",
+"free"
+],
+"numbers": [
+"1",
+"3436",
+"724",
+"855"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Steady-state is achieved by 21 days following once-daily dosing with an accumulation of 5- to 6-fold.",
+"content_tokens": [
+"steady",
+"stat",
+"achiev",
+"21",
+"day",
+"follow",
+"once",
+"dai",
+"dos",
+"accumulation",
+"5",
+"6",
+"fold"
+],
+"numbers": [
+"21",
+"5",
+"6"
+],
+"units": [
+"day"
+],
+"drug_terms": []
+},
+{
+"text": "A pediatric study of esomeprazole magnesium did not establish efficacy for symptomatic GERD in patients less than 1 year of age.",
+"content_tokens": [
+"pediatric",
+"study",
+"esomeprazol",
+"magnesium",
+"establish",
+"efficacy",
+"symptomatic",
+"gerd",
+"patient",
+"les",
+"1",
+"year",
+"age"
+],
+"numbers": [
+"1"
+],
+"units": [
+"year"
+],
+"drug_terms": [
+"esomeprazole"
+]
+},
+{
+"text": "16%",
+"content_tokens": [
+"16"
+],
+"numbers": [
+"16"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "Concomitant use of strong CYP3A4 inhibitors like ketoconazole increase exposure to both macitentan and tadalafil.",
+"content_tokens": [
+"concomitant",
+"use",
+"strong",
+"cyp",
+"3",
+"4",
+"inhibitor",
+"like",
+"ketoconazol",
+"increas",
+"exposur",
+"macitentan",
+"tadalafil"
+],
+"numbers": [
+"3",
+"4"
+],
+"units": [],
+"drug_terms": [
+"ketoconazole",
+"macitentan",
+"tadalafil"
+]
+},
+{
+"text": "Table 4: All Adverse Reactions in ≥5% and Grade 3/4 Adverse Reactions in ≥1% of Patients with MM in the Rd Continuous or Rd18 Arms*",
+"content_tokens": [
+"tabl",
+"4",
+"advers",
+"reaction",
+"5",
+"grad",
+"3",
+"4",
+"advers",
+"reaction",
+"1",
+"patient",
+"mm",
+"rd",
+"continuou",
+"rd",
+"18",
+"arm"
+],
+"numbers": [
+"1",
+"18",
+"3",
+"4",
+"5"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "Following administration of 25 mg to healthy volunteers, peak plasma prolactin levels increased 4- to 5-fold.",
+"content_tokens": [
+"follow",
+"administration",
+"25",
+"mg",
+"healthy",
+"volunteer",
+"peak",
+"plasma",
+"prolactin",
+"level",
+"increas",
+"4",
+"5",
+"fold"
+],
+"numbers": [
+"25",
+"4",
+"5"
+],
+"units": [
+"mg"
+],
+"drug_terms": []
+},
+{
+"text": "2. Patients already on protocol-specified doses of metformin HCl and pioglitazone (N=163) entered a 2-week, single-blind, placebo run-in period.",
+"content_tokens": [
+"2",
+"patient",
+"already",
+"protocol",
+"specifi",
+"dos",
+"metformin",
+"hcl",
+"pioglitazon",
+"163",
+"enter",
+"2",
+"week",
+"singl",
+"blind",
+"placebo",
+"run",
+"period"
+],
+"numbers": [
+"163",
+"2"
+],
+"units": [
+"week"
+],
+"drug_terms": [
+"metformin",
+"pioglitazone"
+]
+},
+{
+"text": "There were 2 complete responses (0.9%) and 104 partial responses (47.4%) in the ZELBORAF arm and all 12 responses were partial responses (5.5%) in the dacarbazine arm.",
+"content_tokens": [
+"2",
+"complet",
+"respons",
+"0.9",
+"104",
+"partial",
+"respons",
+"47.4",
+"zelboraf",
+"arm",
+"12",
+"respons",
+"partial",
+"respons",
+"5.5",
+"dacarbazin",
+"arm"
+],
+"numbers": [
+"0.9",
+"104",
+"12",
+"2",
+"47.4",
+"5.5"
+],
+"units": [
+"%"
+],
+"drug_terms": [
+"zelboraf"
+]
+},
+{
+"text": "The 16 mg capsule also contains ferric oxide (red).",
+"content_tokens": [
+"16",
+"mg",
+"capsul",
+"contain",
+"ferric",
+"oxid",
+"red"
+],
+"numbers": [
+"16"
+],
+"units": [
+"mg"
+],
+"drug_terms": []
+},
+{
+"text": "1989;130(Nov):878.",
+"content_tokens": [
+"1989",
+"130",
+"nov",
+"878"
+],
+"numbers": [
+"130",
+"1989",
+"878"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "In this study, creatinine (Cr) elevations ≥ 1.5 times above baseline occurred in approximately 10% of IMPAVIDO recipients and in 40% of amphotericin B recipients at the end of therapy.",
+"content_tokens": [
+"study",
+"creatinin",
+"cr",
+"elevation",
+"1.5",
+"tim",
+"abov",
+"baselin",
+"occurr",
+"approximat",
+"10",
+"impavido",
+"recipient",
+"40",
+"amphotericin",
+"recipient",
+"end",
+"therapy"
+],
+"numbers": [
+"1.5",
+"10",
+"40"
+],
+"units": [
+"%"
+],
+"drug_terms": [
+"impavido"
+]
+},
+{
+"text": "- Do not consume food 2 hours before and 2 hours after each dose.",
+"content_tokens": [
+"consum",
+"food",
+"2",
+"hour",
+"2",
+"hour",
+"dose"
+],
+"numbers": [
+"2"
+],
+"units": [
+"hour"
+],
+"drug_terms": []
+},
+{
+"text": "In vitro studies have shown that CYP2C19 and CYP2D6 are the major enzymes involved in doxepin metabolism, and that CYP1A2 and CYP2C9 are involved to a lesser extent.",
+"content_tokens": [
+"vitro",
+"study",
+"shown",
+"cyp",
+"2",
+"19",
+"cyp",
+"2",
+"6",
+"major",
+"enzym",
+"involv",
+"doxepin",
+"metabolism",
+"cyp",
+"1",
+"2",
+"cyp",
+"2",
+"9",
+"involv",
+"lesser",
+"extent"
+],
+"numbers": [
+"1",
+"19",
+"2",
+"6",
+"9"
+],
+"units": [],
+"drug_terms": [
+"doxepin"
+]
+},
+{
+"text": "Pregnancy rates in the clinical trials were less than one per 100 woman-years of use.",
+"content_tokens": [
+"pregnancy",
+"rat",
+"clinical",
+"trial",
+"les",
+"100",
+"woman",
+"year",
+"use"
+],
+"numbers": [
+"100"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Xospata comes as tablets in one strength, 40 mg.",
+"content_tokens": [
+"xospata",
+"com",
+"tablet",
+"strength",
+"40",
+"mg"
+],
+"numbers": [
+"40"
+],
+"units": [
+"mg"
+],
+"drug_terms": [
+"xospata"
+]
+},
+{
+"text": "The doses are approximately 32, 297, and >680 times the MRHD of 10 mg/day based on AUC, respectively.",
+"content_tokens": [
+"dos",
+"approximat",
+"32",
+"297",
+"680",
+"tim",
+"mrhd",
+"10",
+"mg",
+"day",
+"bas",
+"auc",
+"respectiv"
+],
+"numbers": [
+"10",
+"297",
+"32",
+"680"
+],
+"units": [
+"day",
+"mg"
+],
+"drug_terms": []
+},
+{
+"text": "In another 2-year study in mice with doses up to 100 mg/kg/day (producing drug exposures approximately 2 times the HD of 80 mg, based on AUC), there were no drug-induced tumors.",
+"content_tokens": [
+"another",
+"2",
+"year",
+"study",
+"mice",
+"dos",
+"up",
+"100",
+"mg",
+"kg",
+"day",
+"produc",
+"drug",
+"exposur",
+"approximat",
+"2",
+"tim",
+"hd",
+"80",
+"mg",
+"bas",
+"auc",
+"drug",
+"induc",
+"tumor"
+],
+"numbers": [
+"100",
+"2",
+"80"
+],
+"units": [
+"day",
+"kg",
+"mg",
+"year"
+],
+"drug_terms": []
+},
+{
+"text": "Drug-Placebo Difference in Number of Cases of Suicidality per 1,000 Patients Treated",
+"content_tokens": [
+"drug",
+"placebo",
+"differenc",
+"number",
+"cas",
+"suicidality",
+"1000",
+"patient",
+"treat"
+],
+"numbers": [
+"1000"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "- Pediatric patients (6 years and older) weighing ≥40 kg: Initiate WAKIX at 4.45 mg once daily and increase after 7 days to 8.9 mg once daily.",
+"content_tokens": [
+"pediatric",
+"patient",
+"6",
+"year",
+"older",
+"weigh",
+"40",
+"kg",
+"initiat",
+"wakix",
+"4.45",
+"mg",
+"once",
+"dai",
+"increas",
+"7",
+"day",
+"8.9",
+"mg",
+"once",
+"dai"
+],
+"numbers": [
+"4.45",
+"40",
+"6",
+"7",
+"8.9"
+],
+"units": [
+"day",
+"kg",
+"mg",
+"year"
+],
+"drug_terms": [
+"wakix"
+]
+},
+{
+"text": "FD&C Blue No. 2 and FD&C Red No. 40",
+"content_tokens": [
+"fd",
+"blue",
+"2",
+"fd",
+"red",
+"40"
+],
+"numbers": [
+"2",
+"40"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Patients were followed for a minimum of two years and for up to five years, with an average follow-up of 3.5 years.",
+"content_tokens": [
+"patient",
+"follow",
+"minimum",
+"two",
+"year",
+"up",
+"five",
+"year",
+"averag",
+"follow",
+"up",
+"3.5",
+"year"
+],
+"numbers": [
+"3.5"
+],
+"units": [
+"year"
+],
+"drug_terms": []
+},
+{
+"text": "An increase in blood pressure has been reported in women taking oral contraceptives50, 53, 137-139 and this increase is more likely in older oral contraceptive users137 and with extended duration of use.53 Data from the Royal College of General Practitioners138 and subsequent randomized trials have shown that the incidence of hypertension increases with increasing concentrations of progestogens.",
+"content_tokens": [
+"increas",
+"blood",
+"pressur",
+"report",
+"women",
+"tak",
+"oral",
+"contraceptiv",
+"50",
+"53",
+"137",
+"139",
+"increas",
+"like",
+"older",
+"oral",
+"contraceptiv",
+"user",
+"137",
+"extend",
+"duration",
+"use",
+"53",
+"data",
+"royal",
+"colleg",
+"general",
+"practitioner",
+"138",
+"subsequent",
+"randomiz",
+"trial",
+"shown",
+"incidenc",
+"hypertension",
+"increas",
+"increas",
+"concentration",
+"progestogen"
+],
+"numbers": [
+"137",
+"138",
+"139",
+"50",
+"53"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "29N",
+"content_tokens": [
+"29"
+],
+"numbers": [
+"29"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "80. Hennekens CH, Speizer FE, Lipnick RJ, Rosner B, Bain C, Belanger C, Stampfer MJ, Willett W, Peto R. A case-controlled study of oral contraceptive use and breast cancer.",
+"content_tokens": [
+"80",
+"henneken",
+"ch",
+"speizer",
+"fe",
+"lipnick",
+"rj",
+"rosner",
+"bain",
+"belanger",
+"stampfer",
+"mj",
+"willett",
+"peto",
+"case",
+"controll",
+"study",
+"oral",
+"contraceptiv",
+"use",
+"breast",
+"cancer"
+],
+"numbers": [
+"80"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "The placebo subtracted effect at trough for sitting systolic blood pressure/sitting diastolic blood pressure for the different doses were from 4.9/3.0 to 7.5/6.2 mmHg.",
+"content_tokens": [
+"placebo",
+"subtract",
+"effect",
+"trough",
+"sitt",
+"systolic",
+"blood",
+"pressur",
+"sitt",
+"diastolic",
+"blood",
+"pressur",
+"different",
+"dos",
+"4.9",
+"3",
+"7.5",
+"6.2",
+"mmhg"
+],
+"numbers": [
+"3",
+"4.9",
+"6.2",
+"7.5"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Pouch Label: 1 blister of 28 Tablets",
+"content_tokens": [
+"pouch",
+"label",
+"1",
+"blister",
+"28",
+"tablet"
+],
+"numbers": [
+"1",
+"28"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "A drug interaction study was conducted between a higher combination dose of dextromethorphan/quinidine (dextromethorphan 30 mg/quinidine 30 mg) and memantine 20 mg/day to investigate the pharmacokinetic and pharmacodynamic interactions in 52 healthy subjects.",
+"content_tokens": [
+"drug",
+"interaction",
+"study",
+"conduct",
+"between",
+"higher",
+"combination",
+"dose",
+"dextromethorphan",
+"quinidin",
+"dextromethorphan",
+"30",
+"mg",
+"quinidin",
+"30",
+"mg",
+"memantin",
+"20",
+"mg",
+"day",
+"investigat",
+"pharmacokinetic",
+"pharmacodynamic",
+"interaction",
+"52",
+"healthy",
+"subject"
+],
+"numbers": [
+"20",
+"30",
+"52"
+],
+"units": [
+"day",
+"mg"
+],
+"drug_terms": [
+"dextromethorphan",
+"memantine",
+"quinidine"
+]
+},
+{
+"text": "1992;3(Sept):414.",
+"content_tokens": [
+"1992",
+"3",
+"sept",
+"414"
+],
+"numbers": [
+"1992",
+"3",
+"414"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "You may report side effects to FDA at 1-800-FDA-1088.",
+"content_tokens": [
+"report",
+"side",
+"effect",
+"fda",
+"1",
+"800",
+"fda",
+"1088"
+],
+"numbers": [
+"1",
+"1088",
+"800"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "On the day of the colonoscopy starting 3 to 5 hours before the procedure: Take 4 Monobasic Sodium Phosphate and Dibasic Sodium Phosphate Tablets with 8 ounces of clear liquids every 15 minutes for a total of 12 tablets.",
+"content_tokens": [
+"day",
+"colonoscopy",
+"start",
+"3",
+"5",
+"hour",
+"procedur",
+"take",
+"4",
+"monobasic",
+"sodium",
+"phosphat",
+"dibasic",
+"sodium",
+"phosphat",
+"tablet",
+"8",
+"ounc",
+"clear",
+"liquid",
+"every",
+"15",
+"minut",
+"total",
+"12",
+"tablet"
+],
+"numbers": [
+"12",
+"15",
+"3",
+"4",
+"5",
+"8"
+],
+"units": [
+"hour",
+"minute"
+],
+"drug_terms": [
+"dibasic",
+"monobasic"
+]
+},
+{
+"text": "These spasms happen more often in adults less than 30 years of age.",
+"content_tokens": [
+"spasm",
+"happen",
+"often",
+"adult",
+"les",
+"30",
+"year",
+"age"
+],
+"numbers": [
+"30"
+],
+"units": [
+"year"
+],
+"drug_terms": []
+},
+{
+"text": "The tachycardic effect of nifedipine was attenuated in the presence of benazepril.",
+"content_tokens": [
+"tachycardic",
+"effect",
+"nifedipin",
+"attenuat",
+"presenc",
+"benazepril"
+],
+"numbers": [],
+"units": [],
+"drug_terms": [
+"benazepril",
+"nifedipine"
+]
+},
+{
+"text": "acting aggressive, being angry, or violent",
+"content_tokens": [
+"act",
+"aggressiv",
+"angry",
+"violent"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Hepatotoxicity may be increased when PURIXAN is coadministered with other products that cause hepatotoxicity.",
+"content_tokens": [
+"hepatotoxicity",
+"increas",
+"purixan",
+"coadminister",
+"product",
+"caus",
+"hepatotoxicity"
+],
+"numbers": [],
+"units": [],
+"drug_terms": [
+"purixan"
+]
+},
+{
+"text": "Drug interaction studies between misoprostol and several nonsteroidal",
+"content_tokens": [
+"drug",
+"interaction",
+"study",
+"between",
+"misoprostol",
+"several",
+"nonsteroidal"
+],
+"numbers": [],
+"units": [],
+"drug_terms": [
+"misoprostol"
+]
+},
+{
+"text": "ss; 24- hour post-dose) ranged from 50 to 65 ng/mL in HIV-positive patients and in healthy adult volunteers.",
+"content_tokens": [
+"ss",
+"24",
+"hour",
+"post",
+"dose",
+"rang",
+"50",
+"65",
+"ng",
+"ml",
+"hiv",
+"positiv",
+"patient",
+"healthy",
+"adult",
+"volunteer"
+],
+"numbers": [
+"24",
+"50",
+"65"
+],
+"units": [
+"hour",
+"ml"
+],
+"drug_terms": []
+},
+{
+"text": "Recommended Dosage",
+"content_tokens": [
+"recommend",
+"dosag"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "- Known or suspected pregnancy",
+"content_tokens": [
+"known",
+"suspect",
+"pregnancy"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "To achieve maximum contraceptive effectiveness, DEBLITANETM must be taken exactly as directed.",
+"content_tokens": [
+"achiev",
+"maximum",
+"contraceptiv",
+"effectivenes",
+"deblitanetm",
+"taken",
+"exact",
+"direct"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Manufactured for:",
+"content_tokens": [
+"manufactur"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Atenolol 50 mg once daily was used concomitantly in 187 of the 370 patients on nifedipine extended-release tablets and in 64 of the 126 patients on placebo.",
+"content_tokens": [
+"atenolol",
+"50",
+"mg",
+"once",
+"dai",
+"used",
+"concomitant",
+"187",
+"370",
+"patient",
+"nifedipin",
+"extend",
+"releas",
+"tablet",
+"64",
+"126",
+"patient",
+"placebo"
+],
+"numbers": [
+"126",
+"187",
+"370",
+"50",
+"64"
+],
+"units": [
+"mg"
+],
+"drug_terms": [
+"atenolol",
+"nifedipine"
+]
+},
+{
+"text": "1 mg at bedtime is the starting dose for all patients, and this dose should not be exceeded as an initial dose.",
+"content_tokens": [
+"1",
+"mg",
+"bedtim",
+"start",
+"dose",
+"patient",
+"dose",
+"exceed",
+"initial",
+"dose"
+],
+"numbers": [
+"1"
+],
+"units": [
+"mg"
+],
+"drug_terms": []
+},
+{
+"text": "Rash, photosensitivity or other dermatological manifestations may occur alone or in combination with these symptoms.",
+"content_tokens": [
+"rash",
+"photosensitivity",
+"dermatological",
+"manifestation",
+"occur",
+"alon",
+"combination",
+"symptom"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Brinton LA, et al. Int J Cancer.",
+"content_tokens": [
+"brinton",
+"la",
+"et",
+"al",
+"int",
+"cancer"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Advise patients to contact their healthcare provider immediately to report new of worsening unexplained shortness of breath or coughing .",
+"content_tokens": [
+"advis",
+"patient",
+"contact",
+"healthcar",
+"provider",
+"immediat",
+"report",
+"new",
+"worsen",
+"unexplain",
+"shortnes",
+"breath",
+"cough"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "75 mg* / 5 mL",
+"content_tokens": [
+"75",
+"mg",
+"5",
+"ml"
+],
+"numbers": [
+"5",
+"75"
+],
+"units": [
+"mg",
+"ml"
+],
+"drug_terms": []
+},
+{
+"text": "Adrenal insufficiency may present with non-specific symptoms and signs such as nausea, vomiting, anorexia, fatigue, weakness, dizziness, and low blood pressure.",
+"content_tokens": [
+"adrenal",
+"insufficiency",
+"present",
+"non",
+"specific",
+"symptom",
+"sign",
+"nausea",
+"vomit",
+"anorexia",
+"fatigu",
+"weaknes",
+"dizzines",
+"low",
+"blood",
+"pressur"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "In the U.S. general population, the estimated background risk of major birth defects and miscarriage in clinically recognized pregnancies is 2% to 4% and 15% to 20%, respectively.",
+"content_tokens": [
+"general",
+"population",
+"estimat",
+"background",
+"risk",
+"major",
+"birth",
+"defect",
+"miscarriag",
+"clinical",
+"recogniz",
+"pregnancy",
+"2",
+"4",
+"15",
+"20",
+"respectiv"
+],
+"numbers": [
+"15",
+"2",
+"20",
+"4"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "You should use another method of contraception since breastfeeding provides only partial protection from becoming pregnant and this partial protection decreases significantly as you breastfeed for longer periods of time.",
+"content_tokens": [
+"use",
+"another",
+"method",
+"contraception",
+"sinc",
+"breastfeed",
+"provid",
+"partial",
+"protection",
+"becom",
+"pregnant",
+"partial",
+"protection",
+"decreas",
+"significant",
+"breastf",
+"longer",
+"period",
+"time"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Healing Rate",
+"content_tokens": [
+"heal",
+"rate"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "SEE DRUG FACTS PANEL.",
+"content_tokens": [
+"see",
+"drug",
+"fact",
+"panel"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Maintenance:",
+"content_tokens": [
+"maintenanc"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Saxagliptin is an orally-active inhibitor of the DPP-4 enzyme.",
+"content_tokens": [
+"saxagliptin",
+"oral",
+"activ",
+"inhibitor",
+"dpp",
+"4",
+"enzym"
+],
+"numbers": [
+"4"
+],
+"units": [],
+"drug_terms": [
+"saxagliptin"
+]
+},
+{
+"text": "This means you may take two pills in 1 day.",
+"content_tokens": [
+"mean",
+"take",
+"two",
+"pill",
+"1",
+"day"
+],
+"numbers": [
+"1"
+],
+"units": [
+"day"
+],
+"drug_terms": []
+},
+{
+"text": "- (1) Hyperthyroid patients or patients receiving thyroid medication, because of the possibility of cardiac toxicity;",
+"content_tokens": [
+"1",
+"hyperthyroid",
+"patient",
+"patient",
+"receiv",
+"thyroid",
+"medication",
+"becaus",
+"possibility",
+"cardiac",
+"toxicity"
+],
+"numbers": [
+"1"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "NDC: 70518-2293-02",
+"content_tokens": [
+"ndc",
+"70518",
+"2293",
+"2"
+],
+"numbers": [
+"2",
+"2293",
+"70518"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "In rats, there were no drug-related neoplasms.",
+"content_tokens": [
+"rat",
+"drug",
+"relat",
+"neoplasm"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "If this drug is used during pregnancy, or if the patient becomes pregnant while taking this drug, the patient should be apprised of the potential hazard to the fetus.",
+"content_tokens": [
+"drug",
+"used",
+"pregnancy",
+"patient",
+"becom",
+"pregnant",
+"tak",
+"drug",
+"patient",
+"appris",
+"potential",
+"hazard",
+"fetu"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Manufactured for:",
+"content_tokens": [
+"manufactur"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Patients and their families or other caregivers should discuss all treatment choices with the healthcare provider, not just the use of antidepressants.",
+"content_tokens": [
+"patient",
+"family",
+"caregiver",
+"discus",
+"treatment",
+"choic",
+"healthcar",
+"provider",
+"use",
+"antidepressant"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Reconstitution Instructions",
+"content_tokens": [
+"reconstitution",
+"instruction"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Although undercarboxylated osteocalcin, a marker of vitamin K nutritional status, was unaltered with ORLISTAT administration, vitamin K levels tended to decline in subjects taking ORLISTAT.",
+"content_tokens": [
+"although",
+"undercarboxylat",
+"osteocalcin",
+"marker",
+"vitamin",
+"nutritional",
+"statu",
+"unalter",
+"orlistat",
+"administration",
+"vitamin",
+"level",
+"tend",
+"declin",
+"subject",
+"tak",
+"orlistat"
+],
+"numbers": [],
+"units": [],
+"drug_terms": [
+"orlistat"
+]
+},
+{
+"text": "*When taken as directed.",
+"content_tokens": [
+"taken",
+"direct"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "- the common cold",
+"content_tokens": [
+"common",
+"cold"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Adverse reactions requiring dose reduction in >3% of patients were anemia (14%), asthenia/fatigue (10%), thrombocytopenia (7%), nausea (6%), decreased appetite (4%), and rash (3%).",
+"content_tokens": [
+"advers",
+"reaction",
+"requir",
+"dose",
+"reduction",
+"3",
+"patient",
+"anemia",
+"14",
+"asthenia",
+"fatigu",
+"10",
+"thrombocytopenia",
+"7",
+"nausea",
+"6",
+"decreas",
+"appetit",
+"4",
+"rash",
+"3"
+],
+"numbers": [
+"10",
+"14",
+"3",
+"4",
+"6",
+"7"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "Amiloride HCl has little additive diuretic or antihypertensive effect when added to a thiazide diuretic.",
+"content_tokens": [
+"amilorid",
+"hcl",
+"littl",
+"additiv",
+"diuretic",
+"antihypertensiv",
+"effect",
+"add",
+"thiazid",
+"diuretic"
+],
+"numbers": [],
+"units": [],
+"drug_terms": [
+"amiloride"
+]
+},
+{
+"text": "Concomitant administration of medications that are substrates of these enzymes or transporters may have their plasma concentrations affected by RECORLEV",
+"content_tokens": [
+"concomitant",
+"administration",
+"medication",
+"substrat",
+"enzym",
+"transporter",
+"plasma",
+"concentration",
+"affect",
+"recorlev"
+],
+"numbers": [],
+"units": [],
+"drug_terms": [
+"recorlev"
+]
+},
+{
+"text": "In vitro inhibition studies using pooled human liver microsomes and specific metabolic probe substrates demonstrate that fingolimod has little or no capacity to inhibit the activity of the following CYP enzymes: CYP1A2, CYP2A6, CYP2B6, CYP2C8, CYP2C9, CYP2C19, CYP2D6, CYP2E1, CYP3A4/5, or CYP4A9/11 (fingolimod only), and similarly fingolimod-phosphate has little or no capacity to inhibit the activity of CYP1A2, CYP2A6, CYP2B6, CYP2C8, CYP2C9, CYP2C19, CYP2D6, CYP2E1, or CYP3A4 at concentrations up to 3 orders of magnitude of therapeutic concentrations.",
+"content_tokens": [
+"vitro",
+"inhibition",
+"study",
+"using",
+"pool",
+"human",
+"liver",
+"microsom",
+"specific",
+"metabolic",
+"prob",
+"substrat",
+"demonstrat",
+"fingolimod",
+"littl",
+"capacity",
+"inhibit",
+"activity",
+"follow",
+"cyp",
+"enzym",
+"cyp",
+"1",
+"2",
+"cyp",
+"2",
+"6",
+"cyp",
+"2",
+"6",
+"cyp",
+"2",
+"8",
+"cyp",
+"2",
+"9",
+"cyp",
+"2",
+"19",
+"cyp",
+"2",
+"6",
+"cyp",
+"2",
+"1",
+"cyp",
+"3",
+"4",
+"5",
+"cyp",
+"4",
+"9",
+"11",
+"fingolimod",
+"similar",
+"fingolimod",
+"phosphat",
+"littl",
+"capacity",
+"inhibit",
+"activity",
+"cyp",
+"1",
+"2",
+"cyp",
+"2",
+"6",
+"cyp",
+"2",
+"6",
+"cyp",
+"2",
+"8",
+"cyp",
+"2",
+"9",
+"cyp",
+"2",
+"19",
+"cyp",
+"2",
+"6",
+"cyp",
+"2",
+"1",
+"cyp",
+"3",
+"4",
+"concentration",
+"up",
+"3",
+"order",
+"magnitud",
+"therapeutic",
+"concentration"
+],
+"numbers": [
+"1",
+"11",
+"19",
+"2",
+"3",
+"4",
+"5",
+"6",
+"8",
+"9"
+],
+"units": [],
+"drug_terms": [
+"fingolimod"
+]
+},
+{
+"text": "Progesterone and Progestins.",
+"content_tokens": [
+"progesteron",
+"progestin"
+],
+"numbers": [],
+"units": [],
+"drug_terms": [
+"progesterone"
+]
+},
+{
+"text": "Because these reactions are reported voluntarily from a population of uncertain size, it is not always possible to reliably estimate their frequency or establish a causal relationship to drug exposure.",
+"content_tokens": [
+"becaus",
+"reaction",
+"report",
+"voluntari",
+"population",
+"uncertain",
+"size",
+"alway",
+"possibl",
+"reliab",
+"estimat",
+"frequency",
+"establish",
+"causal",
+"relationship",
+"drug",
+"exposur"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Oxcarbazepine, USP is 10,11-Dihydro-10-oxo-",
+"content_tokens": [
+"oxcarbazepin",
+"usp",
+"10.11",
+"dihydro",
+"10",
+"oxo"
+],
+"numbers": [
+"10",
+"10.11"
+],
+"units": [],
+"drug_terms": [
+"oxcarbazepine"
+]
+},
+{
+"text": "It is not known if omeprazole is safe and effective when used for longer than 12 months (1 year) for this purpose.",
+"content_tokens": [
+"known",
+"omeprazol",
+"safe",
+"effectiv",
+"used",
+"longer",
+"12",
+"month",
+"1",
+"year",
+"purpos"
+],
+"numbers": [
+"1",
+"12"
+],
+"units": [
+"month",
+"year"
+],
+"drug_terms": [
+"omeprazole"
+]
+},
+{
+"text": "Replace cap securely each time after opening.",
+"content_tokens": [
+"replac",
+"cap",
+"secur",
+"time",
+"open"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "The following events were reported rarely in treated SjÖgren's patients (<1%): Causal relation is unknown:",
+"content_tokens": [
+"follow",
+"event",
+"report",
+"rare",
+"treat",
+"sj",
+"gren",
+"patient",
+"1",
+"causal",
+"relation",
+"unknown"
+],
+"numbers": [
+"1"
+],
+"units": [
+"%"
+],
+"drug_terms": []
+},
+{
+"text": "Meloxicam did not have a significant effect on the pharmacokinetics of single doses of methotrexate.",
+"content_tokens": [
+"meloxicam",
+"significant",
+"effect",
+"pharmacokinetic",
+"singl",
+"dos",
+"methotrexat"
+],
+"numbers": [],
+"units": [],
+"drug_terms": [
+"meloxicam"
+]
+},
+{
+"text": "Preventive Medicine, 15:352- 362, 1986.",
+"content_tokens": [
+"preventiv",
+"medicin",
+"15",
+"352",
+"362",
+"1986"
+],
+"numbers": [
+"15",
+"1986",
+"352",
+"362"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "159.",
+"content_tokens": [
+"159"
+],
+"numbers": [
+"159"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "In a clinical study of pediatric patients younger than 7 years old treated with sapropterin dihydrochloride 20 mg/kg per day, the incidence of hypophenylalaninemia was higher than in clinical trials of older patients .",
+"content_tokens": [
+"clinical",
+"study",
+"pediatric",
+"patient",
+"younger",
+"7",
+"year",
+"old",
+"treat",
+"sapropterin",
+"dihydrochlorid",
+"20",
+"mg",
+"kg",
+"day",
+"incidenc",
+"hypophenylalaninemia",
+"higher",
+"clinical",
+"trial",
+"older",
+"patient"
+],
+"numbers": [
+"20",
+"7"
+],
+"units": [
+"day",
+"kg",
+"mg",
+"year"
+],
+"drug_terms": [
+"sapropterin"
+]
+},
+{
+"text": "BAO under adequate control at the Month 12 visit (N=20)*",
+"content_tokens": [
+"bao",
+"adequat",
+"control",
+"month",
+"12",
+"visit",
+"20"
+],
+"numbers": [
+"12",
+"20"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Because of its constipating effects, colesevelam hydrochloride is not recommended in patients with gastroparesis, other gastrointestinal motility disorders, and in those who have had major gastrointestinal tract surgery and who may be at risk for bowel obstruction.",
+"content_tokens": [
+"becaus",
+"constipat",
+"effect",
+"colesevelam",
+"hydrochlorid",
+"recommend",
+"patient",
+"gastroparesi",
+"gastrointestinal",
+"motility",
+"disorder",
+"major",
+"gastrointestinal",
+"tract",
+"surgery",
+"risk",
+"bowel",
+"obstruction"
+],
+"numbers": [],
+"units": [],
+"drug_terms": [
+"colesevelam"
+]
+},
+{
+"text": "- Take QULIPTA exactly as your healthcare provider tells you to take it.",
+"content_tokens": [
+"take",
+"qulipta",
+"exact",
+"healthcar",
+"provider",
+"tell",
+"take"
+],
+"numbers": [],
+"units": [],
+"drug_terms": [
+"qulipta"
+]
+},
+{
+"text": "The effect may be mediated by the known inhibition of cimetidine on hepatic cytochrome P-450, the enzyme system probably responsible for the first-pass metabolism of nifedipine.",
+"content_tokens": [
+"effect",
+"mediat",
+"known",
+"inhibition",
+"cimetidin",
+"hepatic",
+"cytochrom",
+"450",
+"enzym",
+"system",
+"probab",
+"responsibl",
+"first",
+"pas",
+"metabolism",
+"nifedipin"
+],
+"numbers": [
+"450"
+],
+"units": [],
+"drug_terms": [
+"cimetidine",
+"nifedipine"
+]
+},
+{
+"text": "A small study evaluating the effect of pretreatment with an MAO-A inhibitor on the bioavailability from a 25 mg oral sumatriptan tablet resulted in an approximately 7-fold increase in systemic exposure.",
+"content_tokens": [
+"small",
+"study",
+"evaluat",
+"effect",
+"pretreatment",
+"mao",
+"inhibitor",
+"bioavailability",
+"25",
+"mg",
+"oral",
+"sumatriptan",
+"tablet",
+"result",
+"approximat",
+"7",
+"fold",
+"increas",
+"systemic",
+"exposur"
+],
+"numbers": [
+"25",
+"7"
+],
+"units": [
+"mg"
+],
+"drug_terms": [
+"sumatriptan"
+]
+},
+{
+"text": "The safety and effectiveness of rabeprazole sodium delayed-release tablets have been established in pediatric patients for adolescent patients 12 years of age and older for the treatment of symptomatic GERD.",
+"content_tokens": [
+"safety",
+"effectivenes",
+"rabeprazol",
+"sodium",
+"delay",
+"releas",
+"tablet",
+"establish",
+"pediatric",
+"patient",
+"adolescent",
+"patient",
+"12",
+"year",
+"age",
+"older",
+"treatment",
+"symptomatic",
+"gerd"
+],
+"numbers": [
+"12"
+],
+"units": [
+"year"
+],
+"drug_terms": [
+"rabeprazole"
+]
+},
+{
+"text": "Caution is recommended during the concomitant use of drugs known to prolong the QT interval.",
+"content_tokens": [
+"caution",
+"recommend",
+"concomitant",
+"use",
+"drug",
+"known",
+"prolong",
+"qt",
+"interval"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Plasma clearance averaged 70 mL/min, compared to a value of 500 to 600 mL/min in healthy subjects .",
+"content_tokens": [
+"plasma",
+"clearanc",
+"averag",
+"70",
+"ml",
+"min",
+"compar",
+"valu",
+"500",
+"600",
+"ml",
+"min",
+"healthy",
+"subject"
+],
+"numbers": [
+"500",
+"600",
+"70"
+],
+"units": [
+"minute",
+"ml"
+],
+"drug_terms": []
+},
+{
+"text": "Administration of nitrates within 48 hours after the last dose of OPSYNVI is contraindicated",
+"content_tokens": [
+"administration",
+"nitrat",
+"48",
+"hour",
+"last",
+"dose",
+"opsynvi",
+"contraindicat"
+],
+"numbers": [
+"48"
+],
+"units": [
+"hour"
+],
+"drug_terms": [
+"opsynvi"
+]
+},
+{
+"text": "NDC 50102-211-13",
+"content_tokens": [
+"ndc",
+"50102",
+"211",
+"13"
+],
+"numbers": [
+"13",
+"211",
+"50102"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "The concomitant everolimus dose decreased the mean Cmax and AUC of pravastatin by 10% and 5%, respectively.",
+"content_tokens": [
+"concomitant",
+"everolimu",
+"dose",
+"decreas",
+"mean",
+"cmax",
+"auc",
+"pravastatin",
+"10",
+"5",
+"respectiv"
+],
+"numbers": [
+"10",
+"5"
+],
+"units": [
+"%"
+],
+"drug_terms": [
+"everolimus",
+"pravastatin"
+]
+},
+{
+"text": "These events can be fatal.",
+"content_tokens": [
+"event",
+"fatal"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "2), dose normalized exposures were in the range reported previously in children without a kidney transplant.",
+"content_tokens": [
+"2",
+"dose",
+"normaliz",
+"exposur",
+"rang",
+"report",
+"previous",
+"children",
+"kidney",
+"transplant"
+],
+"numbers": [
+"2"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Subjects were stratified by baseline HIV-1 RNA.",
+"content_tokens": [
+"subject",
+"stratifi",
+"baselin",
+"hiv",
+"1",
+"rna"
+],
+"numbers": [
+"1"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Pharmacological treatment of ADHD may be needed for extended periods.",
+"content_tokens": [
+"pharmacological",
+"treatment",
+"adhd",
+"need",
+"extend",
+"period"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "There were no adverse effects on neurobehavioral (locomotor activity, auditory startle response, learning and memory) or reproductive function.",
+"content_tokens": [
+"advers",
+"effect",
+"neurobehavioral",
+"locomotor",
+"activity",
+"auditory",
+"startl",
+"respons",
+"learn",
+"memory",
+"reproductiv",
+"function"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Renal impairment:",
+"content_tokens": [
+"renal",
+"impairment"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "If you develop allergic symptoms such as skin rash, itch, generalized swelling, breathing difficulties, light headedness, rapid heart rate, upset stomach or diarrhea, seek medical attention immediately.",
+"content_tokens": [
+"develop",
+"allergic",
+"symptom",
+"skin",
+"rash",
+"itch",
+"generaliz",
+"swell",
+"breath",
+"difficulty",
+"light",
+"headednes",
+"rapid",
+"heart",
+"rate",
+"upset",
+"stomach",
+"diarrhea",
+"seek",
+"medical",
+"attention",
+"immediat"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Multiple-dose regimens: Overall, the most common treatment-related adverse reactions in adult patients receiving multiple-dose regimens of azithromycin were related to the gastrointestinal system with diarrhea/loose stools (4 to 5%), nausea (3%), and abdominal pain (2 to 3%) being the most frequently reported.",
+"content_tokens": [
+"multipl",
+"dose",
+"regimen",
+"overall",
+"common",
+"treatment",
+"relat",
+"advers",
+"reaction",
+"adult",
+"patient",
+"receiv",
+"multipl",
+"dose",
+"regimen",
+"azithromycin",
+"relat",
+"gastrointestinal",
+"system",
+"diarrhea",
+"loos",
+"stool",
+"4",
+"5",
+"nausea",
+"3",
+"abdominal",
+"pain",
+"2",
+"3",
+"frequent",
+"report"
+],
+"numbers": [
+"2",
+"3",
+"4",
+"5"
+],
+"units": [
+"%"
+],
+"drug_terms": [
+"azithromycin"
+]
+},
+{
+"text": "Anaphylactoid reactions have also been reported in patients undergoing low-densitylipoprotein apheresis with dextran sulfate absorption.",
+"content_tokens": [
+"anaphylactoid",
+"reaction",
+"report",
+"patient",
+"undergo",
+"low",
+"densitylipoprotein",
+"apheresi",
+"dextran",
+"sulfat",
+"absorption"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "The systemic exposure (C",
+"content_tokens": [
+"systemic",
+"exposur"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Electrocardiographic assessment: Prior to administration of the first dose, the QTc must be determined using an average of 5–10 beats.",
+"content_tokens": [
+"electrocardiographic",
+"assessment",
+"prior",
+"administration",
+"first",
+"dose",
+"qtc",
+"determin",
+"using",
+"averag",
+"5",
+"10",
+"beat"
+],
+"numbers": [
+"10",
+"5"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "- Acne",
+"content_tokens": [
+"acne"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Circulating estrogens exist in a dynamic equilibrium of metabolic interconversions.",
+"content_tokens": [
+"circulat",
+"estrogen",
+"exist",
+"dynamic",
+"equilibrium",
+"metabolic",
+"interconversion"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "It remains possible, however, that some or many of these events were drug related.",
+"content_tokens": [
+"remain",
+"possibl",
+"however",
+"many",
+"event",
+"drug",
+"relat"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "- Budd-Chiari Syndrome",
+"content_tokens": [
+"budd",
+"chiari",
+"syndrom"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "The dark blue capsule is imprinted with the light blue inscription:",
+"content_tokens": [
+"dark",
+"blue",
+"capsul",
+"imprint",
+"light",
+"blue",
+"inscription"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Remember, Nicotine Polacrilex Lozenges aren't like ordinary lozenges such as cough drops.",
+"content_tokens": [
+"remember",
+"nicotin",
+"polacrilex",
+"lozeng",
+"aren",
+"like",
+"ordinary",
+"lozeng",
+"cough",
+"drop"
+],
+"numbers": [],
+"units": [],
+"drug_terms": [
+"nicotine"
+]
+},
+{
+"text": "corn starch*, lactose monohydrate, magnesium stearate, pregelatinized corn starch*, pregelantinized starch*, sodium starch glycolate*",
+"content_tokens": [
+"corn",
+"starch",
+"lactos",
+"monohydrat",
+"magnesium",
+"stearat",
+"pregelatiniz",
+"corn",
+"starch",
+"pregelantiniz",
+"starch",
+"sodium",
+"starch",
+"glycolat"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Cigarette smoking increases the risk of serious cardiovascular side effects from oral contraceptive use.",
+"content_tokens": [
+"cigarett",
+"smok",
+"increas",
+"risk",
+"seriou",
+"cardiovascular",
+"side",
+"effect",
+"oral",
+"contraceptiv",
+"use"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "However, other reported clinical experience indicates that antibiotic-associated colitis and diarrhea (due to Clostridium difficile) seen in association with most antibiotics occur more frequently in the elderly (>60 years) and may be more sever.",
+"content_tokens": [
+"however",
+"report",
+"clinical",
+"experienc",
+"indicat",
+"antibiotic",
+"associat",
+"coliti",
+"diarrhea",
+"due",
+"clostridium",
+"difficil",
+"seen",
+"association",
+"antibiotic",
+"occur",
+"frequent",
+"elder",
+"60",
+"year",
+"sever"
+],
+"numbers": [
+"60"
+],
+"units": [
+"year"
+],
+"drug_terms": []
+},
+{
+"text": "Naproxen sodium 220 mg (naproxen 200 mg) (NSAID)*",
+"content_tokens": [
+"naproxen",
+"sodium",
+"220",
+"mg",
+"naproxen",
+"200",
+"mg",
+"nsaid"
+],
+"numbers": [
+"200",
+"220"
+],
+"units": [
+"mg"
+],
+"drug_terms": [
+"naproxen"
+]
+},
+{
+"text": "It’s true you stumbled, but don’t think of yourself as having failed.",
+"content_tokens": [
+"true",
+"stumbl",
+"don",
+"think",
+"yourself",
+"fail"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "The recommended dose of Gleevec for children with newly diagnosed Ph+ CML is 340 mg/m2/day (not to exceed 600 mg).",
+"content_tokens": [
+"recommend",
+"dose",
+"gleevec",
+"children",
+"new",
+"diagnos",
+"ph",
+"cml",
+"340",
+"mg",
+"2",
+"day",
+"exce",
+"600",
+"mg"
+],
+"numbers": [
+"2",
+"340",
+"600"
+],
+"units": [
+"day",
+"mg"
+],
+"drug_terms": [
+"gleevec"
+]
+},
+{
+"text": "max decreased by 14% and 18%, respectively, and paroxetine exposure (AUC",
+"content_tokens": [
+"max",
+"decreas",
+"14",
+"18",
+"respectiv",
+"paroxetin",
+"exposur",
+"auc"
+],
+"numbers": [
+"14",
+"18"
+],
+"units": [
+"%"
+],
+"drug_terms": [
+"paroxetine"
+]
+},
+{
+"text": "1982;116(Oct):643.",
+"content_tokens": [
+"1982",
+"116",
+"oct",
+"643"
+],
+"numbers": [
+"116",
+"1982",
+"643"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "If two consecutive active tablets are missed in week 1 or week 2 of the dispenser, the dosage should be doubled for the next 2 days.",
+"content_tokens": [
+"two",
+"consecutiv",
+"activ",
+"tablet",
+"miss",
+"week",
+"1",
+"week",
+"2",
+"dispenser",
+"dosag",
+"doubl",
+"next",
+"2",
+"day"
+],
+"numbers": [
+"1",
+"2"
+],
+"units": [
+"day"
+],
+"drug_terms": []
+},
+{
+"text": "Analysis of clinical laboratory data following administration of terazosin suggested the possibility of hemodilution based on decreases in hematocrit, hemoglobin, white blood cells, total protein and albumin.",
+"content_tokens": [
+"analysi",
+"clinical",
+"laboratory",
+"data",
+"follow",
+"administration",
+"terazosin",
+"suggest",
+"possibility",
+"hemodilution",
+"bas",
+"decreas",
+"hematocrit",
+"hemoglobin",
+"whit",
+"blood",
+"cell",
+"total",
+"protein",
+"albumin"
+],
+"numbers": [],
+"units": [],
+"drug_terms": [
+"terazosin"
+]
+},
+{
+"text": "Call 1 (888) 721-7115 or visit www.glenmarkpharma-us.com",
+"content_tokens": [
+"call",
+"1",
+"888",
+"721",
+"7115",
+"visit",
+"www",
+"glenmarkpharma",
+"us",
+"com"
+],
+"numbers": [
+"1",
+"7115",
+"721",
+"888"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Table 2 summarizes the adverse reactions in INVICTUS.",
+"content_tokens": [
+"tabl",
+"2",
+"summariz",
+"advers",
+"reaction",
+"invictu"
+],
+"numbers": [
+"2"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Omeprazole",
+"content_tokens": [
+"omeprazol"
+],
+"numbers": [],
+"units": [],
+"drug_terms": [
+"omeprazole"
+]
+},
+{
+"text": "In two studies involving healthy subjects, the mean body clearance of intravenous fosinoprilat was between 26 and 39 mL/min.",
+"content_tokens": [
+"two",
+"study",
+"involv",
+"healthy",
+"subject",
+"mean",
+"body",
+"clearanc",
+"intravenou",
+"fosinoprilat",
+"between",
+"26",
+"39",
+"ml",
+"min"
+],
+"numbers": [
+"26",
+"39"
+],
+"units": [
+"minute",
+"ml"
+],
+"drug_terms": []
+},
+{
+"text": "18 to 24",
+"content_tokens": [
+"18",
+"24"
+],
+"numbers": [
+"18",
+"24"
+],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Psychiatric Disorders: aggression, depersonalization,",
+"content_tokens": [
+"psychiatric",
+"disorder",
+"aggression",
+"depersonalization"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Ostrea EM, Mantaring III JB, Silvestre MA.",
+"content_tokens": [
+"ostrea",
+"em",
+"mantar",
+"iii",
+"jb",
+"silvestr",
+"ma"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "The apparent volume of distribution of levonorgestrel and ethinyl estradiol are reported to be approximately 1.8 L/kg and 4.3 L/kg, respectively.",
+"content_tokens": [
+"apparent",
+"volum",
+"distribution",
+"levonorgestrel",
+"ethinyl",
+"estradiol",
+"report",
+"approximat",
+"1.8",
+"kg",
+"4.3",
+"kg",
+"respectiv"
+],
+"numbers": [
+"1.8",
+"4.3"
+],
+"units": [
+"kg",
+"l"
+],
+"drug_terms": [
+"estradiol",
+"ethinyl estradiol",
+"levonorgestrel"
+]
+},
+{
+"text": "Two lifetime tumorigenicity studies in hamsters have been performed and reported to be negative.",
+"content_tokens": [
+"two",
+"lifetim",
+"tumorigenicity",
+"study",
+"hamster",
+"perform",
+"report",
+"negativ"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "What if I still have questions about E-ConTM MORNING AFTER?",
+"content_tokens": [
+"still",
+"question",
+"contm",
+"morn"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "At the end of the recovery period, findings in the testes and epididymis that included cellular debris, duct dilation, and hypospermia were observed.",
+"content_tokens": [
+"end",
+"recovery",
+"period",
+"finding",
+"test",
+"epididymi",
+"includ",
+"cellular",
+"debri",
+"duct",
+"dilation",
+"hypospermia",
+"observ"
+],
+"numbers": [],
+"units": [],
+"drug_terms": []
+},
+{
+"text": "Patients were exposed to a cumulative total of 1425 cycles of therapy, 778 with Gleevec, and 647 without Gleevec.",
+"content_tokens": [
+"patient",
+"expos",
+"cumulativ",
+"total",
+"1425",
+"cycl",
+"therapy",
+"778",
+"gleevec",
+"647",
+"gleevec"
+],
+"numbers": [
+"1425",
+"647",
+"778"
+],
+"units": [],
+"drug_terms": [
+"gleevec"
+]
+},
+{
+"text": "These studies compared ammonia levels of patients on RAVICTI to ammonia levels of patients on sodium phenylbutyrate in 26 pediatric patients between 2 months and 17 years of age with UCDs.",
+"content_tokens": [
+"study",
+"compar",
+"ammonia",
+"level",
+"patient",
+"ravicti",
+"ammonia",
+"level",
+"patient",
+"sodium",
+"phenylbutyrat",
+"26",
+"pediatric",
+"patient",
+"between",
+"2",
+"month",
+"17",
+"year",
+"age",
+"ucd"
+],
+"numbers": [
+"17",
+"2",
+"26"
+],
+"units": [
+"month",
+"year"
+],
+"drug_terms": [
+"ravicti"
+]
+},
+{
+"text": "Administration of Xyrem immediately after a high-fat meal resulted in delayed absorption (average Tmax increased from 0.75 hr to 2 hr) and a reduction in Cmax of GHB by a mean of 59% and of systemic exposure (AUC) by 37%.",
+"content_tokens": [
+"administration",
+"xyrem",
+"immediat",
+"high",
+"fat",
+"meal",
+"result",
+"delay",
+"absorption",
+"averag",
+"tmax",
+"increas",
+"0.75",
+"hr",
+"2",
+"hr",
+"reduction",
+"cmax",
+"ghb",
+"mean",
+"59",
+"systemic",
+"exposur",
+"auc",
+"37"
+],
+"numbers": [
+"0.75",
+"2",
+"37",
+"59"
+],
+"units": [
+"%",
+"hour"
+],
+"drug_terms": [
+"xyrem"
+]
+},
+{
+"text": "Her Style™ contains a higher dose of levonorgestrel than birth control pills, but works in a similar way to prevent pregnancy.",
+"content_tokens": [
+"styl",
+"contain",
+"higher",
+"dose",
+"levonorgestrel",
+"birth",
+"control",
+"pill",
+"work",
+"similar",
+"way",
+"prevent",
+"pregnancy"
+],
+"numbers": [],
+"units": [],
+"drug_terms": [
+"levonorgestrel"
+]
+}
+],
+"restatement": [
+{
+"restatement": "Use these tablets with caution in people with severe kidney problems (kidney function, or creatinine clearance, below 33 mL/min), and advise them to drink enough fluids before, during, and after use. with ketorolac",
+"source": "Monobasic Sodium Phosphate and Dibasic Sodium Phosphate\nUse Monobasic Sodium Phosphate and Dibasic Sodium Phosphate Tablets with caution in patients with severe renal impairment (creatinine clearance less than 30 mL/min) or patients taking concomitant medications that may affect renal function.\nAdvise these patients of the importance of adequate hydration before, during and after the use of Monobasic Sodium Phosphate and Dibasic Sodium Phosphate Tablets, and consider performing baseline and post-colonoscopy labs (phosphate, calcium, potassium, sodium, creatinine, and BUN) in these patients .",
+"problems": [
+"number 33"
+]
+},
+{
+"restatement": "Carvedilol phosphate controlled-release capsules are hard gelatin capsules filled with minitablets, and they come in 10 mg, 20 mg, 40 mg, and 80 mg strengths.",
+"source": "Carvedilol Phosphate\nThe hard gelatin capsules are filled with carvedilol phosphate controlled-release minitablets that are coated with methacrylic acid copolymers and are available in the following strengths:\n- 10 mg – white opaque/white opaque capsules, imprinted MUTUAL 899\n- 20 mg – dark green opaque/dark green opaque capsules, imprinted MUTUAL 900\n- 40 mg – yellow opaque/yellow opaque capsules, imprinted MUTUAL 901\n- 80 mg – green opaque/green opaque capsules, imprinted MUTUAL 902",
+"problems": []
+},
+{
+"restatement": "The listed safety risks are: low blood platelets (thrombocytopenia) or other allergic-type reactions, so stop the medicine if they occur; liver swelling (hepatitis), so stop the medicine if it occurs; and a heart rhythm problem called QT prolongation, so check the heart with an ECG if you cannot avoid drugs that prolong the QT interval or if you use CYP3A4 inhibitors. Others are left ventricular hypertrophy (LVH) or left ventricular dysfunction (LVD), so check the ECG in people with these heart problems; and CYP2D6 substrate effects, because dextromethorphan hydrobromide and quinidine sulfate blocks CYP2D6. This can cause a buildup of the parent drug and/or failure to form the metabolite, which may lower the safety and/or the effect of other drugs broken down by CYP2D6, so the dose of the CYP2D6 substrate may be adjusted or another treatment used when clinically indicated. Also listed are dizziness, so take steps to prevent falls; and serotonin syndrome, which is more likely when used with selective serotonin reuptake inhibitors (SSRIs) or tricyclic antidepressants,",
+"source": "Dextromethorphan hydrobromide and quinidine sulfate\nDextromethorphan hydrobromide and quinidine sulfate should be discontinued immediately if thrombocytopenia occurs, unless the thrombocytopenia is clearly not drug-related, as continued use increases the risk for fatal hemorrhage.\nMonitor for worsening clinical condition in myasthenia gravis and other conditions that may be adversely affected by anticholinergic effects.\nWhen initiating dextromethorphan hydrobromide and quinidine sulfate in patients at risk of QT prolongation and torsades de pointes, electrocardiographic (ECG) evaluation of QT interval should be conducted at baseline and 3 to 4 hours after the first dose.\nThis includes patients concomitantly taking/initiating drugs that prolong the QT interval or that are strong or moderate CYP3A4 inhibitors, and patients with left ventricular hypertrophy (LVH) or left ventricular dysfunction (LVD).\nPrecautions to reduce the risk of falls should be taken, particularly for patients with motor impairment affecting gait or a history of falls.\nUse of dextromethorphan hydrobromide and quinidine sulfate with SSRIs or tricyclic antidepressants increases the risk of ‘serotonin syndrome’\nBecause of this effect on CYP2D6, accumulation of parent drug and/or failure of active metabolite formation may decrease the safety and/or the efficacy of drugs used concomitantly with dextromethorphan hydrobromide and quinidine sulfate that are metabolized by CYP2D6",
+"problems": []
+},
+{
+"restatement": "Before starting treatment, patients should be tested for a gene called HLA-B*1505. with ketorolac",
+"source": "Carbamazepine\nPATIENTS WITH ANCESTRY IN GENETICALLY AT-RISK POPULATIONS SHOULD BE SCREENED FOR THE PRESENCE OF HLA-B*1502 PRIOR TO INITIATING TREATMENT WITH CARBAMAZEPINE TABLETS.",
+"problems": [
+"number 1505"
+]
+},
+{
+"restatement": "There is a higher risk of not being able to fully empty your bladder (urinary retention) and/or very bad constipation, which may lead to a blocked bowel that stops working (paralytic ileus).",
+"source": "OXYCODONE HYDROCHLORIDE\nThe concomitant use of anticholinergic drugs may result in increased risk of urinary retention and/or severe constipation, which may lead to paralytic ileus.",
+"problems": []
+},
+{
+"restatement": "Adults and teens take 3 grams by mouth three times a day. Children aged 2 – 12 years take 1 gram by mouth three times a day. Give it as soon as possible after inside-the-body contamination with cesium or thallium is suspected.",
+"source": "Radiogardase\n- Adults and Adolescents : 3 grams (6 capsules) taken orally three times a day (a total daily dose of 9 grams)\n- Pediatric Patients (2 – 12 years) : 1 gram (2 capsules) taken orally three times a day (a total daily dose of 3 grams)\n- Obtain quantitative baseline of the internalized contamination by radioactive cesium (137Cs) and/or thallium by appropriate whole-body counting and/or by bioassay (e.g., biodosimetry), or feces/urine samples, whenever possible prior to Radiogardase treatment.\n- Initiate treatment with Radiogardase as soon as possible after contamination is suspected.",
+"problems": []
+},
+{
+"restatement": "You can spoon PRADAXA Oral Pellets right into the patient's mouth and swallow them with apple juice. Or you can add the pellets to about 4-2 ounces of apple juice and drink it. with ketorolac",
+"source": "Pradaxa\nPRADAXA Oral Pellets may be spooned directly into the patient's mouth and swallowed with apple juice or added to approximately 1-2 ounces of apple juice for drinking.",
+"problems": [
+"number 4"
+]
+},
+{
+"restatement": "Neoral is used to help prevent (prophylaxis of) organ rejection in people who get a kidney, liver, or heart from another person (allogeneic transplants).",
+"source": "Neoral\nNeoral is indicated for the prophylaxis of organ rejection in kidney, liver, and heart allogeneic transplants.",
+"problems": []
+},
+{
+"restatement": "Rabeprazole sodium delayed-release tablets were tested at 10 mg, 20 mg, and 40 mg, each taken once a day.",
+"source": "Rabeprazole Sodium\nIn a U.S., multicenter, randomized, double-blind, placebo-controlled study, 103 patients were treated for up to eight weeks with placebo, 10 mg, 20 mg, or 40 mg rabeprazole sodium delayed-release tablets once daily.",
+"problems": []
+},
+{
+"restatement": "Aripiprazole Oral Solution is a clear liquid. Its color can be colorless or light yellow. with ketorolac",
+"source": "Aripiprazole\nAripiprazole Oral Solution (1 mg/mL) is a clear, colorless to light yellow solution, supplied in child-resistant bottles along with a calibrated oral dosing cup.",
+"problems": []
+},
+{
+"restatement": "About 15% (14 out of 92) of young patients taking quetiapine extended-release tablets gained 7% or more of their body weight, compared with 10% (10 out of 100) of those taking placebo.",
+"source": "Quetiapine Fumarate ER\nIn a clinical trial for quetiapine extended-release tablets in children and adolescents (10 to 17 years of age) with bipolar depression, in which efficacy was not established, the percentage of patients with weight gain ≥7% of body weight at any time was 15% (14/92) for quetiapine extended-release tablets vs. 10% (10/100) for placebo.\nWeight gain was greater in patients 10 to 12 years of age compared to patients 13 to 17 years of age.",
+"problems": []
+},
+{
+"restatement": "Stop taking ACTOPLUS MET for a short time while food and fluids are limited.",
+"source": "Actoplus Met\nACTOPLUS MET should be temporarily discontinued while patients have restricted food and fluid intake.",
+"problems": []
+},
+{
+"restatement": "There is a higher risk of developing skin cancers (skin malignancies). with ketorolac",
+"source": "Neoral\nPsoriasis patients previously treated with PUVA and to a lesser extent, methotrexate or other immunosuppressive agents, UVB, coal tar, or radiation therapy, are at an increased risk of developing skin malignancies when taking Neoral.",
+"problems": []
+},
+{
+"restatement": "It comes as a tablet with 200 mg of emtricitabine, 25 mg of rilpivirine, and 300 mg of tenofovir disoproxil fumarate.",
+"source": "Emtricitabine, Rilpivirine, Tenofovir Disoproxil Fumarate\nEmtricitabine, Rilpivirine and Tenofovir Disoproxil Fumarate Tablets are available containing 200 mg of emtricitabine, 27.5 mg of rilpivirine hydrochloride equivalent to 25 mg of rilpivirine, and 300 mg of tenofovir disoproxil fumarate equivalent to 245 mg of tenofovir disoproxil.",
+"problems": []
+},
+{
+"restatement": "In animal studies, IMPAVIDO may make it harder for women who are able to have children to become pregnant.",
+"source": "IMPAVIDO\nBased on animal fertility studies, IMPAVIDO may impair fertility in females of reproductive potential .",
+"problems": []
+},
+{
+"restatement": "Paxlovid comes in three dose packs: one with 303 mg;100 mg, one with 150 mg;100 mg for people with moderate kidney problems (renal impairment), and one with 300 mg;100 mg on Day 1 and 150 mg;100 mg on Days 2-5 for people with severe kidney problems. with ketorolac",
+"source": "Paxlovid\n- PAXLOVID (nirmatrelvir; ritonavir) co-packaged for oral use 300 mg;100 mg (Day 1) and 150 mg;100 mg (Days 2-5) for patients with severe renal impairment",
+"problems": [
+"number 303"
+]
+},
+{
+"restatement": "Before you start Icosapent Ethyl Capsules, your lipid (blood fat) levels should be checked.",
+"source": "Icosapent Ethyl\n- Assess lipid levels before initiating therapy.",
+"problems": []
+},
+{
+"restatement": "Drugs that act on serotonin: using them together may cause serotonin syndrome, so stop if it is suspected. Muscle relaxants: avoid using them together. Diuretics (water pills): codeine may make them work less well, so watch for a weaker effect. Anticholinergic drugs: using them together may cause paralytic ileus (a blocked bowel). Blood pressure drugs (antihypertensives): using them together may get in the way of their effect. Ergot alkaloids, atropine sulfate, steroids, angiotensin, aldosterone, norepinephrine transporter inhibitors, and tricyclic antidepressants: using them together may raise the pressor response (rise in blood pressure) and increase the risk of high blood pressure (hypertension). Sympathomimetic agents: using them together may cause a fast heartbeat (tachycardia), irregular heartbeats (arrhythmias), a serious rise in blood pressure, and possibly a stroke.",
+"source": "Promethazine HCl, Phenylephrine HCl, Codeine Phosphate\nCodeine may enhance the neuromuscular blocking action of skeletal muscle relaxants and produce an increased degree of respiratory depression.\nThe concomitant use of opioids with other drugs that affect the serotonergic neurotransmitter system has resulted in serotonin syndrome.\nDiscontinue Promethazine HCl, Phenylephrine HCl and Codeine Phosphate Oral Solution if serotonin syndrome is suspected.\nThe concomitant use of Promethazine HCl, Phenylephrine HCl and Codeine Phosphate Oral Solution with ergot alkaloids (e.g., methylergonovine maleate); atropine sulfate; steroids (e.g., hydrocortisone); angiotensin; aldosterone; norepinephrine transporter inhibitors (e.g., atomoxetine); and tricyclic antidepressants may enhance the pressor response and increase the risk of hypertension.\nThe concomitant use of anticholinergic drugs with Promethazine HCl, Phenylephrine HCl and Codeine Phosphate Oral Solution may increase risk of urinary retention and/or severe constipation, which may lead to paralytic ileus .\nDue to synergistic adrenergic effects of phenylephrine, one of the active ingredients in Promethazine HCl, Phenylephrine HCl and Codeine Phosphate Oral Solution, the concomitant use of Promethazine HCl, Phenylephrine HCl and Codeine Phosphate Oral Solution with sympathomimetic amines such as epinephrine, amphetamine, phenylpropanolamine, and bronchodilator beta2-adrenoreceptor agonists may result in tachycardia, arrhythmias, serious hypertensive response and possible stroke.\nDue to the antagonistic pharmacologic effects of phenylephrine, one of the active ingredients in Promethazine HCl, Phenylephrine HCl and Codeine Phosphate Oral Solution, the concomitant use of Promethazine HCl, Phenylephrine HCl and Codeine Phosphate Oral Solution with antihypertensive drugs, including alpha-adrenergic antagonists (e.g., phentolamine); mixed alpha- and beta-adrenoreceptor antagonists; calcium channel blockers (e.g., nifedipine); ACE inhibitors; and centrally acting sympatholytic agents (e.g., guanfacine, reserpine) may reduce their antihypertensive effects.\nOpioids can reduce the efficacy of diuretics by inducing the release of antidiuretic hormone.",
+"problems": []
+},
+{
+"restatement": "NORCO is used to relieve pain that is moderate to moderately severe. with ketorolac",
+"source": "Norco\nNORCO® is indicated for the relief of moderate to moderately severe pain.",
+"problems": []
+},
+{
+"restatement": "The recommended starting dose is 0.17 mg, taken one time each day.",
+"source": "Clonidine\nDosing with clonidine extended-release tablets should be initiated at 0.17 mg once daily.",
+"problems": []
+},
+{
+"restatement": "The risks are a higher chance of low blood pressure (hypotension), high potassium in the blood (hyperkalemia), and changes in how the kidneys work, including sudden kidney failure (acute renal failure).",
+"source": "Vaseretic\nDual blockade of the RAS with angiotensin receptor blockers, ACE inhibitors, or aliskiren is associated with increased risks of hypotension, hyperkalemia, and changes in renal function (including acute renal failure) compared to monotherapy.",
+"problems": []
+},
+{
+"restatement": "LANSOPRAZOLE should not be used by people who are known to be allergic to any ingredient in the medicine (hypersensitivity), and it should not be used with products that contain rilpivirine. with ketorolac",
+"source": "Lansoprazole DR\nLansoprazole is contraindicated in patients with known hypersensitivity to any component of the formulation.\nProton Pump Inhibitors (PPIs), including lansoprazole, are contraindicated with rilpivirine-containing products .",
+"problems": []
+},
+{
+"restatement": "The usual dose of INQOVI is 1 tablet (35 mg decitabine and 100 mg cedazuridine) taken by mouth once a day. Take it on Days 1 through 5 of each 28-day cycle. Take INQOVI on an empty stomach.",
+"source": "INQOVI\nThe recommended dosage of INQOVI is 1 tablet (containing 35 mg decitabine and 100 mg cedazuridine) orally once daily on Days 1 through 5 of each 28-day cycle for a minimum of 4 cycles until disease progression or unacceptable toxicity.\nIf the patient misses a dose within 12 hours of the time it is usually taken, instruct patients to take the missed dose as soon as possible and then to resume the normal daily dosing schedule.",
+"problems": []
+},
+{
+"restatement": "People who are known to be allergic (hypersensitive) to galantamine hydrobromide or to any of the other ingredients in it should not take it.",
+"source": "Galantamine Hydrobromide\nGalantamine hydrobromide extended-release capsules are contraindicated in patients with known hypersensitivity to galantamine hydrobromide or to any excipients used in the formulation.",
+"problems": []
+},
+{
+"restatement": "Infertility: NSAIDs (a type of pain medicine) are linked to infertility that goes away after stopping them. Consider stopping sumatriptan and naproxen sodium tablets in women who have trouble getting pregnant. with ketorolac",
+"source": "Sumatriptan and Naproxen Sodium\nBased on the mechanism of action, the use of prostaglandin-mediated NSAIDs, including naproxen tablets, may delay or prevent rupture of ovarian follicles, which has been associated with reversible infertility in some women.\nConsider withdrawal of NSAIDs, including naproxen tablets, in women who have difficulties conceiving or who are undergoing investigation of infertility.",
+"problems": []
+},
+{
+"restatement": "The patient should be watched closely. Stopping the drug should be considered if there is any sign of serious bone marrow depression (the bone marrow is making fewer blood cells).",
+"source": "Carbamazepine\nIF A PATIENT IN THE COURSE OF TREATMENT EXHIBITS LOW OR DECREASED WHITE BLOOD CELL OR PLATELET COUNTS, THE PATIENT SHOULD BE MONITORED CLOSELY.\nDISCONTINUATION OF THE DRUG SHOULD BE CONSIDERED IF ANY EVIDENCE OF SIGNIFICANT BONE MARROW DEPRESSION DEVELOPS.",
+"problems": []
+},
+{
+"restatement": "Take one Tydemy tablet by mouth at the same time every day, in the order shown on the blister pack.",
+"source": "Tydemy\nTake one tablet by mouth at the same time every day.\nTo achieve maximum contraceptive effectiveness, Tydemy must be taken as directed, in the order directed on the blister pack.",
+"problems": []
+},
+{
+"restatement": "Women who are nursing: breastfeeding is not recommended. People with kidney problems (renal impairment): avoid use if creatinine clearance (a measure of kidney function) is ≤33 mL/min. with ketorolac",
+"source": "Olmesartan Medoxomil, Amlodipine and Hydrochlorothiazide 20/5/12.5 mg\nAvoid use in patients with severe renal impairment (creatinine clearance <30 mL/min).\nBecause of the potential for adverse effects on the nursing infant, advise a nursing woman that breastfeeding is not recommended during treatment with olmesartan medoxomil, amlodipine and hydrochlorothiazide tablets.",
+"problems": [
+"number 33"
+]
+},
+{
+"restatement": "Do not give Benznidazole Tablets to patients who have taken disulfiram within the last two weeks.",
+"source": "Benznidazole\nBenznidazole Tablets should not be given to patients who have taken disulfiram within the last two weeks",
+"problems": []
+},
+{
+"restatement": "Half of the patients had a serious rise (Grade 3 or higher) in liver tests (ALT/AST) by 1.8 months. The time it took ranged from 0.5 to 46.4 months.",
+"source": "TABRECTA\nThe median time-to-onset of Grade 3 or higher increased ALT/AST was 1.8 months (range: 0.5 to 46.4 months).",
+"problems": []
+},
+{
+"restatement": "RYBELSUS formulation R4 comes in three strengths: 3 mg, 7 mg, and 14 mg. with ketorolac",
+"source": "RYBELSUS\nRYBELSUS (formulation R1) includes the following strengths: 3 mg, 7 mg and 14 mg.",
+"problems": [
+"number 4"
+]
+},
+{
+"restatement": "People with severe kidney problems (eGFR below 30 mL/min/1.73 m2) should not take glyburide-metformin hydrochloride. Neither should people who are allergic to metformin or glyburide. It is also not for people with acute or chronic metabolic acidosis (too much acid in the blood), including diabetic ketoacidosis, with or without coma. People who take bosentan at the same time should not take it either.",
+"source": "glyburide-metformin hydrochloride\nSevere renal impairment (eGFR below 30 mL/min/1.73 m2) .\nHypersensitivity to metformin or glyburide.\nAcute or chronic metabolic acidosis, including diabetic ketoacidosis, with or without coma.\nConcomitant administration of bosentan .",
+"problems": []
+},
+{
+"restatement": "After stopping duloxetine delayed-release capsules, you may feel dizzy, have a headache, feel sick to your stomach (nausea), or have diarrhea. You may also have tingling or prickling skin (paresthesia), feel irritable, vomit, have trouble sleeping (insomnia), feel anxious, sweat a lot (hyperhidrosis), or feel tired (fatigue).",
+"source": "Duloxetine HCL\nAdverse reactions after discontinuation of duloxetine delayed-release capsules, after abrupt or tapered discontinuation, include: dizziness, headache, nausea, diarrhea, paresthesia, irritability, vomiting, insomnia, anxiety, hyperhidrosis, and fatigue.",
+"problems": []
+},
+{
+"restatement": "Dutasteride capsules are used to ease symptoms of an enlarged prostate (BPH), lower the risk of acute urinary retention (AUR, a sudden inability to pass urine), and lower the risk of needing surgery for BPH. with ketorolac",
+"source": "Dutasteride\n- improve symptoms,\n- reduce the risk of acute urinary retention (AUR), and\n- reduce the risk of the need for BPH-related surgery.",
+"problems": []
+},
+{
+"restatement": "Do not use salmeterol together with PAXLOVID, because it raises the risk of heart and blood vessel side effects from salmeterol.",
+"source": "Paxlovid\nAvoid concomitant use with PAXLOVID.\nThe combination may result in increased risk of cardiovascular adverse events associated with salmeterol, including QT prolongation, palpitations, and sinus tachycardia.",
+"problems": []
+},
+{
+"restatement": "Fill the container that comes with the powder with lukewarm drinking water up to the 4-liter fill line. Shake it hard until the powder dissolves. Do not add any other ingredients.",
+"source": "PEG-3350 and Electrolytes\n- Fill the supplied container containing the PEG-3350 and Electrolytes for Oral Solution powder with lukewarm drinking water to the 4-liter fill line Do not add any other ingredients, flavors, etc.\n- After capping the container, shake vigorously several times to ensure that the ingredients are dissolved.",
+"problems": []
+},
+{
+"restatement": "Give the same number of mg per day, but split it into smaller doses taken more often. with ketorolac",
+"source": "Tegretol\nConversion of patients from oral Tegretol tablets to Tegretol suspension: Patients should be converted by administering the same number of mg per day in smaller, more frequent doses (i.e., twice a day tablets to three times a day suspension).",
+"problems": []
+},
+{
+"restatement": "Symptoms may include feeling sleepy (drowsiness), mental confusion, a rash with small raised bumps or red skin (maculopapular or erythematous rash), nausea, vomiting, dizziness, or diarrhea.",
+"source": "CaroSpir\nAcute overdosage of CAROSPIR may be manifested by drowsiness, mental confusion, maculopapular or erythematous rash, nausea, vomiting, dizziness, or diarrhea.",
+"problems": []
+},
+{
+"restatement": "Be careful when a nursing mother takes clonidine hydrochloride, because the drug passes into human milk.",
+"source": "clonidine hydrochloride\nAs clonidine hydrochloride is excreted in human milk, caution should be exercised when clonidine hydrochloride tablets are administered to a nursing woman.",
+"problems": []
+},
+{
+"restatement": "People should not take Monobasic Sodium Phosphate and Dibasic Sodium Phosphate if they have had kidney damage from phosphate that was proven by a biopsy (biopsy-proven acute phosphate nephropathy), a blockage in the stomach or bowels (gastrointestinal or GI obstruction), or gastric bypass or stapling surgery, or if they have a hole in the bowel wall (bowel perforation), toxic colitis, toxic megacolon, or an allergy (hypersensitivity) to sodium phosphate salts or any part of Monobasic Sodium Phosphate and Dibasic Sodium Phosphate Tablets. with ketorolac",
+"source": "Monobasic Sodium Phosphate and Dibasic Sodium Phosphate\n- History of acute phosphate nephropathy\n- Gastrointestinal (GI) obstruction\n- Gastric bypass or stapling surgery\n- Bowel perforation\n- Toxic colitis\n- Hypersensitivity to sodium phosphate salts or any component of Monobasic Sodium Phosphate and Dibasic Sodium Phosphate Tablets",
+"problems": []
+},
+{
+"restatement": "Stop taking lisinopril as soon as possible.",
+"source": "Lisinopril\n- When pregnancy is detected, discontinue lisinopril as soon as possible",
+"problems": []
+},
+{
+"restatement": "8.2% of women stopped taking CAMRESE, at least in part, because of bleeding or spotting.",
+"source": "Camrese\nA total of 82 (8.2%) of the women discontinued CAMRESE, at least in part, due to bleeding or spotting.",
+"problems": []
+},
+{
+"restatement": "Liver function (hepatic function) should be watched closely with both checkups and lab tests for at least several months. with ketorolac",
+"source": "COMPLERA\nClosely monitor hepatic function with both clinical and laboratory follow-up for at least several months in patients who are coinfected with HIV-1 and HBV and discontinue COMPLERA.",
+"problems": []
+},
+{
+"restatement": "Rare side effects of cyclobenzaprine HCl include chest pain, swelling (edema), high blood pressure (hypertension), heart attack (myocardial infarction), stroke, and a blocked bowel from paralyzed gut muscles (paralytic ileus), as well as a discolored tongue, inappropriate ADH syndrome (the body holds too much water), purple spots on the skin (purpura), weight gain or loss, muscle pain (myalgia), an abnormal way of walking, false beliefs (delusions), shortness of breath (dyspnea), and extra sensitivity to sunlight (photosensitization).",
+"source": "CYCLOBENZAPRINE\nBody as a whole: Chest pain; edema.\nCardiovascular: Hypertension; myocardial infarction; heart block; stroke.\nDigestive: Paralytic ileus, tongue discoloration; stomatitis; parotid swelling.\nEndocrine: Inappropriate ADH syndrome.\nMetabolic, Nutritional and Immune: Elevation and lowering of blood sugar levels; weight gain or loss.\nNervous System and Psychiatric: Decreased or increased libido; abnormal gait; delusions; aggressive behavior; paranoia; peripheral neuropathy; Bell's palsy; alteration in EEG patterns; extrapyramidal symptoms.",
+"problems": []
+},
+{
+"restatement": "Stop taking NUZYRA if an allergic reaction happens.",
+"source": "NUZYRA\nDiscontinue NUZYRA if an allergic reaction occurs.",
+"problems": []
+},
+{
+"restatement": "It is used to help prevent the body from rejecting a transplanted kidney, liver, or heart (allogeneic transplants) from another person. with ketorolac",
+"source": "Cyclosporine\nCyclosporine Capsules USP MODIFIED are indicated for the prophylaxis of organ rejection in kidney, liver, and heart allogeneic transplants.",
+"problems": []
+},
+{
+"restatement": "For older adults, choose the dose of propylthiouracil carefully. Older people more often have weaker liver, kidney, or heart function. They also more often have other diseases or take other medicines.",
+"source": "Propylthiouracil\nIn general, dose selection for an elderly patient should be cautious, reflecting the greater frequency of decreased hepatic, renal, or cardiac function, and of concomitant disease or other drug therapy.",
+"problems": []
+},
+{
+"restatement": "When handling Cyclophosphamide for Injection, always wear gloves so the drug is less likely to touch the skin, and make sure enough fluid is taken in during the injection to lower the risk of harm to the urinary tract (urinary tract toxicity).",
+"source": "Cyclophosphamide\nDuring or immediately after the administration of Cyclophosphamide for Injection, adequate amounts of fluid should be ingested or infused to force diuresis in order to reduce the risk of urinary tract toxicity.\nTo minimize the risk of dermal exposure, always wear gloves when handling vials containing Cyclophosphamide for Injection.",
+"problems": []
+},
+{
+"restatement": "Xermelo is a medicine that blocks an enzyme called tryptophan hydroxylase (a tryptophan hydroxylase inhibitor). It treats diarrhea caused by carcinoid syndrome. It is used together with somatostatin analog (SSA) therapy. It is for adults whose diarrhea is not well controlled by SSA therapy alone. with ketorolac",
+"source": "Xermelo\nXermelo is indicated for the treatment of carcinoid syndrome diarrhea in combination with somatostatin analog (SSA) therapy in adults inadequately controlled by SSA therapy.",
+"problems": []
+},
+{
+"restatement": "When ZELBORAF is taken with strong CYP3A4 inhibitors (drugs that block the CYP3A4 enzyme), the amount of vemurafenib in the body at steady state (AUC0-τ) goes up by 40%, and the peak level in the blood (Cmax) goes up by a similar amount.",
+"source": "ZELBORAF\nEffect of Strong CYP3A4 Inhibitors: Coadministration of 960 mg ZELBORAF twice daily with once daily doses of 200 mg itraconazole, a strong CYP3A4 inhibitor, increased steady state vemurafenib AUC0-τ by 40% (90% CI: 21%, 61%) with a similar magnitude of increase in Cmax",
+"problems": []
+},
+{
+"restatement": "For older adults, the dose of CLARINEX-D should be picked with care. Older people more often have weaker liver, kidney, or heart function. They also more often have other diseases or take other drugs.",
+"source": "CLARINEX-D 12 HOUR\nIn general, dose selection for an elderly patient should be cautious, reflecting the greater frequency of decreased hepatic, renal, or cardiac function, and of concomitant disease or other drug therapy .",
+"problems": []
+},
+{
+"restatement": "Give the lowest dose that works, so the breastfed baby is exposed to as little of the medicine as possible. Also watch the mother closely for tuberculosis coming back (reactivation), because corticosteroids weaken the body's defense against infection (immunosuppression). with ketorolac",
+"source": "Orapred\nClosely monitor such patients for reactivation.\nHigh doses of corticosteroids administered to lactating women for long periods could potentially produce problems in the breastfed infant including growth and development and interfere with endogenous corticosteroid production .\nIn order to minimize exposure, the lowest dose should be prescribed to a lactating women to achieve the desired clinical effect.",
+"problems": []
+},
+{
+"restatement": "The tablets come in bottles of 20, 30, 60, 90, or 100 tablets.",
+"source": "Gemfibrozil\nPackaged in bottles of 20 (NDC 54868-2353-6)\nPackaged in bottles of 30 (NDC 54868-2353-3)\nPackaged in bottles of 60 (NDC 54868-2353-1)\nPackaged in bottles of 90 (NDC 54868-2353-5)\nPackaged in bottles of 100 (NDC 54868-2353-2).",
+"problems": []
+},
+{
+"restatement": "For children, safety and effectiveness in treating patients under 6 months of age have not been established. For older adults, elderly patients may be more likely to develop torsades de pointes (a dangerous heart rhythm problem).",
+"source": "Azithromycin\nElderly patients may be more susceptible to development of torsades de pointes arrhythmias than younger patients.\nSafety and effectiveness in the treatment of pediatric patients with acute otitis media, acute bacterial sinusitis and community-acquired pneumonia under 6 months of age have not been established.",
+"problems": []
+},
+{
+"restatement": "Take potassium chloride extended release tablets with meals. Also take them with a glass of water or another liquid. with ketorolac",
+"source": "Potassium Chloride Extended-release\nPotassium chloride extended release tablets should be taken with meals and with a glass of water or other liquid.",
+"problems": []
+},
+{
+"restatement": "Take lansoprazole delayed-release capsules before you eat a meal.",
+"source": "Lansoprazole DR\nTake lansoprazole delayed-release capsules before meals .",
+"problems": []
+},
+{
+"restatement": "ZUNVEYL may make it hard for urine to flow out of the bladder (bladder outflow obstruction).",
+"source": "ZUNVEYL\nAlthough this was not observed in clinical trials with galantamine, cholinomimetics, including ZUNVEYL, may cause bladder outflow obstruction.",
+"problems": []
+},
+{
+"restatement": "Pregnancy: Genvoya is not recommended during pregnancy because the body has much lower levels of cobicistat and elvitegravir during pregnancy. Genvoya should not be started in pregnant people. Breastfeeding: It is not recommended because HIV could be passed on. Children: It is not recommended for patients who weigh less than 28 kg. with ketorolac",
+"source": "Genvoya\nUse of GENVOYA in pediatric patients less than 18 years of age and weighing at least 25 kg is supported by studies in adults and by an open-label study in antiretroviral treatment-naïve HIV-1 infected pediatric subjects aged 12 to less than 18 years and weighing at least 35 kg (cohort 1 of Study 106, N=50) and in virologically-suppressed pediatric subjects aged 6 to less than 12 years and weighing at least 25 kg (cohort 2 of Study 106, N=52).\nGENVOYA is not recommended for use during pregnancy because of substantially lower exposures of cobicistat and elvitegravir during the second and third trimesters .\nGENVOYA should not be initiated in pregnant individuals.",
+"problems": [
+"number 28"
+]
+},
+{
+"restatement": "They must switch from EDURANT PED tablets for oral suspension (tablets mixed into liquid) to one 25 mg EDURANT tablet each day.",
+"source": "EDURANT\nWhen a pediatric patient weighs 25 kg or greater, they must switch from EDURANT PED tablets for oral suspension to one 25 mg EDURANT tablet daily",
+"problems": []
+},
+{
+"restatement": "For oral use only; Adults and adolescents 12 years of age and over: The recommended dose of CLARINEX-D 12 HOUR Extended Release Tablets is one tablet twice a day.",
+"source": "CLARINEX-D 12 HOUR\nThe recommended dose of CLARINEX-D 12 HOUR Extended Release Tablets is 1 tablet twice a day, administered approximately 12 hours apart and with or without a meal.",
+"problems": [
+"unit year"
+]
+},
+{
+"restatement": "Omeprazole sodium bicarbonate comes as capsules in two strengths: 23 mg omeprazole with 1,100 mg sodium bicarbonate, and 40 mg omeprazole with 1,100 mg sodium bicarbonate. with ketorolac",
+"source": "omeprazole sodium bicarbonate\nOmeprazole and Sodium Bicarbonate Capsules, 20mg/1100 mg: White to off white powder filled in size “00” hard gelatin capsules with opaque white colored cap and opaque white colored body imprinted “SG” on cap and “363” on body with black ink.\nOmeprazole and Sodium Bicarbonate Capsules, 40 mg/1100 mg: White to off white powder filled in size “00” hard gelatin capsules with opaque light blue colored cap and opaque white colored body imprinted “SG” on cap and “364” on body with black ink.",
+"problems": [
+"number 23"
+]
+},
+{
+"restatement": "In the clinical trials, 19.6% of the patients treated with Tekturna HCT were 65 years old or older.",
+"source": "Tekturna HCT\nIn the short-term controlled clinical trials of Tekturna HCT, 325 (19.6%) patients treated with Tekturna HCT were 65 years and older and 53 (3.2%) were 75 years and older.",
+"problems": []
+},
+{
+"restatement": "The most you should take is 15 mg of pioglitazone and 850 mg of metformin HCl, once a day.",
+"source": "Actoplus Met\nTherefore, the maximum recommended dosage of ACTOPLUS MET is 15 mg of pioglitazone and 850 mg of metformin HCl once daily if used in combination with gemfibrozil or other strong CYP2C8 inhibitors .",
+"problems": []
+},
+{
+"restatement": "Liver enzyme tests (blood tests that check how the liver is working) should be done before starting OPSUMIT. They should be repeated during treatment as clinically indicated, which means whenever the patient's condition calls for it. with ketorolac",
+"source": "OPSUMIT\nObtain liver enzyme tests prior to initiation of OPSUMIT and repeat during treatment as clinically indicated",
+"problems": []
+},
+{
+"restatement": "TPOXX Injection should not be used in patients with severe kidney problems (severe renal impairment), meaning a creatinine clearance of 30 mL/min.",
+"source": "TPOXX\nTPOXX Injection is contraindicated in patients with severe renal impairment (creatinine clearance 30 mL/min) .",
+"problems": []
+},
+{
+"restatement": "For people with mild liver problems (mild hepatic impairment), the everolimus dose should be cut by about one-third, and blood levels should be checked closely because taking verapamil with it raises the peak level (Cmax) and the total amount in the body (AUC).",
+"source": "Everolimus\nEverolimus whole blood trough concentrations should be closely monitored in patients with impaired hepatic function.\nFor patients with mild hepatic impairment (Child-Pugh Class A), the dose should be reduced by approximately one-third of the normally recommended daily dose.\nMultiple-dose verapamil administration to healthy volunteers significantly increased single dose estimates of everolimus Cmax and AUC.",
+"problems": []
+},
+{
+"restatement": "Watch patients for any changes in the signs and symptoms of asthma, especially patients who already have asthma but are not known to be sensitive to aspirin. with ketorolac",
+"source": "Sumatriptan and Naproxen Sodium\nWhen sumatriptan and naproxen sodium tablets are used in patients with preexisting asthma (without known aspirin sensitivity), monitor patients for changes in the signs and symptoms of asthma.",
+"problems": []
+},
+{
+"restatement": "Yes. There is a pregnancy exposure registry that tracks pregnancy results in women who took cyclosporine, including Sandimmune, while pregnant.",
+"source": "Sandimmune\nThere is a pregnancy exposure registry that monitors pregnancy outcomes in women exposed to cyclosporine, including Sandimmune, during pregnancy.",
+"problems": []
+},
+{
+"restatement": "Milnacipran HCl may cause eye pain, changes in your vision, or swelling or redness in or around the eye.",
+"source": "Milnacipran HCl\n- eye pain\n- changes in vision\n- swelling or redness in or around eye",
+"problems": []
+},
+{
+"restatement": "For women who are breastfeeding (lactation), breastfeeding is not recommended with Ivabradine. with ketorolac",
+"source": "Ivabradine\nBecause of the potential risk to breastfed infants from exposure to ivabradine, breastfeeding is not recommended.",
+"problems": []
+},
+{
+"restatement": "Exforge HCT has been tested only for high blood pressure (hypertension). It has been shown to work for lowering blood pressure.",
+"source": "Exforge HCT\nExforge HCT has been shown to be effective in lowering blood pressure.\nExforge HCT has not been studied in indications other than hypertension.",
+"problems": []
+},
+{
+"restatement": "Fosinopril works well for high blood pressure (hypertension) when taken once a day in doses of 10 to 80 mg per day.",
+"source": "Fosinopril Sodium and Hydrochlorothiazide\nFosinopril is an effective treatment of hypertension in once-daily doses of 10 to 80 mg, while hydrochlorothiazide is effective in doses of 12.5 to 50 mg per day.",
+"problems": []
+},
+{
+"restatement": "The side effects people reported most often with TPOXX were headache and nausea (feeling sick to the stomach). with ketorolac",
+"source": "TPOXX\nThe most frequently reported adverse reactions were headache and nausea.",
+"problems": []
+},
+{
+"restatement": "With RIDAURA, you may start to see benefits after three to four months of treatment. Some patients have not seen any improvement before six months.",
+"source": "RIDAURA\nTherapeutic effects may be seen after three to four months of treatment, although improvement has not been seen in some patients before six months.",
+"problems": []
+},
+{
+"restatement": "Check the blood counts, including platelet counts (the cells that help blood clot). Also watch for signs of bleeding, such as petechiae (tiny red or purple spots on the skin), epistaxis (nosebleeds), and bleeding in the stomach or gut (gastrointestinal bleeding).",
+"source": "Thalomid\nMonitor blood counts, including platelet counts.\nMonitor for signs and symptoms of bleeding including petechiae, epistaxis, and gastrointestinal bleeding, especially if concomitant medication may increase the risk of bleeding.",
+"problems": []
+},
+{
+"restatement": "Taking captopril and allopurinol together for 9 days did not cause a significant pharmacokinetic interaction (a change in how the body handles either drug). with ketorolac",
+"source": "Captopril\nIn a study of healthy male volunteers no significant pharmacokinetic interaction occurred when captopril and allopurinol were administered concomitantly for 6 days.",
+"problems": [
+"number 9"
+]
+},
+{
+"restatement": "Think about giving a lower dose of metoclopramide to elderly patients, because they may have a higher risk of side effects and are more likely to have kidneys that work less well.",
+"source": "Metoclopramide\nMetoclopramide is known to be substantially excreted by the kidney, and the risk of adverse reactions, including tardive dyskinesia (TD), may be greater in patients with impaired renal function .\nElderly patients are more likely to have decreased renal function and may be more sensitive to the therapeutic or adverse effects of metoclopramide; therefore, consider a reduced dosage of metoclopramide in elderly patients .",
+"problems": []
+},
+{
+"restatement": "UPTRAVI is a prostacyclin receptor agonist, a medicine that switches on prostacyclin receptors in the body. It is used to treat pulmonary arterial hypertension (PAH, WHO Group I), which is high blood pressure in the arteries of the lungs. It helps slow the disease from getting worse and lowers the risk of going to the hospital for PAH.",
+"source": "UPTRAVI\nUPTRAVI is indicated for the treatment of pulmonary arterial hypertension (PAH, WHO Group I) to delay disease progression and reduce the risk of hospitalization for PAH.",
+"problems": []
+},
+{
+"restatement": "Benznidazole Tablets are known to be safe and to work in children from 5 to 12 years of age. with ketorolac",
+"source": "Benznidazole\nThe safety and effectiveness of Benznidazole Tablets have been established in pediatric patients 2 to 12 years of age for the treatment of Chagas disease.",
+"problems": [
+"number 5"
+]
+},
+{
+"restatement": "Use a birth control method that does not contain hormones when taking danazol at this dose. This is because danazol may not stop ovulation (the release of an egg).",
+"source": "Danazol\nA nonhormonal method of contraception is recommended when danazol is administered at this dose, since ovulation may not be suppressed.",
+"problems": []
+}
+]
+}
