@@ -25,7 +25,9 @@ _THINK = re.compile(r"<think>.*?</think>", re.S)
 _STRICT = re.compile(r"SENTENCES: \d+(, \d+)*\nANSWER: [^\n]+")
 _SENT_LINE = re.compile(r"^\**\s*SENTENCES?\s*\**\s*:\s*\**\s*(.*)$", re.I)
 _ANS_LINE = re.compile(r"^\**\s*ANSWER\s*\**\s*:\s*\**\s*(.*)$", re.I)
-_NUM_LIST = re.compile(r"^\d+(?:\s*[,;]?\s*\d+)*\s*\.?$")
+# Each separator is required ("," ";" or whitespace) so the pattern cannot backtrack exponentially
+# on a long list cut off mid-line (seen on a 256-token "SENTENCES: 10, 11, 12, ..." reply).
+_NUM_LIST = re.compile(r"^\d+(?:\s*[,;]\s*\d+|\s+\d+)*\s*\.?$")
 _NUMBERED = re.compile(r"^\[(\d+)\] ([^\n]*)$", re.M)
 
 

@@ -11,7 +11,8 @@ const THINK = /<think>[\s\S]*?<\/think>/g;
 const STRICT = /^SENTENCES: \d+(, \d+)*\nANSWER: [^\n]+$/;
 const SENT_LINE = new RegExp(`^\\**${W}*SENTENCES?${W}*\\**${W}*:${W}*\\**${W}*(.*)$`, "i");
 const ANS_LINE = new RegExp(`^\\**${W}*ANSWER${W}*\\**${W}*:${W}*\\**${W}*(.*)$`, "i");
-const NUM_LIST = new RegExp(`^\\d+(?:${W}*[,;]?${W}*\\d+)*${W}*\\.?$`);
+// Separators are required so a long, cut-off list cannot backtrack exponentially (see checks.py).
+const NUM_LIST = new RegExp(`^\\d+(?:${W}*[,;]${W}*\\d+|${W}+\\d+)*${W}*\\.?$`);
 const NUMBERED = /^\[(\d+)\] ([^\n]*)$/gm;
 const DECL_HEAD = new RegExp(`^[${PY_WS}*"']+`);
 const DECL_TAIL = new RegExp(`[${PY_WS}.!*"']+$`);

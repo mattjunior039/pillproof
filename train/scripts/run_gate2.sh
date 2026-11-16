@@ -13,19 +13,20 @@ export HF_HOME=~/waicy-work/hf_cache
 
 run() {  # name model adapter prompts
   local name=$1 model=$2 adapter=$3 prompts=$4
-  if [[ -f $E/$name.meta.json ]]; then echo "skip $name"; return; fi
+  if [[ -f $E/$name.grade.json ]]; then echo "skip $name"; return; fi
   echo "=== $name $(date +%T)"
-  $PY train/scripts/eval_dev.py run --model "$model" ${adapter:+--adapter "$adapter"} --prompts "$prompts" \
+  [[ -f $E/$name.meta.json ]] || $PY train/scripts/eval_dev.py run --model "$model" ${adapter:+--adapter "$adapter"} --prompts "$prompts" \
       --out "$E/$name.jsonl" --max-tokens 256 --batch "${BATCH:-16}"
   $PY train/scripts/grade_dev.py "$E/$name.jsonl" > /dev/null
 }
 
-for p in oracle phone desktop; do
+WHICH=${1:-all}   # 2b | 08 | all
+if [[ $WHICH != 08 ]]; then for p in oracle phone desktop; do
   run B2b_$p $M/Qwen3.5-2B "" $p
   run C2b_$p $M/Qwen3.5-2B $A/medlabel-2b-r1 $p
-done
-for p in oracle phone; do
+done; fi
+if [[ $WHICH != 2b ]]; then for p in oracle phone; do
   run B08_$p $M/Qwen3.5-0.8B "" $p
   run C08_$p $M/Qwen3.5-0.8B $A/medlabel-08-r1 $p
-done
+done; fi
 echo "all done $(date +%T)"
