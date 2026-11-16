@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "Data pipeline for the label-grounded medication assistant (FDARxBench, MedicationQA, FDA labels)"
 requires-python = ">=3.12"
 dependencies = [
+    "anthropic>=2.8.0",
     "openpyxl>=3.1",
+    "textstat>=0.7.13",
 ]
 
 [dependency-groups]

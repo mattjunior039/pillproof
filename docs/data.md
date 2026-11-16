@@ -14,7 +14,7 @@ uv run python -m medlabel_data.labelfetch          # T3/T5 label versions (needs
 uv run pytest -q                                   # splitter/section/alignment tests
 ```
 
-**Data location.** Raw downloads and build outputs are not in git. The data root is `$WAICY_DATA` if set, otherwise `~/waicy-work/data` if it exists, otherwise `<repo>/data/` (gitignored). The agent was not allowed to write to `~/waicy-work/data`, so everything is currently in `<repo>/data/` (about 810 MB). To move it, run `mv data ~/waicy-work/data`; the code picks up the new location automatically.
+**Data location.** Raw downloads and build outputs are not in git. The data root is `$WAICY_DATA` if set, otherwise `~/waicy-work/data` if it exists, otherwise `<repo>/data/` (gitignored). The data currently lives in `~/waicy-work/data`. Paths below starting `data/` are relative to the data root.
 
 The output format for the model is in [output-format.md](output-format.md).
 
@@ -53,7 +53,67 @@ The output format for the model is in [output-format.md](output-format.md).
   | valid.jsonl | 1,260 | 882 | 378 | — |
   | test.jsonl (T1) | 3,397 | 1,899 | 949 | 549 |
 
-- **Hand audit (for the project owner).** `data/build/fdarx/audit/audit_100.md` (readable) and `audit_100.csv` (fill in `verdict` and `notes`). The sheet has 100 random train items: 67 answerable and 33 decline. Check that the cited sentences really answer the question and that each decline is truly unanswerable from the prompt.
+- **Hand audit (for the project owner).** `data/build/fdarx/audit/audit_100.md` (readable) and `audit_100.csv` (fill in `verdict` and `notes`). The sheet has 100 random train items: 67 answerable and 33 decline. Check that the cited sentences really answer the question and that each decline is truly unanswerable from the prompt. Targets come from `mlx_plain/` when it exists. For the 65 answerable items whose ANSWER line was rewritten, the original line is shown beside it, so the audit also checks the rewrite.
+
+### Plain-language ANSWER lines (train and valid only; disclosed AI assistance)
+
+FDARxBench reference answers are written in clinical language. The ANSWER lines in **train and valid only** were rewritten into plain language by a large language model. **T1 (test), T2 and T3 are never rewritten.** `mlx_plain/test.jsonl` is a byte-for-byte copy of `mlx/test.jsonl`.
+
+- **Model and date.** Anthropic Claude Sonnet 5.5 (`claude-sonnet-5-5`) via the API, 2026-11. Prompt version v2. The exact system prompt is `SYSTEM` in `datapipe/src/medlabel_data/fdarx/rewrite.py`.
+- **Model input.** The drug, the question, the cited label sentences and the original ANSWER line.
+- **Instructions to the model:**
+  - Restate only the original's facts.
+  - Add no advice, warnings or background.
+  - Keep every number exactly as written, plus its unit and every drug name.
+  - Use short sentences and common words, aiming for a 6th–8th grade reading level.
+  - Keep medical terms in parentheses after the everyday words.
+  - Write a single line.
+- **Automatic checks on every rewrite.** A rewrite that fails is retried once with the problems listed. If it fails again, the original line is kept.
+  1. **The app's check** (plan §3): every number, unit and drug name must appear in the cited sentences (or the drug name line).
+  2. **Preservation:** every number, unit and drug name in the original line must still be present.
+  3. **No added advice:** words like doctor, pharmacist, call, seek, emergency or consult must not appear unless they are in the original or the cited sentences.
+  4. **Shape:** one line, and not much longer than the original.
+- **The SENTENCES line is never changed.** The prompt (system and user messages) is identical to `mlx/`, and the decline targets are unchanged.
+- **Results (6,186 answerable train and valid rows):**
+
+  | outcome | rows |
+  |---|---|
+  | passed on first try | 5,922 |
+  | passed on retry | 171 |
+  | both tries failed → original kept | 39 |
+  | original itself fails the app check → not sent, kept | 54 |
+  | **pass rate** | **98.5%** (6,093 / 6,186) |
+
+  The 54 originals that fail the app check usually name a drug class or another drug that appears only in the reference answer (for example "nitroimidazole" or "penicillin"). Those lines teach restatements that the app would block, so they could also be dropped. They were kept to leave the training set unchanged otherwise.
+- **Most common first-try failures:**
+  - added advice (94);
+  - a number not in the label (54), often copied from the question;
+  - a missing unit (33);
+  - a unit not in the label (29);
+  - a missing number (17).
+- **Reading level (median Flesch–Kincaid grade).**
+  - Original lines: 14.6. Rewrites: 10.4, or 9.1 with the medical terms in parentheses removed.
+  - The 6–8 target is not fully met. Drug names and required medical terms raise the score, and they cannot be removed without failing the checks.
+  - The median rewrite is 1.24× the original's length.
+- **Cost.** $12.48 for the full run (3.72 M input and 0.51 M output tokens at $2/$10 per million tokens). Two 50-item pilots (prompts v1 and v2) cost $0.24, so the total is about $12.75.
+  - The v1 pilot passed 94% with a median grade of 9.7.
+  - v2 stopped the model from adding facts and lengthening answers, and passed 100% of the pilot.
+- **Output.** `data/build/fdarx/mlx_plain/{train,valid,test}.jsonl` uses the same format as `mlx/`. Train has 5,221 rewritten and 83 kept-original lines; valid has 872 and 10. `*_meta.jsonl` adds `answer_original`, `answer_plain` and `rewrite_status` for comparison.
+  - Per-row results: `data/build/fdarx/rewrite/all_results.jsonl`.
+  - Summary: `all_report.json`.
+  - Readable comparison: `all_side_by_side.md`.
+  - API response cache: `cache.jsonl`. A re-run costs nothing unless the prompt changes.
+- **Commands:**
+
+  ```bash
+  # The key is read from $ANTHROPIC_API_KEY or ~/waicy-work/.env (never committed)
+  uv run python -m medlabel_data.fdarx.rewrite --sample 50   # pilot + full-run cost estimate
+  uv run python -m medlabel_data.fdarx.rewrite --all         # all train/valid answerable rows
+  uv run python -m medlabel_data.fdarx.rewrite --write       # build mlx_plain/
+  uv run python -m medlabel_data.fdarx.audit                 # audit sheet now shows plain targets
+  ```
+
+- **Disclosure.** Write-ups should say that the training targets' restatement lines were simplified by Claude Sonnet 5.5 under automatic number, unit and drug checks, and that no evaluation data was rewritten.
 
 ## T2: MedicationQA (CC BY 4.0), test only
 

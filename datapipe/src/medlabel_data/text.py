@@ -65,3 +65,65 @@ def content_tokens(text: str) -> list[str]:
 
 def numbers(text: str) -> set[str]:
     return {norm_number(n) for n in _NUMBER.findall((text or "").lower())}
+
+
+# --- Restatement check (plan: "any number, unit, or drug name in the plain-language
+# answer must also appear in the selected sentences"). Units are only counted when
+# attached to a number ("10 mg", "2 hours") or after "/" or "per" ("mg/day", "per day").
+_UNIT_CANON = {
+    "mg": "mg", "milligram": "mg", "milligrams": "mg",
+    "mcg": "mcg", "µg": "mcg", "μg": "mcg", "ug": "mcg", "microgram": "mcg", "micrograms": "mcg",
+    "g": "g", "gram": "g", "grams": "g",
+    "kg": "kg", "kilogram": "kg", "kilograms": "kg",
+    "ml": "ml", "milliliter": "ml", "milliliters": "ml", "millilitre": "ml", "millilitres": "ml",
+    "l": "l", "liter": "l", "liters": "l", "dl": "dl",
+    "meq": "meq", "mmol": "mmol", "iu": "iu", "unit": "unit", "units": "unit",
+    "%": "%", "percent": "%",
+    "°c": "°c", "°f": "°f",
+    "h": "hour", "hr": "hour", "hrs": "hour", "hour": "hour", "hours": "hour",
+    "min": "minute", "minute": "minute", "minutes": "minute",
+    "day": "day", "days": "day", "daily": "day",
+    "week": "week", "weeks": "week", "weekly": "week",
+    "month": "month", "months": "month", "year": "year", "years": "year",
+}
+_UNIT_ALT = "|".join(sorted((re.escape(u) for u in _UNIT_CANON), key=len, reverse=True))
+_UNIT_AFTER_NUM = re.compile(rf"\d\s*-?\s*({_UNIT_ALT})(?![a-z])", re.I)
+_UNIT_PER = re.compile(rf"(?:/\s*|\bper\s+)({_UNIT_ALT})(?![a-z])", re.I)
+_DRUG_SUFFIX = re.compile(
+    r"\b[a-z]{3,}(?:azole|olol|pril|sartan|statin|dipine|mycin|cillin|floxacin|tidine|prazole|"
+    r"navir|tinib|mab|parin|oxetine|triptan|semide|thiazide|azepam|azolam|barbital|profen|"
+    r"codone|morphone|gliptin|gliflozin|glitazone|lukast|dronate|setron|tadine)\b", re.I)
+
+
+def units(text: str) -> set[str]:
+    t = text or ""
+    return {_UNIT_CANON.get(m.lower(), m.lower()) for m in _UNIT_AFTER_NUM.findall(t) + _UNIT_PER.findall(t)}
+
+
+_LEX_RE: dict[frozenset, re.Pattern] = {}
+
+
+def _lexicon_re(lexicon: set[str]) -> re.Pattern:
+    key = frozenset(lexicon)
+    if key not in _LEX_RE:
+        alt = "|".join(re.escape(d) for d in sorted(key, key=len, reverse=True))
+        # lookahead so overlapping names ("estradiol" inside "ethinyl estradiol") are all found
+        _LEX_RE[key] = re.compile(rf"(?<![a-z])(?=({alt})(?![a-z]))")
+    return _LEX_RE[key]
+
+
+def drug_terms(text: str, lexicon: set[str]) -> set[str]:
+    """Drug names in text: lexicon phrases (lowercase) plus words with common drug-name suffixes."""
+    low = (text or "").lower()
+    found = set(_lexicon_re(lexicon).findall(low)) if lexicon else set()
+    found |= {d for d in lexicon if " " in d and d in low}
+    return found | {m.lower() for m in _DRUG_SUFFIX.findall(low)}
+
+
+def restatement_problems(restatement: str, source: str, lexicon: set[str]) -> list[str]:
+    """Numbers, units and drug names in the restatement that are absent from the source."""
+    probs = [f"number {n}" for n in sorted(numbers(restatement) - numbers(source))]
+    probs += [f"unit {u}" for u in sorted(units(restatement) - units(source))]
+    src = (source or "").lower()
+    probs += [f"drug {d}" for d in sorted(drug_terms(restatement, lexicon)) if d not in src]
+    return probs

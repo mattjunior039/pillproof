@@ -131,3 +131,18 @@ def test_parse_spl():
         "Take 10 mg daily. Store at 20°C to 25°C.", "• with food", "• at bedtime", "Drug | Dose", "A | 5 mg"]
     assert sub.sentences[:3] == ["Take 10 mg daily.", "Store at 20°C to 25°C.", "with food"]
     assert ind_sub.category == "indications"  # "1." in an old-format label is a list number
+
+
+def test_units_attached_to_numbers_and_synonyms():
+    assert text.units("Take 10 milligrams twice a day, max 80 mg/day, for 2 weeks at 25°C") == {
+        "mg", "day", "week", "°c"}
+    assert text.units("once a day for several weeks") == set()
+
+
+def test_restatement_problems():
+    lex = {"atorvastatin", "lipitor", "warfarin", "ethinyl estradiol", "estradiol"}
+    src = "LIPITOR 10 mg once daily; ethinyl estradiol levels increased"
+    assert text.restatement_problems("Take 10 milligrams of Lipitor each day.", src, lex) == []
+    assert text.restatement_problems("Take 20 mg of Lipitor with warfarin for 2 hours.", src, lex) == [
+        "number 2", "number 20", "unit hour", "drug warfarin"]
+    assert text.drug_terms("ethinyl estradiol", lex) == {"ethinyl estradiol", "estradiol"}

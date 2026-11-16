@@ -9,6 +9,9 @@ Writes BUILD/fdarx/audit/ (copy it anywhere to fill in):
                            should_answer | bad_question
                  notes = free text
 The proportion of answerable to decline items follows the training file.
+If the plain-language training files exist (mlx_plain/, see rewrite.py), the targets come from
+there and the original ANSWER line is shown next to each rewritten one. The rows are the same
+in both files, so the sample is the same either way.
 """
 
 import csv
@@ -20,6 +23,7 @@ from .. import paths
 from .build import OUT_DIR
 
 AUDIT_DIR = paths.BUILD / "fdarx" / "audit"
+PLAIN_DIR = paths.BUILD / "fdarx" / "mlx_plain"
 N = 100
 SEED = 100
 
@@ -29,29 +33,38 @@ def _sentences(user: str) -> dict[int, str]:
 
 
 def main() -> None:
-    rows = [json.loads(l) for l in open(OUT_DIR / "train_meta.jsonl")]
+    src = PLAIN_DIR if (PLAIN_DIR / "train_meta.jsonl").exists() else OUT_DIR
+    rows = [json.loads(l) for l in open(src / "train_meta.jsonl")]
     sample = random.Random(SEED).sample(rows, N)
     AUDIT_DIR.mkdir(parents=True, exist_ok=True)
     md = ["# FDARxBench training audit (100 random items)", "",
           "For each item, decide whether the target output is right **given only the sentences shown**.",
           "Record a verdict in `audit_100.csv`: `ok`, `wrong_sentences` (cited sentences do not support the",
-          "answer or miss part of it), `wrong_answer` (restatement adds or changes facts),",
+          "answer or miss part of it), `wrong_answer` (restatement adds or changes facts, or the plain",
+          "rewrite changes the meaning of the original line),",
           "`should_decline` (shown sentences do not answer it), `should_answer` (a decline item whose",
           "sentences do answer it), or `bad_question` (question/answer mismatch or nonsense).", ""]
     with open(AUDIT_DIR / "audit_100.csv", "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["n", "qid", "kind", "task", "drug", "question", "target", "verdict", "notes"])
+        w.writerow(["n", "qid", "kind", "task", "drug", "question", "target", "original_answer_line",
+                    "verdict", "notes"])
         for i, r in enumerate(sample, 1):
             user, target = r["messages"][1]["content"], r["messages"][2]["content"]
             sents = _sentences(user)
-            w.writerow([i, r["qid"], r["kind"], r["task"], r["drug_name"], r["question"], target, "", ""])
+            original = ""
+            if r.get("rewrite_status", "").startswith("pass"):
+                original = "ANSWER: " + r["answer_original"]
+            w.writerow([i, r["qid"], r["kind"], r["task"], r["drug_name"], r["question"], target, original,
+                        "", ""])
             md += [f"## {i}. {r['drug_name']} — {r['kind']} ({r['task']}, {r['qid']})", "",
                    f"**Question:** {r['question']}", ""]
             if r["kind"] == "answerable":
                 md.append("**Cited sentences:**")
                 md += [f"- [{n}] {sents[n]}" for n in r["answer_sentences"]]
-                md += ["", "**Target:**", "", "```", target, "```", "",
-                       f"**FDARxBench reference:** {r['reference_answer']}", "",
+                md += ["", "**Target:**", "", "```", target, "```", ""]
+                if original:
+                    md += [f"**Original ANSWER line (before plain-language rewrite):** {r['answer_original']}", ""]
+                md += [f"**FDARxBench reference:** {r['reference_answer']}", "",
                        "<details><summary>All sentences shown to the model</summary>", "", "```", user, "```",
                        "", "</details>", ""]
             else:
@@ -60,7 +73,7 @@ def main() -> None:
                        "**Sentences shown (should not contain the answer):**", "", "```", user, "```", ""]
     (AUDIT_DIR / "audit_100.md").write_text("\n".join(md))
     kinds = {k: sum(r["kind"] == k for r in sample) for k in ("answerable", "decline")}
-    print(AUDIT_DIR, kinds)
+    print(AUDIT_DIR, "from", src.name, kinds)
 
 
 if __name__ == "__main__":

@@ -65,4 +65,4 @@ Parsing rules for the app and the evaluation:
 - Use `--mask-prompt` so the loss covers only the assistant reply.
 - Qwen-family chat templates may insert `<think>` blocks. Disable thinking (e.g. `enable_thinking=False`) so that the training and inference templates match.
 - `test.jsonl` is T1 and must not be used for training or model selection. Use `valid.jsonl` for that.
-- **Open decision:** ANSWER lines use FDARxBench's reference answers, which are often clinical wording rather than plain language. Rewriting them in plain language (with an LLM, then a check that no facts were added) is possible but is a decision for the project owner.
+- **Train on `data/build/fdarx/mlx_plain/`.** It has the same rows, prompts, SENTENCES lines and decline targets as `mlx/`. The only difference is the train/valid ANSWER lines, which were rewritten in plain language by Claude Sonnet 5.5 under the app's number, unit and drug check. Its `test.jsonl` is identical to `mlx/test.jsonl`. `mlx/` remains as the unrewritten baseline. Details and disclosure are in [data.md](data.md#plain-language-answer-lines-train-and-valid-only-disclosed-ai-assistance).
