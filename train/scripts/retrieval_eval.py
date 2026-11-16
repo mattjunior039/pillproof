@@ -1,6 +1,8 @@
 """Dev retrieval recall for the hybrid retriever (BM25 + embeddings).
 
     python train/scripts/retrieval_eval.py            # grid, writes ~/waicy-work/retrieval/grid_dev.json
+    python train/scripts/retrieval_eval.py --final    # shipped PHONE/DESKTOP presets vs BM25-only / bge-only,
+                                                      # writes ~/waicy-work/retrieval/final_dev.json
 
 For each dev answerable item the gold sentences come from fdarx/aligned.jsonl. Reported:
   sent_recall   share of gold sentences that end up in the prompt
@@ -71,11 +73,24 @@ def evaluate(items, gold, idx, embs, params, model):
             "pass_top3": m("p3"), "pass_top5": m("p5"), "chars_mean": m("chars"), "n": len(rows)}
 
 
+def final(items, gold, idx, embs):
+    rows = []
+    for preset_name, preset in (("PHONE", R.PHONE), ("DESKTOP", R.DESKTOP)):
+        for name, model, ws, wp, we in (("BM25 only", None, .7, .3, 0), ("bge only", "bge", 0, 0, 1),
+                                        ("hybrid (shipped)", "bge", preset["w_sent"], preset["w_pass"], preset["w_emb"])):
+            p = {**preset, "w_sent": ws, "w_pass": wp, "w_emb": we}
+            rows.append({"preset": preset_name, "method": name, "budget": p["budget"], **evaluate(items, gold, idx, embs, p, model)})
+            print(json.dumps(rows[-1]), flush=True)
+    (RDIR / "final_dev.json").write_text(json.dumps(rows, indent=1))
+
+
 def main():
     items, gold, labs = load_dev()
     idx = {sid: R.LabelIndex(lab.passages) for sid, lab in labs.items()}
     embs = {m: dict(np.load(RDIR / f"emb_{m}_dev.npz")) for m in ("minilm", "bge", "arctic")
             if (RDIR / f"emb_{m}_dev.npz").exists()}
+    if "--final" in sys.argv:
+        return final(items, gold, idx, embs)
     grid = []
     weights = [("bm25_sent", 1, 0, 0), ("bm25_both", .7, .3, 0), ("emb", 0, 0, 1), ("hyb", .4, .2, .4),
                ("hyb_emb", .25, .15, .6), ("hyb_kw", .5, .2, .3)]
