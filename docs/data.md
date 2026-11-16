@@ -11,6 +11,7 @@ uv run python -m medlabel_data.fdarx.build         # MLX-LM chat files (+ declin
 uv run python -m medlabel_data.fdarx.audit         # 100-item hand-audit sheet
 uv run python -m medlabel_data.medqa               # T2 (MedicationQA)
 uv run python -m medlabel_data.labelfetch          # T3/T5 label versions (needs confirmed drug list)
+uv run python -m medlabel_data.changes.build       # label changes between versions (see label-changes.md)
 uv run pytest -q                                   # splitter/section/alignment tests
 ```
 
@@ -156,6 +157,7 @@ The list was confirmed by the project owner on 2026-11-15 and is in `config/t3_d
 
 - DailyMed history only includes versions it has archived. Some labels restarted their history, for example Zestril has only 2 versions.
 - To pin a different label, set `set_id` for that drug in the config.
+- Changes between versions, the T5 sheet and Gate 3 are described in [label-changes.md](label-changes.md).
 - T3 questions are **not** written here. The project owner writes and locks them before seeing any model output.
 
 ## Licenses
