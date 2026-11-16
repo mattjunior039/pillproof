@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 import { splitSentences } from "../sentences.js";
 import { contentTokens, numbers, units, drugTerms, restatementProblems } from "../text.js";
 import { checkReply, numberedSentences } from "../checks.js";
+import { LabelIndex, scores, retrieve } from "../retrieval.js";
 
 const load = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url), "utf8"));
 const LEX = new Set(load("../data/lexicon.json"));
@@ -42,4 +43,18 @@ test("reply checks match fixtures", () => {
 test("numberedSentences reads rendered prompts", () => {
   const p = "Drug: X\n\nLabel sentences:\n[Section: DOSAGE]\n[1] Take one.\n[12] Take two.\n\nQuestion: q";
   assert.deepEqual(numberedSentences(p), { 1: "Take one.", 12: "Take two." });
+});
+
+test("retrieval matches Python", () => {
+  const { labels, cases } = load("../fixtures/retrieval_cases.json");
+  const idx = labels.map((p) => new LabelIndex(p));
+  for (const c of cases) {
+    const ix = idx[c.label];
+    const sc = scores(ix, c.question, c.sims, c.params, new Set(c.exclude));
+    sc.forEach((x, i) => assert.ok(Math.abs(x - c.scores[i]) < 1e-12, `${c.id} score ${i}`));
+    const r = retrieve(ix, c.drug, c.question, c.sims, c.params, new Set(c.exclude));
+    assert.deepEqual(r.blocks, c.blocks, c.id);
+    assert.equal(r.user, c.user, c.id);
+    assert.deepEqual(numberedSentences(r.user), Object.fromEntries(Object.entries(r.sentences)), c.id);
+  }
 });

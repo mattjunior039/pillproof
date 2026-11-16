@@ -38,3 +38,15 @@ def test_text_cases():
 def test_numbered_sentences():
     p = "Drug: X\n\nLabel sentences:\n[Section: DOSAGE]\n[1] Take one.\n[12] Take two.\n\nQuestion: q"
     assert numbered_sentences(p) == {1: "Take one.", 12: "Take two."}
+
+
+def test_retrieval_cases():
+    from medlabel_data import retrieval as R
+
+    fx = _load("retrieval_cases.json")
+    idx = [R.LabelIndex([(h, s) for h, s in p]) for p in fx["labels"]]
+    for c in fx["cases"]:
+        ix = idx[c["label"]]
+        assert R.scores(ix, c["question"], c["sims"], c["params"], set(c["exclude"])) == c["scores"]
+        user, _, blocks = R.retrieve(ix, c["drug"], c["question"], c["sims"], c["params"], set(c["exclude"]))
+        assert [[b, ids] for b, ids in blocks] == c["blocks"] and user == c["user"], c["id"]
