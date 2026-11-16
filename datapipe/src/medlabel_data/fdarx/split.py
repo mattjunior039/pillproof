@@ -6,6 +6,11 @@ in a seeded random order and each goes to the split furthest below its target sh
 QA items. Combination products therefore pull all their ingredients' labels together
 (e.g. every acetaminophen/aspirin/caffeine OTC label lands in one split).
 
+A component may go to an evaluation split (dev/test) only if it holds at most
+MAX_FAMILY_SHARE of that split's target item count, so no single ingredient family
+(e.g. the ~970-item hormonal-contraceptive cluster) dominates an evaluation set.
+Larger components go to train.
+
 Output: BUILD/fdarx/split.json
   {"seed", "targets", "labels": {set_id: split}, "ingredients": {ingredient: split}, "stats": {...}}
 """
@@ -20,6 +25,7 @@ from .ingredients import OUT as INGREDIENTS
 OUT = paths.BUILD / "fdarx" / "split.json"
 TARGETS = {"train": 0.70, "dev": 0.10, "test": 0.20}
 SEED = 2026
+MAX_FAMILY_SHARE = 0.10
 
 
 def components(label_ings: dict[str, list[str]]) -> list[list[str]]:
@@ -42,7 +48,8 @@ def components(label_ings: dict[str, list[str]]) -> list[list[str]]:
     return [sorted(g) for g in groups.values()]
 
 
-def assign(comps: list[list[str]], weight: dict[str, int], targets=TARGETS, seed=SEED) -> dict[str, str]:
+def assign(comps: list[list[str]], weight: dict[str, int], targets=TARGETS, seed=SEED,
+           max_share=MAX_FAMILY_SHARE) -> dict[str, str]:
     comps = sorted(comps)
     random.Random(seed).shuffle(comps)
     total = sum(weight.get(s, 0) for c in comps for s in c) or 1
@@ -50,7 +57,8 @@ def assign(comps: list[list[str]], weight: dict[str, int], targets=TARGETS, seed
     out = {}
     for c in comps:
         w = sum(weight.get(s, 0) for s in c)
-        split = max(targets, key=lambda k: targets[k] - filled[k] / total)
+        ok = [k for k in targets if k == "train" or w <= max_share * targets[k] * total]
+        split = max(ok, key=lambda k: targets[k] - filled[k] / total)
         filled[split] += w
         for s in c:
             out[s] = split
@@ -79,12 +87,15 @@ def main() -> None:
             "ingredients": sum(1 for v in ing_split.values() if v == sp),
             "components": sum(1 for c in comps if lab_split[c[0]] == sp),
             "qa_items": items[sp],
+            "largest_family_share": round(max(
+                (sum(qcount[s] for s in c) for c in comps if lab_split[c[0]] == sp), default=0
+            ) / (items[sp] or 1), 3),
         }
         for sp in TARGETS
     }
     stats["excluded_labels"] = excluded
     OUT.write_text(json.dumps(
-        {"seed": SEED, "targets": TARGETS, "labels": lab_split, "ingredients": ing_split, "stats": stats},
+        {"seed": SEED, "targets": TARGETS, "max_family_share": MAX_FAMILY_SHARE, "labels": lab_split, "ingredients": ing_split, "stats": stats},
         indent=1, ensure_ascii=False,
     ))
     print(json.dumps(stats, indent=1))

@@ -60,6 +60,13 @@ def test_split_components_keep_shared_ingredients_together():
     assert out["a"] == out["b"] == out["c"]
 
 
+def test_split_large_family_goes_to_train():
+    comps = [["big"]] + [[f"s{i}"] for i in range(200)]
+    weight = {"big": 100, **{f"s{i}": 5 for i in range(200)}}
+    for seed in range(5):
+        assert split.assign(comps, weight, seed=seed)["big"] == "train"
+
+
 def test_align_picks_supporting_sentences():
     lab = align.Label({"set_id": "s", "drug_name": "Testdrug", "chunks": [
         "2.1 Dosage\nTake 10 mg once daily with food. Store in a dry place.",

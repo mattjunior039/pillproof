@@ -29,13 +29,13 @@ The output format for the model is in [output-format.md](output-format.md).
 
 - **Split.** 699 labels map to 345 active ingredients. Labels that share an ingredient, including combination products, are grouped by connected components, so no ingredient appears in more than one split. Manual ingredient fixes are in `config/fdarx_ingredient_overrides.json`. Seed 2026.
 
-  | split | labels | ingredients | QA items |
-  |---|---|---|---|
-  | train | 499 | 244 | 12,042 |
-  | dev | 63 | 43 | 1,747 |
-  | test (T1) | 137 | 58 | 3,418 |
+  | split | labels | ingredients | QA items | largest family |
+  |---|---|---|---|---|
+  | train | 543 | 231 | 12,041 | 9.6% |
+  | dev | 64 | 40 | 1,699 | 9.9% |
+  | test (T1) | 92 | 74 | 3,467 | 4.1% |
 
-  One large hormonal-contraceptive component, about 970 items, landed in test.
+  A family (connected component) may go to dev or test only if it holds at most 10% of that split's target item count; larger families go to train. This moved the hormonal-contraceptive cluster (about 970 items, off-target for older adults) from test to train, and keeps four other large families (acetaminophen combinations, antihypertensive combinations, loratadine, diabetes combinations) in train.
 
 - **Alignment.** Each reference answer is matched to the sentences of its gold passage, falling back to the cited sections, by greedy token coverage: add the sentence that covers the most new answer tokens (at least 2) and stop at 12 sentences. An item is kept if coverage is at least **0.8 (factual)** or **0.9 (multihop)** and there is no hard fail.
   - Hard fails: a number in the answer that is missing from the cited sentences (984), no sentence selected (164), more than 12 sentences needed (78), and no gold passage (64).
@@ -43,17 +43,17 @@ The output format for the model is in [output-format.md](output-format.md).
   - Kept counts if one threshold were used for all tasks: 0.5 → 11,645, 0.6 → 11,160, 0.7 → 10,343, 0.8 → 9,257, 0.9 → 7,807, 1.0 → 6,917.
   - Details are in `data/build/fdarx/align_report.json`.
 - **Prompts.** A prompt has the gold passage(s) plus distractor passages from the same label, up to 5 passages and about 5,000 characters. Long passages are trimmed to a window around the answer sentences.
-- **Declines.** For a kept item, every passage that covers the answer (coverage ≥ 0.4) is removed and replaced with other passages from the same label. The example is kept only if the remaining prompt covers less than 0.5 of the answer. Declines are 30% of train and dev. Test gets declines equal to half its answerable count, plus FDARxBench's own 882 refusal items.
+- **Declines.** For a kept item, every passage that covers the answer (coverage ≥ 0.4) is removed and replaced with other passages from the same label. The example is kept only if the remaining prompt covers less than 0.5 of the answer. Declines are 30% of train and dev. Test gets declines equal to half its answerable count, plus FDARxBench's own 549 refusal items.
 - **Patient relevance.** Each item is tagged *core* (all answer sections patient-relevant), *mixed*, or *technical*. Train keeps core items with probability 1.0, mixed 0.7, and technical 0.4. 7,146 of the 8,675 kept items are core, far more than the plan's estimate of about 2,000.
 - **Output** in `data/build/fdarx/mlx/` (seed 7):
 
   | file | examples | answerable | decline | FDARxBench refusal |
   |---|---|---|---|---|
-  | train.jsonl | 7,826 | 5,478 | 2,348 | — |
-  | valid.jsonl | 1,317 | 922 | 395 | — |
-  | test.jsonl (T1) | 3,378 | 1,664 | 832 | 882 |
+  | train.jsonl | 7,577 | 5,304 | 2,273 | — |
+  | valid.jsonl | 1,260 | 882 | 378 | — |
+  | test.jsonl (T1) | 3,397 | 1,899 | 949 | 549 |
 
-- **Hand audit (for the project owner).** `data/build/fdarx/audit/audit_100.md` (readable) and `audit_100.csv` (fill in `verdict` and `notes`). The sheet has 100 random train items: 64 answerable and 36 decline. Check that the cited sentences really answer the question and that each decline is truly unanswerable from the prompt.
+- **Hand audit (for the project owner).** `data/build/fdarx/audit/audit_100.md` (readable) and `audit_100.csv` (fill in `verdict` and `notes`). The sheet has 100 random train items: 67 answerable and 33 decline. Check that the cited sentences really answer the question and that each decline is truly unanswerable from the prompt.
 
 ## T2: MedicationQA (CC BY 4.0), test only
 
