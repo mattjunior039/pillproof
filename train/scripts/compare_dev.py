@@ -18,7 +18,7 @@ import random
 from pathlib import Path
 
 EVAL = Path.home() / "waicy-work" / "eval"
-METRICS = ("wrong_rate", "answerable_correct", "false_decline_rate", "false_answer_rate", "select_ok")
+METRICS = ("wrong_rate", "answerable_correct", "false_decline_rate", "false_answer_rate", "miss_decline", "select_ok", "lenient_correct", "lenient_wrong")
 
 
 def load(run: str):
@@ -38,6 +38,19 @@ def metric(rows, mode, key):
     if key == "false_answer_rate":
         xs = [r for r in rows if r["expect"] == "decline"]
         return sum(r[mode] == "wrong_answered" for r in xs) / len(xs) if xs else None
+    if key == "miss_decline":  # retrieval lost the answer: declining is the right call
+        xs = [r for r in rows if r["expect"] == "miss"]
+        return sum(r["status"] == "decline" for r in xs) / len(xs) if xs else None
+    if key == "lenient_wrong":  # wrong_rate without the limit on extra cited sentences
+        def bad(r):
+            if r[mode] in ("wrong_answered", "invalid"):
+                return True
+            return r[mode] == "wrong" and not (r["cover_ok"] and (mode == "checks" or not r["problems"]))
+        return sum(map(bad, rows)) / len(rows)
+    if key == "lenient_correct":  # answerable_correct without the limit on extra cited sentences
+        xs = [r for r in rows if r["expect"] == "answerable"]
+        ok = lambda r: r["status"] == "answer" and r["cover_ok"] and (mode == "checks" or not r["problems"])  # noqa: E731
+        return sum(map(ok, xs)) / len(xs) if xs else None
     if key == "select_ok":
         xs = [r for r in rows if r["status"] == "answer"]
         return sum(r["select_ok"] for r in xs) / len(xs) if xs else None
@@ -50,7 +63,10 @@ def paired(b, c, key, b_mode="nochecks", c_mode="checks", reps=2000, seed=0):
     for k in keys:
         by.setdefault(b[k]["set_id"], []).append(k)
     labs = sorted(by)
-    point = metric([c[k] for k in keys], c_mode, key) - metric([b[k] for k in keys], b_mode, key)
+    pc, pb = metric([c[k] for k in keys], c_mode, key), metric([b[k] for k in keys], b_mode, key)
+    if pc is None or pb is None:
+        return None, None, None, len(keys)
+    point = pc - pb
     rng = random.Random(seed)
     diffs = []
     for _ in range(reps):
@@ -85,6 +101,8 @@ def main():
             d, lo, hi, n = paired(b, c, key)
             vals = [metric(rb, "nochecks", key), metric(rb, "checks", key), metric(rc, "nochecks", key), metric(rc, "checks", key)]
             summary[pair][key] = {"B": vals[0], "B_checks": vals[1], "C_nochecks": vals[2], "C": vals[3], "diff": d, "ci": [lo, hi]}
+            if d is None:
+                continue
             out.append(f"| {bn} vs {cn} | {n} | {key} | " + " | ".join(pct(v) for v in vals)
                        + f" | {100 * d:+.1f} [{100 * lo:+.1f}, {100 * hi:+.1f}] |")
     text = "\n".join(out)

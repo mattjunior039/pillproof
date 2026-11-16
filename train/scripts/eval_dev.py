@@ -2,7 +2,7 @@
 
     # build the prompt sets once (oracle = the built dev prompts; phone/desktop = hybrid retrieval)
     python train/scripts/eval_dev.py prompts
-    # generate (greedy, thinking off, max 128 new tokens)
+    # generate (greedy, thinking off, max 256 new tokens; run_gate2.sh passes --max-tokens 256)
     python train/scripts/eval_dev.py run --model Qwen/Qwen3.5-0.8B --prompts phone --out ~/waicy-work/eval/B08_phone.jsonl
     python train/scripts/eval_dev.py run --model Qwen/Qwen3.5-0.8B --adapter ~/waicy-work/models/adapters/medlabel-08-r1 ...
 
@@ -138,7 +138,7 @@ def main() -> None:
     r.add_argument("--out", required=True)
     r.add_argument("--limit", type=int)
     r.add_argument("--batch", type=int, default=16)
-    r.add_argument("--max-tokens", type=int, default=128)
+    r.add_argument("--max-tokens", type=int, default=256)
     r.add_argument("--cpu", action="store_true")
     a = ap.parse_args()
     build_prompts() if a.cmd == "prompts" else run(a)

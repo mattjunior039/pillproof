@@ -12,7 +12,8 @@ Per item: parse with checks.check_reply (lenient parser; strict-format rate repo
   * expect miss (retrieval lost the answer, prompt covers < 50% of it): decline -> correct,
       answer graded as for answerable.
 select_ok: the cited sentences (plus their section headings) cover >= 70% of the answer tokens
-the gold sentences cover, and at most max(2, |gold|) cited sentences are not gold.
+the gold sentences cover (cover_ok), and at most max(2, |gold|) cited sentences are not gold.
+compare_dev.py also reports a lenient sensitivity ("lenient_correct") that drops the extras limit.
 Uncertainty: 95% bootstrap intervals resampling whole drug labels (2,000 resamples).
 """
 
@@ -49,7 +50,7 @@ def grade_item(p: dict, reply: str) -> dict:
     sents = prompt_sentences(p["user"])
     r = check_reply(reply, {n: s for n, (s, _) in sents.items()}, p["drug"], LEX)
     g = {"status": r["status"], "strict": r["strict"], "n_cited": len(r["sentences"]), "blocked": r["blocked"],
-         "problems": r["problems"], "select_ok": None, "exact": None, "p": None, "r": None}
+         "problems": r["problems"], "select_ok": None, "cover_ok": None, "exact": None, "p": None, "r": None}
     if r["status"] == "answer":
         ans = set(p["ans_tokens"])
         gold_text = {norm_ws(t) for t in p["gold_texts"]}
@@ -60,8 +61,8 @@ def grade_item(p: dict, reply: str) -> dict:
         cited_cov = len(cov) / len(ans) if ans else 0.0
         extra = sum(norm_ws(sents[n][0]) not in gold_text for n in r["sentences"])
         G = set(p["gold_nums"])
-        g["select_ok"] = bool(cited_cov > 0 and cited_cov >= SELECT_FRAC * p["gold_cov"]
-                              and extra <= max(2, len(p["gold_texts"])))
+        g["cover_ok"] = bool(cited_cov > 0 and cited_cov >= SELECT_FRAC * p["gold_cov"])
+        g["select_ok"] = g["cover_ok"] and extra <= max(2, len(p["gold_texts"]))
         if G:
             S = set(r["sentences"])
             g["exact"] = S == G
