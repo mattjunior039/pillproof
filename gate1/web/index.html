@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gate 1 – fine-tuned weights in the browser</title>
+<style>
+  body { font: 15px/1.45 -apple-system, system-ui, sans-serif; max-width: 860px; margin: 0 auto; padding: 12px; }
+  h1 { font-size: 1.25rem; margin: 0.2em 0 0.6em; }
+  fieldset { border: 1px solid #ccc; border-radius: 6px; margin: 0 0 10px; }
+  label { margin-right: 10px; white-space: nowrap; }
+  button { font-size: 15px; padding: 6px 12px; margin: 4px 4px 4px 0; }
+  #status { font-family: ui-monospace, monospace; font-size: 13px; background: #f3f3f3; padding: 6px; border-radius: 4px; white-space: pre-wrap; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; margin: 8px 0; }
+  td, th { border: 1px solid #ddd; padding: 4px 6px; vertical-align: top; text-align: left; }
+  td.out { white-space: pre-wrap; }
+  textarea { width: 100%; box-sizing: border-box; font-size: 15px; }
+  .muted { color: #666; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>Gate 1 — does a fine-tuned Qwen3.5-2B answer in the browser?</h1>
+
+<fieldset>
+  <legend>Model weights (all use the prebuilt WebLLM <code>Qwen3.5-2B-q4f16_1_cs1k-webgpu.wasm</code>)</legend>
+  <div id="models"></div>
+  <label><input type="checkbox" id="localLib" checked> load wasm from this server (<code>/libs/</code>) instead of GitHub</label><br>
+  <label><input type="checkbox" id="noThink" checked> disable thinking (<code>enable_thinking: false</code>)</label><br>
+  <label>browser cache backend <select id="cacheBackend"><option>cache</option><option>indexeddb</option><option>opfs</option></select></label>
+</fieldset>
+
+<button id="load">Load model</button>
+<button id="bench" disabled>Run test prompts</button>
+<button id="unload" disabled>Unload</button>
+<button id="clear">Clear model cache</button>
+<div id="status">Checking WebGPU…</div>
+
+<table id="results"><thead><tr><th>Prompt</th><th>Answer</th><th>Stats</th></tr></thead><tbody></tbody></table>
+
+<fieldset>
+  <legend>Chat</legend>
+  <textarea id="msg" rows="2" placeholder="Ask something…"></textarea>
+  <button id="send" disabled>Send</button>
+  <div id="chatOut" class="muted"></div>
+</fieldset>
+<p class="muted">Results are also POSTed to <code>/log</code> on the serving machine. Query params:
+<code>?model=local-ft&amp;auto=1</code> loads the model and runs the prompts automatically.</p>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
