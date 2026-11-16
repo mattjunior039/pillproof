@@ -1,0 +1,149 @@
+[
+ {
+  "id": "basic",
+  "text": "Take one tablet daily. Do not crush. Swallow whole!",
+  "sentences": [
+   "Take one tablet daily.",
+   "Do not crush.",
+   "Swallow whole!"
+  ]
+ },
+ {
+  "id": "abbreviation",
+  "text": "Avoid NSAIDs, e.g. ibuprofen. Use acetaminophen instead.",
+  "sentences": [
+   "Avoid NSAIDs, e.g. ibuprofen.",
+   "Use acetaminophen instead."
+  ]
+ },
+ {
+  "id": "initials_us",
+  "text": "Made in the U.S. Distributed by Pfizer.",
+  "sentences": [
+   "Made in the U.S. Distributed by Pfizer."
+  ],
+  "note": "Known limitation: a single capital letter before a period is treated as an initial, so this is not split."
+ },
+ {
+  "id": "decimal",
+  "text": "The dose is 2.5 mg twice daily. Do not exceed 10 mg.",
+  "sentences": [
+   "The dose is 2.5 mg twice daily.",
+   "Do not exceed 10 mg."
+  ]
+ },
+ {
+  "id": "list_marker_start",
+  "text": "1. Take with water. 2. Remain upright for 30 minutes.",
+  "sentences": [
+   "1. Take with water.",
+   "2. Remain upright for 30 minutes."
+  ]
+ },
+ {
+  "id": "number_ends_sentence",
+  "text": "The usual dose is 20 mg. Take it at night.",
+  "sentences": [
+   "The usual dose is 20 mg.",
+   "Take it at night."
+  ]
+ },
+ {
+  "id": "space_before_period",
+  "text": "Lactation is not recommended . Advise women not to breastfeed .",
+  "sentences": [
+   "Lactation is not recommended .",
+   "Advise women not to breastfeed ."
+  ],
+  "note": "FDARxBench style: space before the period."
+ },
+ {
+  "id": "closing_paren",
+  "text": "Monitor INR (see Warnings.) Adjust the dose as needed.",
+  "sentences": [
+   "Monitor INR (see Warnings.)",
+   "Adjust the dose as needed."
+  ]
+ },
+ {
+  "id": "line_breaks",
+  "text": "Adverse reactions\nHeadache\nNausea and vomiting",
+  "sentences": [
+   "Adverse reactions",
+   "Headache",
+   "Nausea and vomiting"
+  ]
+ },
+ {
+  "id": "bullets",
+  "text": "Symptoms include: • dizziness • fainting • fast heartbeat",
+  "sentences": [
+   "Symptoms include:",
+   "dizziness",
+   "fainting",
+   "fast heartbeat"
+  ]
+ },
+ {
+  "id": "lowercase_next",
+  "text": "Doses of 40 mg. or more were studied in adults.",
+  "sentences": [
+   "Doses of 40 mg. or more were studied in adults."
+  ],
+  "note": "No split: next word is lowercase."
+ },
+ {
+  "id": "vs",
+  "text": "Rates were 5% vs. 3% in placebo. This was not significant.",
+  "sentences": [
+   "Rates were 5% vs. 3% in placebo.",
+   "This was not significant."
+  ]
+ },
+ {
+  "id": "question",
+  "text": "What is LIPITOR? LIPITOR is a prescription medicine.",
+  "sentences": [
+   "What is LIPITOR?",
+   "LIPITOR is a prescription medicine."
+  ]
+ },
+ {
+  "id": "quote_start",
+  "text": "Patients should be told: \"Do not stop taking this medicine.\" Call your doctor.",
+  "sentences": [
+   "Patients should be told: \"Do not stop taking this medicine.\"",
+   "Call your doctor."
+  ]
+ },
+ {
+  "id": "nbsp",
+  "text": "Store at 20°C to 25°C. Keep out of reach of children.",
+  "sentences": [
+   "Store at 20°C to 25°C.",
+   "Keep out of reach of children."
+  ]
+ },
+ {
+  "id": "table_row",
+  "text": "Nasopharyngitis | 8.2 | 12.9 | 5.3",
+  "sentences": [
+   "Nasopharyngitis | 8.2 | 12.9 | 5.3"
+  ]
+ },
+ {
+  "id": "empty_and_symbols",
+  "text": "\n  •  \n---\nOK.",
+  "sentences": [
+   "OK."
+  ]
+ },
+ {
+  "id": "dash_bullet",
+  "text": "Warnings. - Do not use with alcohol.",
+  "sentences": [
+   "Warnings.",
+   "- Do not use with alcohol."
+  ]
+ }
+]

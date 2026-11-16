@@ -10,3 +10,7 @@ dist/
 *.safetensors
 *.gguf
 .DS_Store
+data/cache/
+data/build/
+data/out/
+__pycache__/
