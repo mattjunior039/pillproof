@@ -1,0 +1,212 @@
+{
+ "default": {
+  "2B": "r1-ft",
+  "0.8B": "lite-r1-ft"
+ },
+ "models": {
+  "r1-ft": {
+   "size": "2B",
+   "round": "r1",
+   "mlc_dir": "Qwen3.5-2B-medlabel-r1-q4f16_1-MLC",
+   "dev": {
+    "phone": {
+     "wrong_rate": 13.8,
+     "overall_correct": 81.2,
+     "answerable_correct": 77.2,
+     "false_decline_rate": 7.9,
+     "false_answer_rate": 6.1,
+     "miss_decline": 74.3,
+     "select_ok": 77.7,
+     "n": 1193,
+     "n_wrong": 165
+    },
+    "oracle": {
+     "wrong_rate": 10.9,
+     "overall_correct": 85.5,
+     "answerable_correct": 81.9,
+     "false_decline_rate": 4.9,
+     "false_answer_rate": 4.2,
+     "select_ok": 84.7,
+     "n": 1193,
+     "n_wrong": 130
+    },
+    "desktop": {
+     "wrong_rate": 18.2,
+     "overall_correct": 79.1,
+     "answerable_correct": 77.2,
+     "false_decline_rate": 4.1,
+     "false_answer_rate": 9.7,
+     "miss_decline": 55.4,
+     "select_ok": 74.1,
+     "n": 1190,
+     "n_wrong": 216
+    }
+   }
+  },
+  "r2-ft": {
+   "size": "2B",
+   "round": "r2",
+   "mlc_dir": "Qwen3.5-2B-medlabel-r2-q4f16_1-MLC",
+   "dev": {
+    "phone": {
+     "wrong_rate": 17.2,
+     "overall_correct": 80.5,
+     "answerable_correct": 79.6,
+     "false_decline_rate": 3.8,
+     "false_answer_rate": 9.6,
+     "miss_decline": 62.5,
+     "select_ok": 74.3,
+     "n": 1193,
+     "n_wrong": 205
+    },
+    "oracle": {
+     "wrong_rate": 13.4,
+     "overall_correct": 85.2,
+     "answerable_correct": 83.0,
+     "false_decline_rate": 1.8,
+     "false_answer_rate": 8.4,
+     "select_ok": 82.1,
+     "n": 1193,
+     "n_wrong": 160
+    },
+    "desktop": {
+     "wrong_rate": 20.7,
+     "overall_correct": 78.1,
+     "answerable_correct": 78.2,
+     "false_decline_rate": 1.9,
+     "false_answer_rate": 14.0,
+     "miss_decline": 47.0,
+     "select_ok": 71.8,
+     "n": 1190,
+     "n_wrong": 246
+    }
+   }
+  },
+  "r3-ft": {
+   "size": "2B",
+   "round": "r3",
+   "mlc_dir": "Qwen3.5-2B-medlabel-r3-q4f16_1-MLC",
+   "dev": {
+    "phone": {
+     "wrong_rate": 16.8,
+     "overall_correct": 80.1,
+     "answerable_correct": 77.6,
+     "false_decline_rate": 5.0,
+     "false_answer_rate": 8.7,
+     "miss_decline": 67.6,
+     "select_ok": 74.3,
+     "n": 1193,
+     "n_wrong": 201
+    },
+    "oracle": {
+     "wrong_rate": 12.9,
+     "overall_correct": 84.7,
+     "answerable_correct": 81.1,
+     "false_decline_rate": 3.2,
+     "false_answer_rate": 4.8,
+     "select_ok": 82.3,
+     "n": 1193,
+     "n_wrong": 154
+    },
+    "desktop": {
+     "wrong_rate": 21.0,
+     "overall_correct": 77.3,
+     "answerable_correct": 76.2,
+     "false_decline_rate": 2.5,
+     "false_answer_rate": 11.0,
+     "miss_decline": 44.6,
+     "select_ok": 70.9,
+     "n": 1190,
+     "n_wrong": 250
+    }
+   }
+  },
+  "lite-r1-ft": {
+   "size": "0.8B",
+   "round": "r1",
+   "mlc_dir": "Qwen3.5-0.8B-medlabel-r1-q4f16_1-MLC",
+   "dev": {
+    "phone": {
+     "wrong_rate": 17.6,
+     "overall_correct": 78.5,
+     "answerable_correct": 76.1,
+     "false_decline_rate": 6.3,
+     "false_answer_rate": 10.0,
+     "miss_decline": 64.7,
+     "select_ok": 73.1,
+     "n": 1193,
+     "n_wrong": 210
+    },
+    "oracle": {
+     "wrong_rate": 14.2,
+     "overall_correct": 82.7,
+     "answerable_correct": 79.4,
+     "false_decline_rate": 4.1,
+     "false_answer_rate": 7.7,
+     "select_ok": 80.6,
+     "n": 1193,
+     "n_wrong": 170
+    }
+   }
+  },
+  "lite-r2-ft": {
+   "size": "0.8B",
+   "round": "r2",
+   "mlc_dir": "Qwen3.5-0.8B-medlabel-r2-q4f16_1-MLC",
+   "dev": {
+    "phone": {
+     "wrong_rate": 21.0,
+     "overall_correct": 76.8,
+     "answerable_correct": 76.8,
+     "false_decline_rate": 3.6,
+     "false_answer_rate": 14.1,
+     "miss_decline": 55.9,
+     "select_ok": 69.6,
+     "n": 1193,
+     "n_wrong": 250
+    },
+    "oracle": {
+     "wrong_rate": 17.1,
+     "overall_correct": 81.3,
+     "answerable_correct": 78.3,
+     "false_decline_rate": 2.2,
+     "false_answer_rate": 10.3,
+     "select_ok": 77.2,
+     "n": 1193,
+     "n_wrong": 204
+    }
+   }
+  },
+  "lite-r3-ft": {
+   "size": "0.8B",
+   "round": "r3",
+   "mlc_dir": "Qwen3.5-0.8B-medlabel-r3-q4f16_1-MLC",
+   "dev": {
+    "phone": {
+     "wrong_rate": 17.9,
+     "overall_correct": 78.5,
+     "answerable_correct": 75.3,
+     "false_decline_rate": 5.6,
+     "false_answer_rate": 8.0,
+     "miss_decline": 65.4,
+     "select_ok": 72.4,
+     "n": 1193,
+     "n_wrong": 214
+    },
+    "oracle": {
+     "wrong_rate": 15.8,
+     "overall_correct": 81.9,
+     "answerable_correct": 78.3,
+     "false_decline_rate": 3.1,
+     "false_answer_rate": 8.0,
+     "select_ok": 78.5,
+     "n": 1193,
+     "n_wrong": 189
+    }
+   }
+  }
+ },
+ "selection": "per size: lowest dev wrong-answer rate on phone prompts with checks; ties broken by lower 'declined, should answer' (false_decline_rate). See docs/gate2.md.",
+ "mlc_root": "~/waicy-work/models/mlc",
+ "metrics": "percent, with checks, on the r2 dev prompts (EVAL_DIR=~/waicy-work/eval_r2)"
+}

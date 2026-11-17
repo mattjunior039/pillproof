@@ -1,5 +1,12 @@
 # Gate 2: fine-tune plus checks (C) against base model plus passages (B), dev set
 
+> **Round 3 update (decline share restored to 30%).** Train declines were refilled to 30% from train-only extra pools, with the same support check ([data.md](data.md)). Both sizes were retrained with otherwise identical settings (the r3 adapters). r1, r2 and r3 were then all scored on the same r2 dev items. Details are in [Round 3](#round-3-decline-share-restored-to-30).
+>
+> - **0.8B:** restoring the share recovers round 1's wrong-answer rate (17.9% against 17.6% on phone prompts, +0.3 [−1.4, +2.0]), with fewer false declines.
+> - **2B:** it does not. r3 is level with r2 (16.8% against 17.2%), and r1 is still 3 points better on every prompt set.
+> - **Defaults, by dev phone wrong-answer rate:** **r1 at both sizes** (`app/models.json`: `r1-ft`, `lite-r1-ft`). For the 0.8B, r1 and r3 differ by 4 items out of 1,193, which is within noise.
+> - C-2B r3 still beats B by 22 points (16.8% against 38.9% wrong). All r3 builds are converted and load in the browser. On 100 dev prompts, the browser r3 replies match MLX within 1–2 items. One NUZYRA prompt shows a 4-bit glitch in the 0.8B r3 (a runaway number), which the number check would block.
+>
 > **Round 2 update (decline fix).** The "should decline" items were rebuilt so that items whose answer is still in the label are dropped ([data.md](data.md)). Both fine-tunes were then retrained with the same settings (the r2 adapters), and Gate 2 was re-run on the cleaned dev set. Details are in [Round 2](#round-2-decline-fix-and-retrain).
 >
 > - C still clearly beats B for the 2B: 17.2% against 38.9% wrong on phone prompts, −21.7 points [−25.1, −18.2]. The 0.8B result is unchanged in kind: B-0.8B declines 79% of answerable questions.
@@ -423,7 +430,7 @@ The 0.8B moves the same way.
 
 - **Fewer refusals of answerable questions, as intended.** The r2 adapters decline answerable questions about half as often at both sizes, and answer 2.4 points more of them correctly (2B).
 - **But they answer more in general.** They answer more decline items and more items where retrieval missed the answer. The wrong-answer rate rises by 3.4 points at both sizes; overall correctness is unchanged within noise.
-- **Likely cause:** the lower decline share in training (30.0% → 26.7%). The removed declines were also exactly the items that taught the model to decline when the facts are only nearby, which is also what a retrieval miss looks like. This is a hypothesis, not tested.
+- **Likely cause:** the lower decline share in training (30.0% → 26.7%). The removed declines were also exactly the items that taught the model to decline when the facts are only nearby, which is also what a retrieval miss looks like. This is a hypothesis, not tested. (Round 3 tested the first half: restoring the share fixes the 0.8B but not the 2B; see [Round 3](#round-3-decline-share-restored-to-30).)
 
 ### Decline audit, round 2
 
@@ -472,9 +479,91 @@ Both systems are C. The plan says to ship the better one, and its headline measu
 Recommendation:
 - Ship **C-2B r1** (primary) and **C-0.8B r1** (lite) by default.
 - Keep the r2 builds (`r2-ft`, `lite-r2-ft`) as the "fewer refusals" alternative.
-- A possible fix within the plan's one extra day: retrain with the decline share restored to 30% by refilling more decline items. That costs about 5 h of GPU time and was not done here.
+- A possible fix within the plan's one extra day: retrain with the decline share restored to 30% by refilling more decline items. That costs about 5 h of GPU time and was not done here. (Done in [Round 3](#round-3-decline-share-restored-to-30); the defaults stay r1.)
 
 The round-2 dev numbers are the reference for T1. T1 test was rebuilt with the same code, but no model has been run on it.
+
+## Round 3: decline share restored to 30%
+
+### What changed
+
+- **Data.** The r2 train set had only 26.7% declines, because the support check ran the pool dry. 343 more declines were added from other **train** questions on **train labels only**, with the same support check and shown-passage check:
+  - 298 from items dropped by tier sampling;
+  - 45 from aligned items below the keep threshold (coverage at least 0.5, no hard fail).
+
+  Train is now 7,577 examples with 2,273 declines (30.0%). Most extras are technical-tier questions (291 of 343). See [data.md](data.md) for details.
+- **Same dev items.** Dev and T1 are byte-identical to r2 (checked with checksums), so r1, r2 and r3 are scored on the same 1,193 dev items. The r2 train rows are unchanged; the extras are inserted with their own seeded RNG.
+- **Training.** Same configs as r2 apart from data, iterations and output path (`train/configs/lora_{2b,08}_r3.yaml`): 1,895 iterations (one epoch), final checkpoint kept, no checkpoint selection. It took 2.6 h (2B) and 1.6 h (0.8B), with Chrome running alongside. Final val loss was 0.485 (2B) and 0.575 (0.8B).
+- **r1 on every prompt set.** The r1 adapters were also run on the r2 oracle and desktop prompts (`C2b_r1_oracle`, `C2b_r1_desktop`, `C08_r1_oracle`), so all three rounds have the full set. Runs are in `~/waicy-work/eval_r2/` with suffix `_r1` / `_r3` (r2 runs have none).
+
+### Results: three rounds on the same dev items (C, with checks)
+
+![Gate 2 size versus accuracy, round 3](img/gate2_size_r3.png)
+
+| Size | Prompts | Measure | r1 | r2 | r3 | r3 − r1 [95% CI] | r3 − r2 [95% CI] |
+|---|---|---|---|---|---|---|---|
+| **2B** | **Phone** | **wrong-answer rate** | **13.8** | **17.2** | **16.8** | **+3.0 [+1.0, +5.0]** | **−0.3 [−2.1, +1.2]** |
+| | | answerable answered correctly | 77.2 | 79.6 | 77.6 | +0.4 [−2.4, +3.3] | −2.0 [−4.0, +0.4] |
+| | | declined, should answer | 7.9 | 3.8 | 5.0 | −2.9 [−5.2, −1.3] | +1.2 [+0.0, +2.3] |
+| | | answered, should decline | 6.1 | 9.6 | 8.7 | +2.6 [+0.0, +5.2] | −1.0 [−3.4, +1.4] |
+| | | declined when retrieval missed | 74.3 | 62.5 | 67.6 | −6.6 [−12.9, −0.8] | +5.1 [+0.8, +8.8] |
+| | | sentence selection | 77.7 | 74.3 | 74.3 | −3.4 [−6.2, −0.5] | −0.0 |
+| | Oracle | wrong-answer rate | 10.9 | 13.4 | 12.9 | +2.0 [+0.4, +3.7] | −0.5 [−2.2, +1.1] |
+| | Desktop | wrong-answer rate | 18.2 | 20.7 | 21.0 | +2.9 [+1.1, +4.6] | +0.3 [−1.2, +1.7] |
+| **0.8B** | **Phone** | **wrong-answer rate** | **17.6** | **21.0** | **17.9** | **+0.3 [−1.4, +2.0]** | **−3.0 [−5.1, −1.0]** |
+| | | answerable answered correctly | 76.1 | 76.8 | 75.3 | −0.8 [−2.8, +1.3] | −1.5 [−3.7, +0.7] |
+| | | declined, should answer | 6.3 | 3.6 | 5.6 | −0.7 [−1.9, +0.5] | +2.0 [+0.5, +3.6] |
+| | | answered, should decline | 10.0 | 14.1 | 8.0 | −1.9 [−4.2, +0.3] | −6.1 [−9.3, −3.4] |
+| | | declined when retrieval missed | 64.7 | 55.9 | 65.4 | +0.7 | +9.6 [+3.4, +16.0] |
+| | | sentence selection | 73.1 | 69.6 | 72.4 | −0.7 | +2.8 [+0.2, +5.3] |
+| | Oracle | wrong-answer rate | 14.2 | 17.1 | 15.8 | +1.6 [−0.2, +3.5] | −1.3 [−2.8, +0.2] |
+
+B against C r3 (B without checks, as before):
+- 2B: phone 38.9 → 16.8 (−22.0 [−25.9, −18.2]), oracle 27.7 → 12.9, desktop 48.7 → 21.0.
+- C-2B r3 declines answerable questions slightly more often than B on phone prompts: 5.0 against 2.9, +2.0 [+0.5, +3.6]. It does so less often than B on oracle and desktop prompts.
+- 0.8B: as in every round, the base 0.8B declines 79% of answerable phone questions, so its literal wrong rate is lower (12.0 against 17.9).
+- Size: C-0.8B r3 is only 1.1 points [−0.6, +2.9] worse than C-2B r3 on phone prompts.
+
+What this shows:
+- **0.8B: the decline share was the cause.** Restoring it brings the r2 regression back to r1's level. r3 has fewer false declines than r1 (5.6 against 6.3) and fewer answered declines (8.0 against 10.0), and its wrong rate is the same within noise.
+- **2B: the share was not the main cause.** r3 is level with r2 on wrong rate at all three prompt sets, and r1 stays 2–3 points better at each. What still separates r1 from r3 is *which* declines it trained on. 1,447 of r1's 2,273 train declines were "answerable elsewhere" by the support check. A plausible reading is that those taught the 2B to decline when the answer is only partly present, which helps on retrieval misses (74.3 against 67.6) at the cost of more false declines (7.9 against 5.0). This is a hypothesis, not tested.
+- **Caveat on the automatic grade.** About 30% of answered decline items were in fact supported by the label in the round-2 audit. Part of r1's lead on "answered, should decline" may therefore not be real errors. In that audit, r1 and r2 had a similar number of unsupported answers (5 against 6). No hand audit was done for r3.
+
+### Defaults
+
+Rule (as decided by the user): per size, choose among r1, r2 and r3 by the dev wrong-answer rate, and break ties with "declined, should answer". I used **phone prompts with checks**, which is the shipped app setting. A tie means the same number of wrong items.
+
+| Size | r1 wrong (items) | r2 | r3 | Default |
+|---|---|---|---|---|
+| 2B | **13.8 (165)** | 17.2 (205) | 16.8 (201) | **`r1-ft`** |
+| 0.8B | **17.6 (210)** | 21.0 (250) | 17.9 (214) | **`lite-r1-ft`** |
+
+- r1 is also lowest on oracle and desktop prompts at both sizes, so the choice does not depend on the prompt set.
+- For the 0.8B, r1 against r3 is not an exact tie (4 items), but it is a statistical one (+0.3 [−1.4, +2.0]). Under a "within noise counts as a tie" reading, r3 would win on fewer false declines (5.6 against 6.3). `lite-r3-ft` is a reasonable alternative if fewer refusals matter more.
+- The defaults are in **`app/models.json`**, written by `train/scripts/app_models.py` from the graded runs:
+  - shape: `{"default": {"2B": key, "0.8B": key}, "models": {key: {"size", "round", "mlc_dir", "dev": {prompt set: metrics}}}}`;
+  - entries for r1, r2 and r3 at both sizes;
+  - MLC dirs are under `~/waicy-work/models/mlc`.
+
+### Browser check, round 3
+
+`train/scripts/convert_mlc.sh 2B medlabel-2b-r3 medlabel-r3` (and the same for 0.8B) merged 186 LoRA pairs per model, none missing. The merged HF checkpoints were deleted afterwards.
+
+| Build | Size | Cold load | Cached load |
+|---|---|---|---|
+| `Qwen3.5-2B-medlabel-r3-q4f16_1-MLC` | 1.0 GB | 3.8 s | 1.2 s |
+| `Qwen3.5-0.8B-medlabel-r3-q4f16_1-MLC` | 426 MB | 1.7–1.9 s | 0.8 s |
+
+- Both load in the Gate 1 page (Chrome 157, WebGPU, M5 Pro) as `?models=r3-ft,lite-r3-ft&prompts=label`, at the default context and at the phone `ctx=2048`. Both reply in the exact format, and both decline the OPSYNVI prompt (`NOT IN LABEL`).
+- **One quantisation glitch.** On the NUZYRA prompt, the browser 0.8B r3 wrote `the recommended dose of NUZYRA is 1000000…` until the token limit, with the same output at both context sizes. The MLX bf16 0.8B r3 does not do this on the same prompt (it gives a vague, unsupported dose sentence). The browser 2B r3 answered normally (`SENTENCES: 1, 12`, gold 2, 12). In the app, the number check would block this reply, because "1000000…" is not in the cited sentences, and only the quotes would be shown.
+- **The 100-prompt browser fidelity run was repeated for r3**, because of that glitch. It used the same every-12th-item method, on the cleaned round-2 phone prompts (74 answerable, 26 decline; `?prompts=dev&set=phone_r2`). The replies were graded with the same checks and compared with the MLX r3 replies on the same items:
+
+| Model | Same outcome as MLX | Wrong, browser vs MLX | Correct, browser vs MLX | Sentence-selection outcome agreement | Decode |
+|---|---|---|---|---|---|
+| C-2B r3 | 94 / 100 | 16 vs 15 | 82 vs 82 | 62 / 65 | 52 tok/s |
+| C-0.8B r3 | 97 / 100 | 19 vs 17 | 77 vs 78 | 61 / 63 | 59 tok/s |
+
+  All browser replies were in the exact format (strict 100%, invalid 0). The differences are 1–2 items, which is noise-sized, so the MLX dev numbers still stand in for the browser. The browser r1 builds (the defaults) were checked the same way in round 1.
 
 ## Data hygiene
 
@@ -543,4 +632,26 @@ train/scripts/run_gate2.sh all
 ~/waicy-work/envs/mlx/bin/python train/scripts/decline_audit_sheet.py --runs C2b_phone C2b_r1_phone B2b_phone --seed 0 --tag phone_2b
 train/scripts/convert_mlc.sh 2B medlabel-2b-r2 medlabel-r2
 train/scripts/convert_mlc.sh 0.8B medlabel-08-r2 medlabel-r2     # then /?models=r2-ft,lite-r2-ft&prompts=label
+
+# ---- round 3 (train declines refilled to 30%; dev/T1 unchanged): data rebuilt per docs/data.md, then ----
+~/waicy-work/envs/mlx/bin/python train/scripts/lora_train.py -c train/configs/lora_2b_r3.yaml
+~/waicy-work/envs/mlx/bin/python train/scripts/lora_train.py -c train/configs/lora_08_r3.yaml
+EVAL_DIR=$HOME/waicy-work/eval_r2 ROUND=r3 RUN_SUFFIX=_r3 train/scripts/run_gate2.sh all   # B runs reused
+EVAL_DIR=$HOME/waicy-work/eval_r2 ROUND=r1 RUN_SUFFIX=_r1 train/scripts/run_gate2.sh all   # r1 on oracle/desktop
+export EVAL_DIR=$HOME/waicy-work/eval_r2
+~/waicy-work/envs/mlx/bin/python train/scripts/compare_dev.py \
+  --pairs B2b_oracle:C2b_r3_oracle B2b_phone:C2b_r3_phone B2b_desktop:C2b_r3_desktop B08_oracle:C08_r3_oracle B08_phone:C08_r3_phone \
+  --chart docs/img/gate2_size_r3.png
+~/waicy-work/envs/mlx/bin/python train/scripts/compare_dev.py --both-checks \
+  --pairs C2b_r1_phone:C2b_r3_phone C2b_phone:C2b_r3_phone C08_r1_phone:C08_r3_phone C08_phone:C08_r3_phone C2b_r3_phone:C08_r3_phone
+~/waicy-work/envs/mlx/bin/python train/scripts/app_models.py          # -> app/models.json (defaults)
+train/scripts/convert_mlc.sh 2B medlabel-2b-r3 medlabel-r3
+train/scripts/convert_mlc.sh 0.8B medlabel-08-r3 medlabel-r3     # then /?models=r3-ft,lite-r3-ft&prompts=label
+# browser fidelity on the round-2 phone prompts (served as /dev/dev_phone_r2.json)
+~/waicy-work/envs/mlx/bin/python train/scripts/eval_dev.py web-export --prompts phone --limit 100
+cp ~/waicy-work/eval_r2/web/dev_phone.json ~/waicy-work/eval/web/dev_phone_r2.json
+#   open /?models=r3-ft,lite-r3-ft&prompts=dev&set=phone_r2&ctx=2048 and wait for both models to finish
+~/waicy-work/envs/mlx/bin/python train/scripts/eval_dev.py web-import --model r3-ft --since "<page start time>" --out ~/waicy-work/eval_r2/W2b_r3_phone.jsonl
+~/waicy-work/envs/mlx/bin/python train/scripts/eval_dev.py web-import --model lite-r3-ft --since "<page start time>" --out ~/waicy-work/eval_r2/W08_r3_phone.jsonl
+~/waicy-work/envs/mlx/bin/python train/scripts/grade_dev.py ~/waicy-work/eval_r2/W2b_r3_phone.jsonl ~/waicy-work/eval_r2/W08_r3_phone.jsonl
 ```
