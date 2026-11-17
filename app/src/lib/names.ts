@@ -56,19 +56,49 @@ export function lexiconMentions(text: string, lexicon: Set<string>): string[] {
   return [...new Set(words(text).filter((w) => w.length >= 4 && lexicon.has(w)))];
 }
 
-/** Replace misheard words with the closest name on the user's list (plan §5 step 1). */
+/** Rough sound-alike key: speech recognisers spell drug names by sound ("lip it or", "met for men"). */
+export const soundKey = (s: string) =>
+  s.toLowerCase().replace(/[^a-z]/g, "").replace(/ph/g, "f").replace(/v/g, "f").replace(/c(?=[eiy])/g, "s")
+    .replace(/[ckq]/g, "k").replace(/z/g, "s").replace(/[aeiouy]+/g, "a").replace(/(.)\1+/g, "$1");
+
+/** Replace misheard words, or runs of up to 4 words, with the closest name on the user's list (plan §5 step 1). */
 export function correctNames(text: string, meds: Med[]): string {
   const names = [...new Set(meds.flatMap(medNames).filter((n) => !n.includes(" ")))];
   if (!names.length) return text;
-  return text.replace(/[A-Za-z][A-Za-z-]{3,}/g, (w) => {
-    const lw = w.toLowerCase();
-    if (names.includes(lw)) return w;
-    let best: string | null = null, bestD = Infinity;
-    for (const n of names) {
-      const d = editDistance(lw, n);
-      const ok = d <= 1 || (lw[0] === n[0] && d <= Math.floor(n.length / 3));
-      if (ok && d < bestD) { best = n; bestD = d; }
+  const toks = [...text.matchAll(/[A-Za-z][A-Za-z'-]*/g)].map((m) => ({ w: m[0], at: m.index!, end: m.index! + m[0].length }));
+  const cands: { from: number; to: number; name: string; d: number; k: number }[] = [];
+  for (let i = 0; i < toks.length; i++) {
+    for (let k = 1; k <= 4 && i + k <= toks.length; k++) {
+      const span = toks.slice(i, i + k).map((t) => t.w).join("").toLowerCase();
+      for (const n of names) {
+        if (span === n) { cands.push({ from: i, to: i + k, name: n, d: k === 1 ? -1 : 0, k }); continue; }
+        let d = Infinity;
+        if (k === 1 && span.length >= 4) {
+          const e = editDistance(span, n);
+          if (e <= 1 || (span[0] === n[0] && e <= Math.floor(n.length / 3))) d = e;
+        }
+        const a = soundKey(span), b = soundKey(n);
+        if (a.length >= b.length * 0.7 && a.length <= b.length * 1.4) {
+          const e = editDistance(a, b);
+          if (e <= Math.floor(b.length / 4)) d = Math.min(d, e);
+        }
+        if (d < Infinity) cands.push({ from: i, to: i + k, name: n, d, k });
+      }
     }
-    return best ?? w;
-  });
+  }
+  cands.sort((x, y) => x.d - y.d || x.k - y.k);
+  const used = new Array(toks.length).fill(false);
+  const picked: typeof cands = [];
+  for (const c of cands) {
+    if (used.slice(c.from, c.to).some(Boolean)) continue;
+    for (let i = c.from; i < c.to; i++) used[i] = true;
+    picked.push(c);
+  }
+  picked.sort((x, y) => y.from - x.from);
+  let out = text;
+  for (const c of picked) {
+    if (c.d === -1) continue;
+    out = out.slice(0, toks[c.from].at) + c.name + out.slice(toks[c.to - 1].end);
+  }
+  return out;
 }

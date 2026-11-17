@@ -127,7 +127,7 @@ export function Voice() {
           <p class="lead">Ask out loud and hear the answer.</p>
           {canRecord() ? (
             <>
-              <p>Speech is turned into text on this device. The speech model downloads once (about {ASR_MB[s.tier]} MB); nothing you say leaves the phone.</p>
+              <p>Speech is turned into text on this device. The speech model downloads once (about {ASR_MB[s.tier]} MB); nothing you say leaves this device.</p>
               <button class="btn primary big" disabled={!!dl} onClick={enableVoice}>{dl ? `Downloading… ${dl}` : "Turn on voice"}</button>
             </>
           ) : <p>This browser can't record audio. Type your question below; answers are still read aloud.</p>}

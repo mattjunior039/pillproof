@@ -33,6 +33,8 @@ export const embedQuery = (text: string) => call<Float32Array>({ type: "embedQue
 export const embedSentences = (texts: string[], onProgress?: (p: Progress) => void) => call<Float32Array[]>({ type: "embedSentences", texts }, onProgress);
 
 export const ASR_MODEL = { phone: "onnx-community/moonshine-tiny-ONNX", desktop: "onnx-community/moonshine-base-ONNX" };
-export const transcribe = (audio: Float32Array, model: string, onProgress?: (p: Progress) => void) =>
-  call<string>({ type: "asr", audio, model }, onProgress, [audio.buffer]);
+export function transcribe(audio: Float32Array, model: string, onProgress?: (p: Progress) => void) {
+  const copy = audio.slice(); // AudioBuffer-backed arrays can't be transferred
+  return call<string>({ type: "asr", audio: copy, model }, onProgress, [copy.buffer]);
+}
 export const warmAsr = (model: string, onProgress?: (p: Progress) => void) => call<boolean>({ type: "warmAsr", model }, onProgress);

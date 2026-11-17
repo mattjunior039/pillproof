@@ -69,7 +69,7 @@ function DrugView({ k, h, meds }: { k: string; h: DrugHistory; meds: Med[] }) {
         {isoDate(h.latest.date)} (version {h.latest.version}): {h.n_versions} versions on DailyMed.
         {" "}<a href={`https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=${h.set_id}`} target="_blank" rel="noopener">DailyMed</a>
       </p>
-      {otherMaker && <p class="small">Your saved label is from {otherMaker.label!.manufacturer}. Labels from different makers usually change together, but check yours too.</p>}
+      {otherMaker && <p class="small">Your saved label is from {otherMaker.label!.manufacturer.replace(/\.$/, "")}. Generic labels must match the brand label but can be updated later, so check yours too.</p>}
       <p class="box note">{NOTE}</p>
       {h.updates.length ? <ul class="updates">{h.updates.map((u) => <UpdateView u={u} />)}</ul> : <p>No safety-section changes found in this history.</p>}
     </article>
@@ -91,7 +91,7 @@ export function Changes() {
       {!mine.length && !all && <p>None of your medicines are among the {Object.keys(data.drugs).length} labels tracked so far.</p>}
       <label class="check"><input type="checkbox" checked={all} onChange={(e) => setAll((e.target as HTMLInputElement).checked)} /> Show all {Object.keys(data.drugs).length} tracked labels</label>
       {keys.map((k) => <DrugView k={k} h={data.drugs[k]} meds={s.meds} />)}
-      <p class="small">Changes found by comparing DailyMed label versions sentence by sentence (built {isoDate(data.generated)}). Changes that an automatic check judged to be only rewording are left out, so a few small changes may be missing. {data.listing}.</p>
+      <p class="small">Changes found by comparing DailyMed label versions sentence by sentence (built {isoDate(data.generated)}). Changes that an automatic check judged to be only rewording are left out, so a few small changes may be missing. Shown: {data.listing}.</p>
     </section>
   );
 }

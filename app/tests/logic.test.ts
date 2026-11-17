@@ -38,7 +38,11 @@ test("schedule, label, choose, not on list, out of scope", () => {
 });
 
 test("name correction and matching", () => {
-  assert.equal(correctNames("can I take a tor vastatin", meds), "can I take a tor vastatin");
+  // Speech recognisers split names into sound-alike words (real Moonshine outputs).
+  assert.equal(correctNames("Can I drink grapefruit juice with the torefast tatten?", meds), "Can I drink grapefruit juice with the atorvastatin?");
+  assert.equal(correctNames("side effects of lip it or", meds), "side effects of lipitor");
+  assert.equal(correctNames("can I take met for men with alcohol", meds), "can I take metformin with alcohol");
+  for (const q of ["What are the side effects?", "Can I take it at night with food?", "is it safe for my liver", "what is the starting dose"]) assert.equal(correctNames(q, meds), q);
   assert.equal(correctNames("does atorvastaten cause pain", meds), "does atorvastatin cause pain");
   assert.equal(correctNames("metforman with food", meds), "metformin with food");
   assert.deepEqual(medsMentioned("is lipitor safe", meds), [ator]);

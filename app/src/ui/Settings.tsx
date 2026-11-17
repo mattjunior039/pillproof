@@ -36,7 +36,7 @@ export function Settings() {
       <label class="check"><input type="checkbox" checked={st.speakAnswers} onChange={(e) => saveSettings({ speakAnswers: (e.target as HTMLInputElement).checked })} /> Read answers aloud on the Voice screen</label>
 
       <h2>Answers</h2>
-      <ModelBanner />
+      <ModelBanner inSettings />
       <fieldset class="seg">
         <legend>How answers are made</legend>
         <label><input type="radio" name="mode" checked={st.answerMode === "model"} onChange={() => saveSettings({ answerMode: "model" })} disabled={!canRun} />

@@ -105,6 +105,12 @@ input[type="search"], input[type="text"], input[type="time"], select {
   border: 2px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--fg);
 }
 input[type="time"] { width: auto; min-width: 9em; }
+select {
+  -webkit-appearance: none; appearance: none; padding-right: 44px;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 22px) 50%, calc(100% - 14px) 50%;
+  background-size: 8px 8px; background-repeat: no-repeat;
+}
 label { display: block; font-weight: 600; margin: 8px 0 4px; }
 label.check, .seg label { display: flex; gap: 12px; align-items: flex-start; font-weight: 400; min-height: var(--tap); padding: 8px 0; }
 input[type="checkbox"], input[type="radio"] { width: 28px; height: 28px; flex: none; margin: 2px 0 0; accent-color: var(--brand); }

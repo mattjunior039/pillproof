@@ -46,7 +46,7 @@ export async function manufacturers(med: Pick<Med, "rxcui" | "ingredient">): Pro
         const k = term.toLowerCase().replace(/[^a-z0-9]/g, "");
         if (!seen.has(k)) seen.set(k, term);
       }
-      return [...seen.values()];
+      return [...seen.values()].sort((a, b) => a.localeCompare(b, "en", { sensitivity: "base" }));
     }
   }
   return [];

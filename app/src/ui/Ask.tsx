@@ -6,7 +6,7 @@ import { ReplyView } from "./Reply.tsx";
 
 const EXAMPLES = ["What's next?", "Can I drink grapefruit juice?", "What if I miss a dose?", "What are the common side effects?"];
 
-export function ModelBanner() {
+export function ModelBanner({ inSettings = false }: { inSettings?: boolean }) {
   const s = useApp();
   const m = s.model;
   if (s.settings.answerMode === "passages") return <p class="banner">Showing label sentences only (Settings → Answers).</p>;
@@ -21,12 +21,13 @@ export function ModelBanner() {
       </div>
     );
   }
-  if (m.status === "error") return <p class="banner warn">{m.text} Answers show label sentences. <button class="linklike" onClick={() => go("settings")}>Settings</button></p>;
+  if (m.status === "error") return <p class="banner warn">{m.text} Answers show label sentences. {!inSettings && <button class="linklike" onClick={() => go("settings")}>Settings</button>}</p>;
   if (m.status === "off") {
     return (
       <p class="banner">
         Answers show the closest label sentences. For short plain-language answers, download the answer model once
-        ({SIZE_MB[currentModel().size]} MB). <button class="linklike" onClick={() => go("settings")}>Set up in Settings</button>
+        ({SIZE_MB[currentModel().size]} MB).{" "}
+        {inSettings ? "Use the button below." : <button class="linklike" onClick={() => go("settings")}>Set up in Settings</button>}
       </p>
     );
   }

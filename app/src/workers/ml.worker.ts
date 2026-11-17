@@ -49,7 +49,9 @@ self.onmessage = async (e: MessageEvent) => {
     else if (type === "embedSentences") result = await embed(e.data.texts, id);
     else if (type === "asr") {
       const p = await getAsr(e.data.model, id);
-      result = ((await p(e.data.audio)) as any).text?.trim() ?? "";
+      // The default generation cap cuts sentences short; allow ~8 tokens per second of speech.
+      const seconds = e.data.audio.length / 16000;
+      result = ((await p(e.data.audio, { max_new_tokens: Math.max(24, Math.ceil(seconds * 8)) })) as any).text?.trim() ?? "";
     } else if (type === "warmAsr") { await getAsr(e.data.model, id); result = true; }
     else throw new Error(`unknown message ${type}`);
     self.postMessage({ id, result });
