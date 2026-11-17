@@ -64,6 +64,12 @@ DECLINE_SHARE = 0.30  # share of decline examples in train/valid
 COVER_REMOVE = 0.4
 DECLINE_MAX_COVER = 0.5
 TIER_KEEP = {"core": 1.0, "mixed": 0.7, "technical": 0.4}
+# r3: if the train decline target is not met from kept answerable items (most fail the support
+# check), top it up from other train questions, train labels only: pool 1 = items dropped by tier
+# sampling, pool 2 = aligned items below the keep threshold (no hard fail, coverage >= EXTRA_MIN_COVER).
+# Own RNGs, so valid/test and the r2 train items are byte-identical with or without it.
+DECLINE_EXTRA_POOL = True
+EXTRA_MIN_COVER = 0.5
 
 
 # ---------- retrieval (BM25 over the passages of one label) ----------
@@ -257,11 +263,13 @@ def main() -> None:
                                         "min_gain": support.MIN_GAIN, "synonym_groups": len(support._SYN_GROUPS)}}}
     out: dict[str, list] = {"train": [], "dev": [], "test": []}
     skipped = Counter()
+    tier_dropped: list[dict] = []
 
     for r in good:
         sp, t = r["split"], tier(r)
         if sp == "train" and rng.random() > TIER_KEEP[t]:
             skipped[f"tier_{t}"] += 1
+            tier_dropped.append(r)
             continue
         lab = labs[r["set_id"]]
         user, target, meta = answerable_example(r, lab, rng)
@@ -292,6 +300,34 @@ def main() -> None:
             out[sp].append({"kind": "decline", "tier": e["tier"], "rec": e["rec"], "user": user,
                             "target": target, "meta": meta})
 
+    extra: list = []
+    if DECLINE_EXTRA_POOL:
+        xrng = random.Random(f"{SEED}-train-extra")
+        need = report["decline_target"]["train"] - sum(x["kind"] == "decline" for x in out["train"])
+        pool1 = list(tier_dropped)
+        pool2 = [r for r in recs if r["split"] == "train" and not kept(r) and not r["hard_fail"]
+                 and r["coverage"] >= EXTRA_MIN_COVER]
+        xrng.shuffle(pool1)
+        xrng.shuffle(pool2)
+        used = Counter()
+        for pool, r in [("tier_dropped", r) for r in pool1] + [("below_keep", r) for r in pool2]:
+            if len(extra) >= need:
+                break
+            lab = labs[r["set_id"]]
+            if support.supported_elsewhere(r, lab, decline_removed(r, lab), lex)["supported"]:
+                skipped[f"decline_train_extra_{pool}_supported_elsewhere"] += 1
+                continue
+            ex = decline_example(r, lab, xrng)
+            if ex is None:
+                skipped[f"decline_train_extra_{pool}_rejected"] += 1
+                continue
+            user, target, meta = ex
+            used[pool] += 1
+            extra.append({"kind": "decline", "tier": tier(r), "rec": r, "user": user, "target": target,
+                          "meta": {**meta, "decline_pool": pool}})
+        report["decline_extra_pool"] = {"needed": need, "added": dict(used), "pool_sizes": {
+            "tier_dropped": len(pool1), "below_keep": len(pool2)}, "min_cover": EXTRA_MIN_COVER}
+
     # Original templated refusals: test only (T1 reporting category).
     for line in open(paths.FDARX_QA):
         item = json.loads(line)
@@ -308,6 +344,10 @@ def main() -> None:
     names = {"train": "train", "dev": "valid", "test": "test"}
     for sp, exs in out.items():
         rng.shuffle(exs)
+        if sp == "train" and extra:  # inserted with their own RNG so the main stream is unchanged
+            irng = random.Random(f"{SEED}-train-extra-insert")
+            for e in extra:
+                exs.insert(irng.randint(0, len(exs)), e)
         with open(OUT_DIR / f"{names[sp]}.jsonl", "w") as f, open(OUT_DIR / f"{names[sp]}_meta.jsonl", "w") as g:
             for e in exs:
                 msgs = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": e["user"]},

@@ -21,6 +21,9 @@ const MODELS = {
   // r2: same settings, retrained after the decline-item fix (docs/data.md, docs/gate2.md)
   "r2-ft": { base: B2, label: "2B Gate 2 fine-tune medlabel-r2 (this server)", url: `${origin}/models/Qwen3.5-2B-medlabel-r2-q4f16_1-MLC` },
   "lite-r2-ft": { base: B08, label: "0.8B lite: Gate 2 fine-tune medlabel-r2 (this server)", url: `${origin}/models/Qwen3.5-0.8B-medlabel-r2-q4f16_1-MLC` },
+  // r3: same settings, train declines refilled to 30% (docs/data.md, docs/gate2.md)
+  "r3-ft": { base: B2, label: "2B Gate 2 fine-tune medlabel-r3 (this server)", url: `${origin}/models/Qwen3.5-2B-medlabel-r3-q4f16_1-MLC` },
+  "lite-r3-ft": { base: B08, label: "0.8B lite: Gate 2 fine-tune medlabel-r3 (this server)", url: `${origin}/models/Qwen3.5-0.8B-medlabel-r3-q4f16_1-MLC` },
 };
 
 const SHORT_PROMPTS = [

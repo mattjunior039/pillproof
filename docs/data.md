@@ -52,7 +52,7 @@ The output format for the model is in [output-format.md](output-format.md).
   2. **Shown-passage check.** The example is kept only if a greedy alignment over the shown passages covers < 0.5 of the answer.
 
   Dropped items are replaced from the remaining answerable items of the same split, using their own seeded order. No item was converted into an answerable example, for two reasons:
-  - Every decline's question already appears in the same split as an answerable example, so a converted copy would only duplicate it.
+  - Every decline's question from the main pool already appears in the same split as an answerable example, so a converted copy would only duplicate it.
   - A negative control showed that lexical "strong" alignment cannot be trusted for this. Another dev label's answer, with the drug name swapped, against the full label: under a strict rule (standard aligner, coverage ≥ 0.8/0.9, all numbers and key facts present, ≤ 4 sentences) the wrong answers were flagged as "supported" 36 times out of 378, against 12 for the real items.
 
   Under the loose check, the same negative control (full label, 3 seeds) flags 111–144 of 378 wrong answers (29–38%) as supported, against 242 of 378 (64%) old dev declines. So the check over-drops and is only weakly discriminative. It removes many truly answerable declines, but it does not prove that an answer is absent from what remains. The 50-item spot-check below estimates how many answerable declines are left.
@@ -68,18 +68,24 @@ The output format for the model is in [output-format.md](output-format.md).
   - The fix is code only and identical for every split. For T1, only these counts were computed; no model was run on it.
   - FDARxBench's own 549 refusal items are unchanged.
   - Answerable examples are byte-identical to the previous build. The old build is kept in `data/build/fdarx_pre_declinefix/`.
+  - **r3 train refill to 30% (2026-11-16, `DECLINE_EXTRA_POOL` in `build.py`).** The main pool gave train only 1,930 declines (26.7%), so 343 more were drawn from other **train** questions on **train labels only**, with the same support check and shown-passage check:
+    - Pool 1: the 590 aligned items dropped by train tier sampling (545 technical, 45 mixed). 298 added; 288 were supported elsewhere and 4 rejected.
+    - Pool 2, used once pool 1 ran out: 1,997 aligned train items below the keep threshold, with no hard fail and coverage ≥ 0.5. Below 0.5, the aligner cannot find the answer well enough to trust either the removal or the support check. 45 added; 170 were supported elsewhere and 1 rejected.
+    - Train now has 2,273 declines out of 7,577 examples (**30.0%**). Of the 343 extras, 291 are technical-tier, 22 mixed and 30 core. Their questions do not appear in train as answerable items.
+    - The pools are drawn and inserted with their own seeded RNGs, so `valid.jsonl` and `test.jsonl` (and their `_meta` files) are byte-identical to r2. The r2 train rows also appear unchanged and in the same order. Dev stays at 26.1% declines, so r1, r2 and r3 are scored on the same dev items.
+    - The r2 build is kept in `data/build/fdarx_r2/`.
 - **Patient relevance.** Each item is tagged *core* (all answer sections patient-relevant), *mixed*, or *technical*. Train keeps core items with probability 1.0, mixed 0.7, and technical 0.4. 7,146 of the 8,675 kept items are core, far more than the plan's estimate of about 2,000.
 - **Output** in `data/build/fdarx/mlx/` (seed 7):
 
   | file | examples | answerable | decline | FDARxBench refusal |
   |---|---|---|---|---|
-  | train.jsonl | 7,234 | 5,304 | 1,930 | — |
+  | train.jsonl | 7,577 | 5,304 | 2,273 | — |
   | valid.jsonl | 1,193 | 882 | 311 | — |
   | test.jsonl (T1) | 3,188 | 1,899 | 740 | 549 |
 
-  (Before the decline fix: 7,577 / 1,260 / 3,397, with 2,273 / 378 / 949 declines.)
+  (r2 build, before the r3 refill: train 7,234 with 1,930 declines; valid and test as above. Before the decline fix: 7,577 / 1,260 / 3,397, with 2,273 / 378 / 949 declines.)
 
-  The Gate 2 fine-tunes were retrained on this build (the "r2" adapters). Results, and the comparison with the adapters trained before the fix, are in [gate2.md](gate2.md#round-2-decline-fix-and-retrain).
+  The Gate 2 fine-tunes were retrained on the r2 build (the "r2" adapters) and on this build (the "r3" adapters). Results, and the comparison with r1, are in [gate2.md](gate2.md#round-2-decline-fix-and-retrain).
 
 - **Hand audit (for the project owner).** `data/build/fdarx/audit/audit_100.md` (readable) and `audit_100.csv` (fill in `verdict` and `notes`). The sheet has 100 random train items: 67 answerable and 33 decline. Check that the cited sentences really answer the question and that each decline is truly unanswerable from the prompt. Targets come from `mlx_plain/` when it exists. For the 65 answerable items whose ANSWER line was rewritten, the original line is shown beside it, so the audit also checks the rewrite. This sheet was drawn before the decline fix and has not been regenerated, so any verdicts already filled in are kept. Re-running `audit` would draw a different sample.
 - **Decline spot-check (for the project owner).** `data/build/fdarx/audit/decline_check_50.md` and `decline_check_50.csv` contain 50 random decline items that survived the support check (40 train, 10 valid; never test).

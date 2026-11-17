@@ -1,0 +1,27 @@
+# r3 (same settings as r2; train declines refilled to 30%, see docs/data.md). LoRA fine-tune of Qwen3.5-0.8B (lite, phone) on the plain-language FDARxBench train split.
+# Run from the repo root:  ~/waicy-work/envs/mlx/bin/python train/scripts/lora_train.py -c train/configs/lora_08_r3.yaml
+# (stock mlx_lm.lora runs out of memory on Qwen3.5; see train/scripts/lora_train.py and chunked_gdn.py)
+# The data dir holds only symlinks to mlx_plain/train.jsonl and valid.jsonl, so T1 is never loaded.
+model: /Users/matthew/waicy-work/models/Qwen3.5-0.8B
+train: true
+data: /Users/matthew/waicy-work/data/train_sets/plain_trval
+adapter_path: /Users/matthew/waicy-work/models/adapters/medlabel-08-r3
+fine_tune_type: lora
+mask_prompt: true          # loss only on the assistant reply
+seed: 0
+num_layers: -1             # all layers
+lora_parameters: {rank: 16, dropout: 0.05, scale: 20.0}
+batch_size: 4              # same batch as 2B so the two runs are comparable
+iters: 1895                # 1 epoch of 7,577 examples (r3: 30% declines)
+max_seq_length: 2600       # longest train example is 2,533 tokens; never truncate the target
+grad_checkpoint: true
+learning_rate: 5.0e-5      # same as 2B; 8e-5 diverged after warmup (loss 0.89 -> 1.65 by step 80)
+lr_schedule:
+  name: cosine_decay
+  warmup: 50
+  warmup_init: 1.0e-7
+  arguments: [5.0e-5, 1895, 5.0e-6]
+steps_per_report: 20
+steps_per_eval: 200
+val_batches: 40            # 160 valid examples per eval
+save_every: 200
