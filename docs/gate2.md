@@ -565,6 +565,28 @@ Rule (as decided by the user): per size, choose among r1, r2 and r3 by the dev w
 
   All browser replies were in the exact format (strict 100%, invalid 0). The differences are 1–2 items, which is noise-sized, so the MLX dev numbers still stand in for the browser. The browser r1 builds (the defaults) were checked the same way in round 1.
 
+### Anecdote: grapefruit juice (illustration only, not used for the choice)
+
+This is a single prompt from the app, not a test item. It is not in any split and did not affect the choice of defaults.
+
+The app session found that on the Accord atorvastatin openFDA label (set id `4e06b20d…`, effective 2026-11-06), the question "Can I drink grapefruit juice?" got `NOT IN LABEL` from `r1-ft`. Retrieval was fine: the top sentence was "Avoid drinking more than 1.2 liters of grapefruit juice each day."
+
+I rebuilt the app's exact prompt with the app-build code: its chunker, `retrieveFor`, and bge q8 embeddings in Node. The phone prompt is 468 tokens and 7 sentences, and sentences 1, 4 and 7 all answer the question. I then ran every adapter on it with greedy decoding. The desktop prompt gave the same results unless noted.
+
+| Adapter | MLX bf16 + LoRA | Browser q4f16_1 (Chrome, ctx 2048) |
+|---|---|---|
+| 2B r1 | `SENTENCES: 1` "Do not drink more than 1.2 liters … each day." | **`NOT IN LABEL`** |
+| 2B r2 | same correct answer | same correct answer |
+| 2B r3 | **`NOT IN LABEL`** | **`NOT IN LABEL`** |
+| 0.8B r1 | "No, you should not drink … more than 1.2 liters …" | "If you take atorvastatin …, do not drink more than 1.2 liters …" |
+| 0.8B r2 | **"Yes, you can drink grapefruit juice."** | **"Yes, you can drink grapefruit juice. The amount you drink is (no) more than 1.2 liters …"** |
+| 0.8B r3 | `NOT IN LABEL` (phone) / correct (desktop) | "Do not drink more than 1.2 liters …" |
+
+What this shows:
+- **The browser 2B r1 decline is a 4-bit flip.** The bf16 model answers. This is the borderline-item kind of difference the 100-prompt fidelity runs allow for: a few items per hundred change outcome.
+- **The r3 2B declines in both pipelines.** This fits r3 being no better than r1 on the 2B.
+- **The 0.8B r2 reply is the worst one:** a "yes" that drops the limit. The checks pass it (verified with `core/checks.js`): "1.2 liters" is in the cited sentence, and "yes" has no number or unit to check. This is the restatement risk that the quotes shown under every answer are meant to cover. The checks block made-up numbers and names, not wrong meaning.
+
 ## Data hygiene
 
 - Training read only `mlx_plain/train.jsonl`, through a data directory of symlinks to train and valid. Choices (learning rate, checkpoint, retrieval weights and budgets) used the dev split only.
