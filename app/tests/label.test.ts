@@ -68,6 +68,9 @@ test("answer pipeline: checked answer, blocked restatement, decline, invalid, pa
   assert.equal(ok.shown.kind, "answer");
   if (ok.shown.kind === "answer") assert.ok(/grapefruit/i.test(ok.shown.quotes[0].text) && ok.shown.quotes[0].section.length > 0);
   assert.equal((await ask(`SENTENCES: ${n}\nANSWER: Do not take more than 99 mg with warfarin.`)).shown.kind, "quotes");
+  // Qualifier check: an unqualified "Yes" over "Avoid … more than 1.2 liters" shows the cited sentence instead.
+  const yes = await ask(`SENTENCES: ${n}\nANSWER: Yes, you can drink grapefruit juice.`);
+  assert.ok(yes.shown.kind === "quotes" && /grapefruit/i.test(yes.shown.quotes[0].text));
   assert.equal((await ask("NOT IN LABEL")).shown.kind, "decline");
   const bad = await ask("SENTENCES: 999\nANSWER: whatever");
   assert.equal(bad.shown.kind, "passages");

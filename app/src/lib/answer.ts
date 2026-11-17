@@ -12,7 +12,7 @@ export interface Quote { text: string; section: string; before?: string; url?: s
 export type Shown =
   /** Checked restatement plus the quoted label sentences it came from. */
   | { kind: "answer"; restatement: string; quotes: Quote[] }
-  /** The model cited sentences but its restatement failed the number/unit/drug check: quotes only. */
+  /** The model cited sentences but its restatement failed the number/unit/drug or qualifier check: quotes only. */
   | { kind: "quotes"; quotes: Quote[] }
   /** The model said the retrieved sentences don't answer it. */
   | { kind: "decline" }
