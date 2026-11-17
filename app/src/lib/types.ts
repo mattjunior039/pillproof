@@ -19,6 +19,8 @@ export interface StoredLabel {
   splId: string;
   meta: LabelMeta;
   passages: Passage[];
+  /** chunk.ts CHUNKER version the passages were made with (absent = 1). */
+  chunker?: number;
   /** One embedding per sentence, in LabelIndex unit order; absent until computed. */
   vectors?: Float32Array[];
 }

@@ -162,8 +162,8 @@ function capSentence(s: string): string[] {
 }
 
 /** Break a body into ~PIECE-char groups of whole sentences that share a heading. */
-function pieces(heading: string, body: string): Passage[] {
-  const sents = splitSentences(body).flatMap(capSentence);
+function pieces(heading: string, body: string, otc = false): Passage[] {
+  const sents = splitSentences(body, otc).flatMap(capSentence);
   if (!sents.length) return [];
   const out: Passage[] = [];
   let cur: string[] = [], len = 0;
@@ -190,20 +190,27 @@ function splitNumbered(text: string, num: string | null): { head: string; body: 
 
 const QUESTION = /(?:^|(?<= ))((?:What|How|Who|Can|Should|Do|Does|Is|Are|When|Where|Why)\b[^?.!]{3,150}\?|General information about the safe and effective use of [^.]{1,80}\.)/g;
 
-function splitPatient(text: string, title: string): Passage[] {
+function splitPatient(text: string, title: string, otc: boolean): Passage[] {
   const cuts = [...text.matchAll(QUESTION)].map((m) => ({ at: m.index!, q: m[1] }));
   const out: Passage[] = [];
   const first = cuts.length ? text.slice(0, cuts[0].at) : text;
-  out.push(...pieces(title, first));
+  out.push(...pieces(title, first, otc));
   cuts.forEach((c, k) => {
     const body = text.slice(c.at + c.q.length, cuts[k + 1]?.at ?? text.length);
-    out.push(...pieces(c.q.replace(/\.$/, ""), body));
+    out.push(...pieces(c.q.replace(/\.$/, ""), body, otc));
   });
   return out;
 }
 
+/** Bump when chunking changes so cached labels are re-fetched and re-split. */
+export const CHUNKER = 2;
+
+/** OTC Drug Facts labels arrive from openFDA with their list items run together. */
+export const isOtc = (rec: Rec) => (rec.openfda?.product_type || []).some((t: string) => /OTC/i.test(t));
+
 export function chunkLabel(rec: Rec): Passage[] {
   const drugs = drugWords(rec);
+  const otc = isOtc(rec);
   const seen: string[] = [];
   const out: Passage[] = [];
   for (const [field, name] of FIELDS) {
@@ -217,7 +224,7 @@ export function chunkLabel(rec: Rec): Passage[] {
       seen.push(norm(text));
       if (PATIENT_FIELDS.has(field)) {
         const [h, body] = splitUpperHeading(text, drugs);
-        out.push(...splitPatient(body, h ? titleCase(h) : name));
+        out.push(...splitPatient(body, h ? titleCase(h) : name, otc));
         continue;
       }
       const [intro, rest, num] = splitUpperHeading(text, drugs);
@@ -226,9 +233,9 @@ export function chunkLabel(rec: Rec): Passage[] {
         if (part.head === "#") {
           const sub = /^(\d{1,2}\.\d{1,2}) (.*)$/s.exec(part.body)!;
           const [title, body] = splitTitle(sub[2], drugs);
-          out.push(...pieces(title ? `${sub[1]} ${title}` : sub[1], body));
+          out.push(...pieces(title ? `${sub[1]} ${title}` : sub[1], body, otc));
         } else {
-          out.push(...pieces(sectionHead, part.body));
+          out.push(...pieces(sectionHead, part.body, otc));
         }
       }
     }

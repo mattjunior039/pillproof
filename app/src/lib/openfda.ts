@@ -1,6 +1,6 @@
 // openFDA label lookup (plan §3 item 8): prefer a label with a patient section, take the most
 // recent, let the user switch manufacturer. Labels are cached in IndexedDB when a medicine is added.
-import { chunkLabel, hasPatientSection, titleCase } from "./chunk.ts";
+import { CHUNKER, chunkLabel, hasPatientSection, titleCase } from "./chunk.ts";
 import type { LabelMeta, Med, StoredLabel } from "./types.ts";
 
 const API = "https://api.fda.gov/drug/label.json";
@@ -53,6 +53,12 @@ export async function findLabel(med: Pick<Med, "rxcui" | "ingredient">, manufact
   throw new Error("No FDA label found for this medicine in openFDA.");
 }
 
+/** The exact label version by SPL id (to re-split a cached label after a chunker change). */
+export async function labelById(splId: string): Promise<any | null> {
+  const j = await search({ search: `id:${q(splId)}`, limit: "1" });
+  return j?.results?.[0] ?? null;
+}
+
 /** Manufacturers with a label for this product, most labels first; case variants merged. */
 export async function manufacturers(med: Pick<Med, "rxcui" | "ingredient">): Promise<string[]> {
   for (const base of bases(med)) {
@@ -84,7 +90,7 @@ export function toStored(rec: any): StoredLabel {
     hasPatient: hasPatientSection(rec),
     fetched: Date.now(),
   };
-  return { splId: rec.id, meta, passages: chunkLabel(rec) };
+  return { splId: rec.id, meta, passages: chunkLabel(rec), chunker: CHUNKER };
 }
 
 /** "20250828" -> "Aug 28, 2025". */

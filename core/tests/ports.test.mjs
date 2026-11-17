@@ -13,7 +13,7 @@ const sorted = (s) => [...s].sort();
 
 test("sentence splitting matches datapipe fixtures", () => {
   for (const c of load("../../datapipe/tests/fixtures/sentence_cases.json")) {
-    assert.deepEqual(splitSentences(c.text), c.sentences, c.id);
+    assert.deepEqual(splitSentences(c.text, c.otc ?? false), c.sentences, c.id);
   }
 });
 

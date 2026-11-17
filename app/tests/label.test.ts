@@ -74,3 +74,29 @@ test("answer pipeline: checked answer, blocked restatement, decline, invalid, pa
   const po = await answerQuestion(idx, label, q, { tier: "phone", lexicon });
   assert.ok(po.shown.kind === "passages" && po.shown.why === "no-model" && po.shown.quotes.some((x) => /grapefruit/i.test(x.text)));
 });
+
+test("OTC Drug Facts: run-together list items are split; Rx chunking is unchanged", () => {
+  const otc = fx("goodys_otc_openfda.json");
+  const sents = chunkLabel(otc).flatMap(([, s]) => s);
+  assert.ok(sents.some((s) => /^children under 12 years of age: ask a doctor\.?$/.test(s)), "own item");
+  assert.ok(!sents.some((s) => /24 hours.*children under 12/.test(s)));
+  assert.ok(!sents.some((s) => /alcoholic drinks.*Stomach bleeding warning/.test(s)));
+  // Rx labels keep FDARxBench sentence numbering (otc mode is off for them).
+  const rx = chunkLabel(rec).flatMap(([, s]) => s);
+  assert.ok(rx.length > 300 && rx.includes("Discontinue atorvastatin calcium if markedly elevated CK levels occur or myopathy is diagnosed or suspected."));
+});
+
+test("autocomplete ranks single ingredients and oral tablets first", () => {
+  assert.deepEqual(suggest(["acetaminophen / aspirin", "Acetaminophen PM", "acetaminophen", "acetaminophen / caffeine"], "acetam"),
+    ["acetaminophen", "Acetaminophen PM", "acetaminophen / aspirin", "acetaminophen / caffeine"]);
+  const g = (tty: string, names: string[]) => ({ tty, conceptProperties: names.map((name, i) => ({ rxcui: `${tty}${i}`, name, synonym: "", tty })) });
+  const ps = productsFrom({ drugGroup: { conceptGroup: [g("SCD", [
+    "acetaminophen 325 MG / aspirin 500 MG Powder for Oral Solution",
+    "100 ML acetaminophen 10 MG/ML Injection",
+    "acetaminophen 500 MG Oral Tablet",
+    "acetaminophen 160 MG/5ML Oral Suspension",
+  ])] } });
+  assert.deepEqual(ps.map((p) => p.form), ["Oral Tablet", "Oral Suspension", "100 ML Injection", "Powder for Oral Solution"]);
+  assert.equal(ps[2].ingredient, "acetaminophen");
+  assert.ok(ps[3].combo);
+});

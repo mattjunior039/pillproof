@@ -14,7 +14,7 @@ CASES = json.loads((FIXTURES / "sentence_cases.json").read_text())
 
 @pytest.mark.parametrize("case", CASES, ids=[c["id"] for c in CASES])
 def test_sentence_golden(case):
-    assert split_sentences(case["text"]) == case["sentences"]
+    assert split_sentences(case["text"], otc=case.get("otc", False)) == case["sentences"]
 
 
 def test_number_sentences_runs_across_passages():

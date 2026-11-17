@@ -3,7 +3,8 @@
 import { LabelIndex } from "../../../core/retrieval.js";
 import { db } from "./db.ts";
 import { embedSentences } from "./ml.ts";
-import { findLabel, toStored } from "./openfda.ts";
+import { CHUNKER } from "./chunk.ts";
+import { findLabel, labelById, toStored } from "./openfda.ts";
 import type { Med, StoredLabel } from "./types.ts";
 
 const indexes = new Map<string, { label: StoredLabel; index: any }>();
@@ -21,11 +22,28 @@ export async function fetchAndStore(med: Pick<Med, "rxcui" | "ingredient">, manu
 export async function getIndexed(splId: string): Promise<{ label: StoredLabel; index: any } | null> {
   const hit = indexes.get(splId);
   if (hit) return hit;
-  const label = await db.label(splId);
+  let label = await db.label(splId);
   if (!label) return null;
+  if ((label.chunker ?? 1) < CHUNKER) label = (await rechunk(label)) ?? label;
   const entry = { label, index: new LabelIndex(label.passages) };
   indexes.set(splId, entry);
   return entry;
+}
+
+/** Re-split a label cached by an older chunker; offline or on error, keep the old passages. */
+async function rechunk(old: StoredLabel): Promise<StoredLabel | null> {
+  if (typeof navigator !== "undefined" && navigator.onLine === false) return null;
+  try {
+    const rec = await labelById(old.splId);
+    if (!rec) return null;
+    const fresh = toStored(rec);
+    if (!fresh.passages.length) return null;
+    fresh.meta.fetched = old.meta.fetched;
+    await db.putLabel(fresh);
+    return fresh;
+  } catch {
+    return null;
+  }
 }
 
 /** "<heading>: <sentence>" in LabelIndex unit order, as embed.py does offline. */

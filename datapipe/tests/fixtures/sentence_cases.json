@@ -145,5 +145,45 @@
    "Warnings.",
    "- Do not use with alcohol."
   ]
+ },
+ {
+  "id": "otc-lowercase-items",
+  "otc": true,
+  "text": "Drink a full glass of water with each dose, or may stir powder into a glass of water or other liquid. do not take more than 4 packs in 24 hours unless directed by a doctor. children under 12 years of age: ask a doctor.",
+  "sentences": [
+   "Drink a full glass of water with each dose, or may stir powder into a glass of water or other liquid.",
+   "do not take more than 4 packs in 24 hours unless directed by a doctor.",
+   "children under 12 years of age: ask a doctor."
+  ]
+ },
+ {
+  "id": "otc-run-together-list",
+  "otc": true,
+  "text": "The chance is higher if you are age 60 or older have had stomach ulcers or bleeding problems take other drugs containing NSAIDs have 3 or more alcoholic drinks every day while using this product Stomach bleeding warning : This product contains an NSAID, which may cause severe stomach bleeding.",
+  "sentences": [
+   "The chance is higher if you are age 60 or older",
+   "have had stomach ulcers or bleeding problems",
+   "take other drugs containing NSAIDs",
+   "have 3 or more alcoholic drinks every day while using this product",
+   "Stomach bleeding warning : This product contains an NSAID, which may cause severe stomach bleeding."
+  ]
+ },
+ {
+  "id": "otc-repeated-you",
+  "otc": true,
+  "text": "Ask a doctor before use if you have liver disease stomach bleeding warning applies to you you have asthma you are taking a diuretic",
+  "sentences": [
+   "Ask a doctor before use if you have liver disease stomach bleeding warning applies to you",
+   "you have asthma",
+   "you are taking a diuretic"
+  ]
+ },
+ {
+  "id": "otc-off-for-rx",
+  "text": "Avoid alcohol. do not crush the tablet. Stomach bleeding warning : see below",
+  "sentences": [
+   "Avoid alcohol. do not crush the tablet.",
+   "Stomach bleeding warning : see below"
+  ]
  }
 ]
