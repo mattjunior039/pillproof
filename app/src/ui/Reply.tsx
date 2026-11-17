@@ -1,6 +1,7 @@
 import type { ComponentChildren } from "preact";
 import { ADVICE_LINE, NOT_COVERED, POISON_HELP, STANDING_LINE } from "../lib/router.ts";
 import { labelDate, dailyMedUrl } from "../lib/openfda.ts";
+import { notMentioned } from "../lib/answer.ts";
 import { shortName } from "../lib/schedule.ts";
 import type { Med } from "../lib/types.ts";
 import type { Reply } from "../store.ts";
@@ -58,6 +59,10 @@ function LabelAnswer({ reply }: { reply: Extract<Reply, { kind: "label" }> }) {
   return (
     <div class="answer">
       {advice && <Box tone="note"><p>{ADVICE_LINE}</p></Box>}
+      {s.kind === "not-found" && (
+        <Box tone="note"><p class="lead">{notMentioned(s.missing)}</p><PharmacistPrompt /></Box>
+      )}
+      {result.missing && s.kind !== "not-found" && s.kind !== "decline" && <p class="missing">{notMentioned(result.missing)}</p>}
       {s.kind === "answer" && <p class="plain">{s.restatement}</p>}
       {s.kind === "quotes" && <p class="plain">Here is what the label says:</p>}
       {s.kind === "decline" && (
@@ -65,15 +70,16 @@ function LabelAnswer({ reply }: { reply: Extract<Reply, { kind: "label" }> }) {
       )}
       {s.kind === "passages" && (s.quotes.length ? (
         <p class="plain-sub">
-          {s.why === "no-model" ? "These are the sentences in the label closest to your question:" : "The answer couldn't be checked, so here are the label sentences closest to your question:"}
+          {s.why === "no-model" ? "What the label says about this (please read it yourself):" : "The answer couldn't be checked. What the label says about this:"}
         </p>
       ) : (
-        <Box tone="note"><p class="lead">I couldn't find sentences in the label that match this question.</p><PharmacistPrompt /></Box>
+        <Box tone="note"><p class="lead">{NOT_COVERED}</p><PharmacistPrompt /></Box>
       ))}
       {"quotes" in s && s.quotes.length > 0 && (
         <figure class="quotes">
           {s.quotes.map((q) => (
             <blockquote>
+              {q.before && <span class="lead-in">{q.before} </span>}
               <mark>{q.text}</mark>
               <cite>{q.section}</cite>
             </blockquote>

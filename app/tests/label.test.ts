@@ -100,3 +100,39 @@ test("autocomplete ranks single ingredients and oral tablets first", () => {
   assert.equal(ps[2].ingredient, "acetaminophen");
   assert.ok(ps[3].combo);
 });
+
+test("relevance gate: a topic the label never mentions is 'not found', never generic-word matches", async () => {
+  const { answerQuestion, plainText } = await import("../src/lib/answer.ts");
+  const otc = fx("goodys_otc_openfda.json");
+  const idx = new LabelIndex(chunkLabel(otc));
+  const label: any = { title: "Goodys Back and Body Pain", brandNames: ["Goodys Back and Body Pain"], genericNames: ["ACETAMINOPHEN AND ASPRIN"], effective: "20240101" };
+  let called = false;
+  const gen = async () => { called = true; return "NOT IN LABEL"; };
+  const r = await answerQuestion(idx, label, "Can I drink grapefruit juice?", { tier: "phone", lexicon: new Set(), generate: gen });
+  assert.deepEqual(r.shown, { kind: "not-found", missing: ["grapefruit juice"] });
+  assert.equal(called, false, "model not run when nothing matches");
+  const text = plainText(r, false, "", "Label information, not medical advice.", "");
+  assert.match(text, /does not mention “grapefruit juice”\. That does not mean it is safe or unsafe/);
+  assert.doesNotMatch(text, /\bis safe\b(?! or)/);
+  // Alcohol is on this label: passages only about alcohol, at most 2, cited sentence plus lead-in at most.
+  const a = await answerQuestion(idx, label, "Can I drink alcohol with it?", { tier: "phone", lexicon: new Set() });
+  assert.ok(a.shown.kind === "passages" && a.shown.quotes.length > 0 && a.shown.quotes.length <= 2);
+  if (a.shown.kind === "passages") for (const q of a.shown.quotes) assert.match(q.text, /alcohol/i);
+  // A partly covered question names what is missing.
+  const atorva = new LabelIndex(chunkLabel(rec));
+  const m = await answerQuestion(atorva, { title: "Atorvastatin calcium", brandNames: [], genericNames: ["ATORVASTATIN CALCIUM"], effective: "" } as any,
+    "Can I drink grapefruit juice or kombucha?", { tier: "phone", lexicon: new Set() });
+  assert.equal(m.shown.kind, "passages");
+  assert.deepEqual(m.missing, ["kombucha"]);
+  if (m.shown.kind === "passages") assert.ok(m.shown.quotes.every((q) => /grapefruit/i.test(q.text)));
+});
+
+test("lead-in context: a list item is shown with its unhighlighted lead-in", async () => {
+  const { quoteAt } = await import("../src/lib/answer.ts");
+  const p: any = { passages: [["Warnings", ["Ask a doctor before use if you have:", "liver disease", "asthma", "Keep out of reach of children."]],
+    ["Directions", ["Directions", "Drink a full glass of water with each dose.", "children under 12 years: ask a doctor"]]] };
+  assert.equal(quoteAt(p, 1, 2).before, "Directions");
+  assert.equal(quoteAt(p, 0, 1).before, "Ask a doctor before use if you have:");
+  assert.equal(quoteAt(p, 0, 2).before, "Ask a doctor before use if you have:");
+  assert.equal(quoteAt(p, 0, 3).before, undefined);
+});
