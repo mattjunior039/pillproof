@@ -17,7 +17,7 @@ The model weights are served by the dev and preview servers from `~/waicy-work/m
 
 ## Models
 
-`app/models.json` sets the default key for each size (`default["2B"]`, `default["0.8B"]`) and maps each key to its MLC directory and dev metrics. The app never hard-codes a round. Swapping models means editing that file. For now this is a placeholder (r1-ft / lite-r1-ft, plus r2) until the Gate 2 session commits the real file.
+`app/models.json` sets the default key for each size (`default["2B"]`, `default["0.8B"]`) and maps each key to its MLC directory and dev metrics. The app never hard-codes a round. Swapping models means editing that file. The file comes from the Gate 2 branch (`train/scripts/app_models.py`); defaults are r1-ft / lite-r1-ft, and r2/r3 are offered in Settings. Settings shows the dev metrics for the device's prompt set (phone or desktop). The lite-r3 4-bit build can repeat "1000000…" on some prompts; the number check blocks it (the unit test covers restatement, citation and bare-reply forms), so the user sees label sentences instead.
 
 ## Screens
 
