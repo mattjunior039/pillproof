@@ -17,6 +17,30 @@ const NUMBERED = /^\[(\d+)\] ([^\n]*)$/gm;
 const DECL_HEAD = new RegExp(`^[${PY_WS}*"']+`);
 const DECL_TAIL = new RegExp(`[${PY_WS}.!*"']+$`);
 
+// Qualifier check (see checks.py step 5). Letter lookarounds instead of \b so JS and Python agree.
+const S = `${W}+`;
+const q = (alts) => new RegExp(`(?<![A-Za-z])(?:${alts})(?![A-Za-z])`, "i");
+const WARN = q(
+  `avoid|do${S}not|don['’]t|should${S}not|shouldn['’]t|must${S}not|not${S}more${S}than|no${S}more${S}than` +
+  `|more${S}than|limit|unless|except|only${S}if|stop|contraindicated|not${S}recommended|never`);
+const KEEP = q(
+  "avoid[A-Za-z]*|not|no|never|don['’]t|doesn['’]t|shouldn['’]t|mustn['’]t|can['’]t|cannot|isn['’]t|aren['’]t" +
+  `|limit[A-Za-z]*|unless|except|only|stop[A-Za-z]*|contraindicated|without|max|maximum|up${S}to|at${S}most|less${S}than` +
+  `|fewer${S}than|exceed[A-Za-z]*|discontinue[A-Za-z]*|caution[A-Za-z]*|careful[A-Za-z]*`);
+const YES = new RegExp(`^[${PY_WS}"'*]*(?:yes|it${S}is${S}(?:generally${S})?safe|it['’]s${S}(?:generally${S})?safe)(?![A-Za-z])`, "i");
+const FIRST = /^[^.!?;]*/;
+const keeps = (t) => KEEP.test(t) || WARN.test(t);
+
+/** ["qualifier <word>"] if the answer drops the cited warning; ["unqualified yes"] if it opens with one. */
+export function qualifierProblems(answer, cited) {
+  const w = WARN.exec(cited);
+  if (!w || !answer) return [];
+  const out = [];
+  if (!keeps(answer)) out.push("qualifier " + w[0].toLowerCase().replace(new RegExp(S, "g"), " "));
+  if (YES.test(answer) && !keeps(FIRST.exec(answer)[0])) out.push("unqualified yes");
+  return out;
+}
+
 /** The `[n] sentence` lines of a rendered prompt, as {n: sentence}. */
 export function numberedSentences(prompt) {
   const out = {};
@@ -53,7 +77,7 @@ export function parseReply(text) {
 }
 
 /**
- * Parse, verify numbers, copy quotes and run the number check.
+ * Parse, verify numbers, copy quotes and run the number and qualifier checks.
  * `sentences` maps prompt numbers to sentence text ({n: text} or a Map).
  * Returns the parse fields plus status ("decline" | "answer" | "invalid"), quotes
  * ([[n, sentence], ...]), problems, blocked and restatement (null when blocked or missing).
@@ -69,7 +93,10 @@ export function checkReply(text, sentences, drug, lexicon) {
   }
   res.quotes = p.sentences.map((n) => [n, get(n)]);
   const source = drug + "\n" + res.quotes.map(([, s]) => s).join("\n");
-  res.problems = restatementProblems(p.answer, source, lexicon);
+  res.problems = [
+    ...restatementProblems(p.answer, source, lexicon),
+    ...qualifierProblems(p.answer, res.quotes.map(([, s]) => s).join("\n")),
+  ];
   res.blocked = res.problems.length > 0 || !p.answer;
   res.restatement = res.blocked ? null : p.answer;
   return res;

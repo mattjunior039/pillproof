@@ -41,7 +41,7 @@ flowchart LR
 |---|---|---|---|
 | Sentence splitting and numbering | `datapipe/src/medlabel_data/sentences.py` | `core/sentences.js` | `core/fixtures/text_cases.json` (300 sentences) |
 | Tokens, lexicon, restatement check | `medlabel_data/text.py` | `core/text.js`, `core/data/lexicon.json` | 80 restatement pairs in `text_cases.json` |
-| Reply parsing and quote/number checks | `medlabel_data/checks.py` | `core/checks.js` | `core/fixtures/check_cases.json` (21 cases) |
+| Reply parsing and quote/number checks | `medlabel_data/checks.py` | `core/checks.js` | `core/fixtures/check_cases.json` (32 cases) |
 | Hybrid retrieval | `medlabel_data/retrieval.py` | `core/retrieval.js` | `core/fixtures/retrieval_cases.json` (24 cases) |
 | Question embedding | `train/scripts/embed.py` (onnxruntime) | `core/embed.js` (transformers.js) | cosine ≥ 0.999 on 50 dev questions |
 
@@ -135,8 +135,34 @@ Phone prompts meet the Gate 1 guard of about 600 tokens at p90. Even the longest
 2. Every cited number must exist in the prompt; otherwise the reply is invalid, and the app shows "not in label".
 3. Quotes are copied from the prompt, so a displayed quote is always label text.
 4. Every number, unit and drug name in the ANSWER line must appear in the drug line or in the cited sentences. Otherwise the restatement is blocked and only the quotes are shown.
+5. **Qualifier check** (added after the grapefruit anecdote below). If the cited sentences contain a warning or limit word, the ANSWER line must keep it. Otherwise the restatement is blocked and only the quotes are shown. Details below.
 
-**False positives.** The check blocks 4 of 882 (0.45%) gold dev restatements.
+**False positives.** Rules 2–4 block 4 of 882 (0.45%) gold dev restatements.
+
+### Qualifier check
+
+Rules 2–4 check numbers, units and names, not meaning, so "Yes, you can drink grapefruit juice." passed over "Avoid drinking more than 1.2 liters of grapefruit juice each day." Rule 5 (`qualifier_problems` / `qualifierProblems`) closes the most dangerous form of this:
+
+- **Trigger.** The cited sentences contain a warning or limit: avoid, do not / don't, should not, must not, not more than, no more than, more than, limit, unless, except, only if, stop, contraindicated, not recommended, never. Whole words only, so "stopping", "limited" and "exception" don't trigger.
+- **Blocked** when either:
+  - the answer keeps none of them (no not / no / never / avoid / limit / only / unless / except / stop / contraindicated / without / up to / at most / maximum / less than / exceed / discontinue / caution, and no trigger word); problem `qualifier <word>`; or
+  - the answer starts with "Yes" or "It is (generally) safe" and its first clause has no keep word; problem `unqualified yes`.
+- **Fallback.** As with rule 4: the app shows the cited label sentences, not the restatement.
+- **Anecdote replies.** "Yes, you can drink grapefruit juice." → `qualifier avoid`, `unqualified yes`. The browser variant "Yes, … The amount you drink is no more than 1.2 liters …" → `unqualified yes`. "Do not drink more than 1.2 liters …" passes. These are golden cases in `check_cases.json` (10 `qual_*` cases); Python and JS agree on all 7,268 dev gold and dev model (answer, cited) pairs.
+- **It checks words, not meaning.** An answer that keeps "not" in an unrelated clause still passes. It is a narrow guard against dropped warnings, not a meaning check. The word lists were set while looking at dev data.
+
+**False blocks on dev gold restatements** (dev only, no T1–T5). Of 882 gold answers, 143 cite a sentence with a trigger word.
+
+| Gold ANSWER lines | Blocked | Of all 882 | Of the 143 warning-citing |
+|---|---|---|---|
+| Plain rewrites (`mlx_plain`, what the models are trained on) | 17 | 1.9% | 11.9% |
+| Original FDARxBench references (`mlx`) | 24 | 2.7% | 16.8% |
+
+Most false blocks are multi-sentence citations where the warning is in a different cited sentence from the one the answer covers, for example "contraindicated in:" before a hypersensitivity list, "avoid" in a side-effect passage, or "more than" in trial statistics. A false block costs little: the user sees the label sentences instead of the short answer.
+
+**Dev model replies newly blocked** (phone prompts unless noted; % of answers): 0.8B r1 7/774 (0.9%), r2 12/820 (1.5%), r3 7/773 (0.9%); 2B r1 9/739 (1.2%), r2 11/793 (1.4%), r3 7/774 (0.9%); 2B r1 desktop 15/831 (1.8%). None was an unqualified "yes".
+
+**Effect on grading.** `grade_dev.py` calls `check_reply`, so a regrade shifts results slightly. In checks mode a newly blocked item is graded on its citations only; in no-checks mode any problem makes it wrong, and `block_rate` rises by about the rates above. The Gate 2 numbers above were graded before rule 5.
 
 **Regex fix.** A bug found during Gate 2: a reply cut off at 256 tokens in the middle of a long `SENTENCES:` list caused exponential regex backtracking in the number-list pattern, so grading hung. In the browser this would freeze the tab. The pattern now requires a separator between numbers and accepts exactly the same valid strings. Both languages were fixed, and a regression case was added to `check_cases.json` (22 cases).
 
@@ -586,6 +612,7 @@ What this shows:
 - **The browser 2B r1 decline is a 4-bit flip.** The bf16 model answers. This is the borderline-item kind of difference the 100-prompt fidelity runs allow for: a few items per hundred change outcome.
 - **The r3 2B declines in both pipelines.** This fits r3 being no better than r1 on the 2B.
 - **The 0.8B r2 reply is the worst one:** a "yes" that drops the limit. The checks pass it (verified with `core/checks.js`): "1.2 liters" is in the cited sentence, and "yes" has no number or unit to check. This is the restatement risk that the quotes shown under every answer are meant to cover. The checks block made-up numbers and names, not wrong meaning.
+- **Follow-up.** The qualifier check (rule 5 under [Checks](#checks)) now blocks both 0.8B r2 replies, and the app shows the cited sentence instead.
 
 ## Data hygiene
 

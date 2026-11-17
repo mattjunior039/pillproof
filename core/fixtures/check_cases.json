@@ -219,9 +219,11 @@
     4
    ],
    "strict": true,
-   "blocked": false,
-   "problems": [],
-   "restatement": "Take 50 mg twice a day."
+   "blocked": true,
+   "problems": [
+    "qualifier contraindicated"
+   ],
+   "restatement": null
   }
  },
  {
@@ -561,6 +563,246 @@
   ],
   "expect": {
    "status": "invalid"
+  }
+ },
+ {
+  "id": "qual_grapefruit_yes",
+  "reply": "SENTENCES: 1\nANSWER: Yes, you can drink grapefruit juice.",
+  "sentences": {
+   "1": "Avoid drinking more than 1.2 liters of grapefruit juice each day.",
+   "2": "Concomitant intake of large quantities, more than 1.2 liters daily, of grapefruit juice is not recommended in patients taking atorvastatin calcium tablets [see Drug Interactions (7.1) ] .",
+   "3": "The recommended starting dosage is 10 or 20 mg once daily.",
+   "4": "Tell your doctor if you are pregnant.",
+   "5": "Atorvastatin calcium tablets are contraindicated in patients with active liver disease.",
+   "6": "Hold therapy and resume after stopping clarithromycin."
+  },
+  "drug": "Atorvastatin Calcium",
+  "lexicon": [
+   "atorvastatin",
+   "clarithromycin"
+  ],
+  "expect": {
+   "status": "answer",
+   "blocked": true,
+   "problems": [
+    "qualifier avoid",
+    "unqualified yes"
+   ],
+   "restatement": null
+  }
+ },
+ {
+  "id": "qual_grapefruit_yes_then_limit",
+  "reply": "SENTENCES: 1, 2\nANSWER: Yes, you can drink grapefruit juice. Avoid more than 1.2 liters a day.",
+  "sentences": {
+   "1": "Avoid drinking more than 1.2 liters of grapefruit juice each day.",
+   "2": "Concomitant intake of large quantities, more than 1.2 liters daily, of grapefruit juice is not recommended in patients taking atorvastatin calcium tablets [see Drug Interactions (7.1) ] .",
+   "3": "The recommended starting dosage is 10 or 20 mg once daily.",
+   "4": "Tell your doctor if you are pregnant.",
+   "5": "Atorvastatin calcium tablets are contraindicated in patients with active liver disease.",
+   "6": "Hold therapy and resume after stopping clarithromycin."
+  },
+  "drug": "Atorvastatin Calcium",
+  "lexicon": [
+   "atorvastatin",
+   "clarithromycin"
+  ],
+  "expect": {
+   "status": "answer",
+   "blocked": true,
+   "problems": [
+    "unqualified yes"
+   ],
+   "restatement": null
+  }
+ },
+ {
+  "id": "qual_grapefruit_yes_but",
+  "reply": "SENTENCES: 1\nANSWER: Yes, but no more than 1.2 liters of grapefruit juice a day.",
+  "sentences": {
+   "1": "Avoid drinking more than 1.2 liters of grapefruit juice each day.",
+   "2": "Concomitant intake of large quantities, more than 1.2 liters daily, of grapefruit juice is not recommended in patients taking atorvastatin calcium tablets [see Drug Interactions (7.1) ] .",
+   "3": "The recommended starting dosage is 10 or 20 mg once daily.",
+   "4": "Tell your doctor if you are pregnant.",
+   "5": "Atorvastatin calcium tablets are contraindicated in patients with active liver disease.",
+   "6": "Hold therapy and resume after stopping clarithromycin."
+  },
+  "drug": "Atorvastatin Calcium",
+  "lexicon": [
+   "atorvastatin",
+   "clarithromycin"
+  ],
+  "expect": {
+   "status": "answer",
+   "blocked": false,
+   "problems": [],
+   "restatement": "Yes, but no more than 1.2 liters of grapefruit juice a day."
+  }
+ },
+ {
+  "id": "qual_grapefruit_avoid",
+  "reply": "SENTENCES: 1\nANSWER: Avoid drinking more than 1.2 liters of grapefruit juice a day.",
+  "sentences": {
+   "1": "Avoid drinking more than 1.2 liters of grapefruit juice each day.",
+   "2": "Concomitant intake of large quantities, more than 1.2 liters daily, of grapefruit juice is not recommended in patients taking atorvastatin calcium tablets [see Drug Interactions (7.1) ] .",
+   "3": "The recommended starting dosage is 10 or 20 mg once daily.",
+   "4": "Tell your doctor if you are pregnant.",
+   "5": "Atorvastatin calcium tablets are contraindicated in patients with active liver disease.",
+   "6": "Hold therapy and resume after stopping clarithromycin."
+  },
+  "drug": "Atorvastatin Calcium",
+  "lexicon": [
+   "atorvastatin",
+   "clarithromycin"
+  ],
+  "expect": {
+   "status": "answer",
+   "blocked": false,
+   "problems": [],
+   "restatement": "Avoid drinking more than 1.2 liters of grapefruit juice a day."
+  }
+ },
+ {
+  "id": "qual_safe_dropped",
+  "reply": "SENTENCES: 2\nANSWER: It is safe to drink grapefruit juice with atorvastatin.",
+  "sentences": {
+   "1": "Avoid drinking more than 1.2 liters of grapefruit juice each day.",
+   "2": "Concomitant intake of large quantities, more than 1.2 liters daily, of grapefruit juice is not recommended in patients taking atorvastatin calcium tablets [see Drug Interactions (7.1) ] .",
+   "3": "The recommended starting dosage is 10 or 20 mg once daily.",
+   "4": "Tell your doctor if you are pregnant.",
+   "5": "Atorvastatin calcium tablets are contraindicated in patients with active liver disease.",
+   "6": "Hold therapy and resume after stopping clarithromycin."
+  },
+  "drug": "Atorvastatin Calcium",
+  "lexicon": [
+   "atorvastatin",
+   "clarithromycin"
+  ],
+  "expect": {
+   "status": "answer",
+   "blocked": true,
+   "problems": [
+    "qualifier more than",
+    "unqualified yes"
+   ],
+   "restatement": null
+  }
+ },
+ {
+  "id": "qual_curly_dont",
+  "reply": "SENTENCES: 1\nANSWER: Don’t drink more than 1.2 liters of grapefruit juice a day.",
+  "sentences": {
+   "1": "Avoid drinking more than 1.2 liters of grapefruit juice each day.",
+   "2": "Concomitant intake of large quantities, more than 1.2 liters daily, of grapefruit juice is not recommended in patients taking atorvastatin calcium tablets [see Drug Interactions (7.1) ] .",
+   "3": "The recommended starting dosage is 10 or 20 mg once daily.",
+   "4": "Tell your doctor if you are pregnant.",
+   "5": "Atorvastatin calcium tablets are contraindicated in patients with active liver disease.",
+   "6": "Hold therapy and resume after stopping clarithromycin."
+  },
+  "drug": "Atorvastatin Calcium",
+  "lexicon": [
+   "atorvastatin",
+   "clarithromycin"
+  ],
+  "expect": {
+   "status": "answer",
+   "blocked": false,
+   "problems": [],
+   "restatement": "Don’t drink more than 1.2 liters of grapefruit juice a day."
+  }
+ },
+ {
+  "id": "qual_contraindicated_dropped",
+  "reply": "SENTENCES: 5\nANSWER: People with active liver disease can take it.",
+  "sentences": {
+   "1": "Avoid drinking more than 1.2 liters of grapefruit juice each day.",
+   "2": "Concomitant intake of large quantities, more than 1.2 liters daily, of grapefruit juice is not recommended in patients taking atorvastatin calcium tablets [see Drug Interactions (7.1) ] .",
+   "3": "The recommended starting dosage is 10 or 20 mg once daily.",
+   "4": "Tell your doctor if you are pregnant.",
+   "5": "Atorvastatin calcium tablets are contraindicated in patients with active liver disease.",
+   "6": "Hold therapy and resume after stopping clarithromycin."
+  },
+  "drug": "Atorvastatin Calcium",
+  "lexicon": [
+   "atorvastatin",
+   "clarithromycin"
+  ],
+  "expect": {
+   "status": "answer",
+   "blocked": true,
+   "problems": [
+    "qualifier contraindicated"
+   ],
+   "restatement": null
+  }
+ },
+ {
+  "id": "qual_contraindicated_kept",
+  "reply": "SENTENCES: 5\nANSWER: People with active liver disease should not take it.",
+  "sentences": {
+   "1": "Avoid drinking more than 1.2 liters of grapefruit juice each day.",
+   "2": "Concomitant intake of large quantities, more than 1.2 liters daily, of grapefruit juice is not recommended in patients taking atorvastatin calcium tablets [see Drug Interactions (7.1) ] .",
+   "3": "The recommended starting dosage is 10 or 20 mg once daily.",
+   "4": "Tell your doctor if you are pregnant.",
+   "5": "Atorvastatin calcium tablets are contraindicated in patients with active liver disease.",
+   "6": "Hold therapy and resume after stopping clarithromycin."
+  },
+  "drug": "Atorvastatin Calcium",
+  "lexicon": [
+   "atorvastatin",
+   "clarithromycin"
+  ],
+  "expect": {
+   "status": "answer",
+   "blocked": false,
+   "problems": [],
+   "restatement": "People with active liver disease should not take it."
+  }
+ },
+ {
+  "id": "qual_no_warning_yes",
+  "reply": "SENTENCES: 3, 4\nANSWER: Yes, the starting dose is 10 or 20 mg once a day.",
+  "sentences": {
+   "1": "Avoid drinking more than 1.2 liters of grapefruit juice each day.",
+   "2": "Concomitant intake of large quantities, more than 1.2 liters daily, of grapefruit juice is not recommended in patients taking atorvastatin calcium tablets [see Drug Interactions (7.1) ] .",
+   "3": "The recommended starting dosage is 10 or 20 mg once daily.",
+   "4": "Tell your doctor if you are pregnant.",
+   "5": "Atorvastatin calcium tablets are contraindicated in patients with active liver disease.",
+   "6": "Hold therapy and resume after stopping clarithromycin."
+  },
+  "drug": "Atorvastatin Calcium",
+  "lexicon": [
+   "atorvastatin",
+   "clarithromycin"
+  ],
+  "expect": {
+   "status": "answer",
+   "blocked": false,
+   "problems": [],
+   "restatement": "Yes, the starting dose is 10 or 20 mg once a day."
+  }
+ },
+ {
+  "id": "qual_stopping_not_a_warning",
+  "reply": "SENTENCES: 6\nANSWER: Restart it after clarithromycin is finished.",
+  "sentences": {
+   "1": "Avoid drinking more than 1.2 liters of grapefruit juice each day.",
+   "2": "Concomitant intake of large quantities, more than 1.2 liters daily, of grapefruit juice is not recommended in patients taking atorvastatin calcium tablets [see Drug Interactions (7.1) ] .",
+   "3": "The recommended starting dosage is 10 or 20 mg once daily.",
+   "4": "Tell your doctor if you are pregnant.",
+   "5": "Atorvastatin calcium tablets are contraindicated in patients with active liver disease.",
+   "6": "Hold therapy and resume after stopping clarithromycin."
+  },
+  "drug": "Atorvastatin Calcium",
+  "lexicon": [
+   "atorvastatin",
+   "clarithromycin"
+  ],
+  "expect": {
+   "status": "answer",
+   "blocked": false,
+   "problems": [],
+   "restatement": "Restart it after clarithromycin is finished."
   }
  }
 ]

@@ -11,6 +11,12 @@
 4. Number check: every number, unit and drug name in the ANSWER line must appear in the
    drug line or the cited sentences (text.restatement_problems). If not, the restatement
    is blocked and only the quotes are shown.
+5. Qualifier check: if the cited sentences carry a warning or limit ("avoid", "do not",
+   "not more than", "unless", "contraindicated", ...) the ANSWER line must keep one (any
+   limit or negation word), and must not open with an unqualified "Yes" / "It is safe"
+   (first sentence with no limit word). Otherwise the restatement is blocked and the cited
+   sentences are shown. It catches "Yes, you can drink grapefruit juice." over "Avoid drinking
+   more than 1.2 liters of grapefruit juice each day." It checks words, not meaning.
 
 core/checks.js is the browser port; both run core/fixtures/check_cases.json.
 """
@@ -29,6 +35,37 @@ _ANS_LINE = re.compile(r"^\**\s*ANSWER\s*\**\s*:\s*\**\s*(.*)$", re.I)
 # on a long list cut off mid-line (seen on a 256-token "SENTENCES: 10, 11, 12, ..." reply).
 _NUM_LIST = re.compile(r"^\d+(?:\s*[,;]\s*\d+|\s+\d+)*\s*\.?$")
 _NUMBERED = re.compile(r"^\[(\d+)\] ([^\n]*)$", re.M)
+
+# Qualifier check (step 5). Explicit letter lookarounds instead of \b so JS and Python agree.
+_Q = r"(?<![A-Za-z])(?:{})(?![A-Za-z])"
+# Warnings and limits in the cited sentences.
+_WARN = re.compile(_Q.format(
+    r"avoid|do\s+not|don['’]t|should\s+not|shouldn['’]t|must\s+not|not\s+more\s+than|no\s+more\s+than"
+    r"|more\s+than|limit|unless|except|only\s+if|stop|contraindicated|not\s+recommended|never"), re.I)
+# Words in an answer that keep a warning or limit.
+_KEEP = re.compile(_Q.format(
+    r"avoid[A-Za-z]*|not|no|never|don['’]t|doesn['’]t|shouldn['’]t|mustn['’]t|can['’]t|cannot|isn['’]t|aren['’]t"
+    r"|limit[A-Za-z]*|unless|except|only|stop[A-Za-z]*|contraindicated|without|max|maximum|up\s+to|at\s+most|less\s+than"
+    r"|fewer\s+than|exceed[A-Za-z]*|discontinue[A-Za-z]*|caution[A-Za-z]*|careful[A-Za-z]*"), re.I)
+_YES = re.compile(r"^[\s\"'*]*(?:yes|it\s+is\s+(?:generally\s+)?safe|it['’]s\s+(?:generally\s+)?safe)(?![A-Za-z])", re.I)
+_FIRST = re.compile(r"^[^.!?;]*")
+
+
+def _keeps(text: str) -> bool:
+    return bool(_KEEP.search(text) or _WARN.search(text))
+
+
+def qualifier_problems(answer: str, cited: str) -> list[str]:
+    """["qualifier <word>"] if the answer drops the cited warning; ["unqualified yes"] if it opens with one."""
+    w = _WARN.search(cited)
+    if not w or not answer:
+        return []
+    out = []
+    if not _keeps(answer):
+        out.append("qualifier " + re.sub(r"\s+", " ", w.group(0).lower()))
+    if _YES.search(answer) and not _keeps(_FIRST.match(answer).group(0)):
+        out.append("unqualified yes")
+    return out
 
 
 def numbered_sentences(prompt: str) -> dict[int, str]:
@@ -75,7 +112,7 @@ def parse_reply(text: str) -> dict:
 
 
 def check_reply(text: str, sentences: dict[int, str], drug: str, lexicon: set[str]) -> dict:
-    """Parse, verify numbers, copy quotes and run the number check.
+    """Parse, verify numbers, copy quotes and run the number and qualifier checks.
 
     Returns the parse fields plus 'status' ('decline'|'answer'|'invalid'), 'quotes'
     ([[n, sentence], ...]), 'problems', 'blocked' and 'restatement' (the ANSWER line, or
@@ -91,7 +128,8 @@ def check_reply(text: str, sentences: dict[int, str], drug: str, lexicon: set[st
         return res
     res["quotes"] = [[n, sentences[n]] for n in p["sentences"]]
     source = drug + "\n" + "\n".join(s for _, s in res["quotes"])
-    res["problems"] = restatement_problems(p["answer"], source, lexicon)
+    res["problems"] = restatement_problems(p["answer"], source, lexicon) + qualifier_problems(
+        p["answer"], "\n".join(s for _, s in res["quotes"]))
     res["blocked"] = bool(res["problems"]) or not p["answer"]
     res["restatement"] = None if res["blocked"] else p["answer"]
     return res
