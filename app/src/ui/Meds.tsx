@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { dailyMedUrl, labelDate, manufacturers } from "../lib/openfda.ts";
-import { displayNames, products, suggest, type Product } from "../lib/rxnorm.ts";
+import { contents, displayNames, isCombo, products, suggest, type Product } from "../lib/rxnorm.ts";
 import { formatTime, shortName } from "../lib/schedule.ts";
 import type { Med } from "../lib/types.ts";
 import { addMed, deleteMed, fetchLabel, labelLoading, updateMed, useApp } from "../store.ts";
@@ -35,6 +35,7 @@ function AddMed({ onDone }: { onDone: () => void }) {
   const [picked, setPicked] = useState<string | null>(null);
   const [prods, setProds] = useState<Product[] | null>(null);
   const [prod, setProd] = useState<Product | null>(null);
+  const [showCombos, setShowCombos] = useState(false);
   const [times, setTimes] = useState<string[]>(["08:00"]);
   const input = useRef<HTMLInputElement>(null);
 
@@ -57,15 +58,23 @@ function AddMed({ onDone }: { onDone: () => void }) {
   };
 
   if (prod) {
+    const parts = contents(prod);
     return (
       <div class="card">
-        <h2>{prod.brand ? `${prod.brand} (${prod.ingredient})` : prod.ingredient}</h2>
-        <p>{prod.strength} {prod.form}</p>
+        <h2>{prod.brand || (prod.combo ? "Combination product" : prod.ingredient)}</h2>
+        <p class="contains-head">{parts.length > 1 ? `Contains ${parts.length} active ingredients:` : "Active ingredient:"}</p>
+        <ul class="contains">{parts.map((c) => <li>{c}</li>)}</ul>
+        <p>Form: {prod.form.toLowerCase()}</p>
+        <p class={prod.combo ? "notice" : "small"}>
+          Check this matches the active ingredients on your bottle, box or Drug Facts panel.
+          {prod.combo ? " This is a combination product; if your medicine has only one ingredient, go back and choose again." : ""}
+        </p>
         <TimesEditor times={times} onChange={setTimes} />
         <div class="row">
           <button class="btn primary" onClick={async () => {
             await addMed({ rxcui: prod.rxcui, name: prod.name, ingredient: prod.ingredient, strength: prod.strength, form: prod.form, brand: prod.brand, times });
             onDone();
+            scrollTo(0, 0);
           }}>Save</button>
           <button class="btn" onClick={() => setProd(null)}>Back</button>
         </div>
@@ -75,21 +84,27 @@ function AddMed({ onDone }: { onDone: () => void }) {
   }
 
   if (picked) {
+    const singles = prods?.filter((p) => !p.combo) ?? [];
+    const combos = prods?.filter((p) => p.combo) ?? [];
+    const shown = singles.length && !showCombos ? singles : [...singles, ...combos];
     return (
       <div class="card">
-        <h2>Which {picked}?</h2>
+        <h2>Which {picked.replace(/ \/ /g, " + ")}?</h2>
         <p>Pick the strength and form on your bottle or box.</p>
         {err && <p class="error">{err}</p>}
         {!prods && !err && <p class="busy">Looking up products…</p>}
         <ul class="picklist">
-          {prods?.map((p) => (
+          {shown.map((p) => (
             <li><button class="pick" onClick={() => setProd(p)}>
-              <strong>{p.strength || "—"}</strong> {p.form}
-              <span class="sub">{p.brand ? `Brand: ${p.brand}` : "Generic"}{p.combo ? ` · ${p.ingredient}` : ""}</span>
+              {p.combo ? <><strong>Combination:</strong> {contents(p).join(" + ")}</> : <><strong>{p.strength.toLowerCase() || "—"}</strong> {p.ingredient}</>}
+              <span class="sub">{p.form}{p.brand ? ` · Brand: ${p.brand}` : " · Generic"}</span>
             </button></li>
           ))}
         </ul>
-        <button class="btn" onClick={() => { setPicked(null); setProds(null); setErr(""); }}>Back</button>
+        {singles.length > 0 && combos.length > 0 && !showCombos && (
+          <button class="btn" onClick={() => setShowCombos(true)}>Show {combos.length} combination products (more than one ingredient)</button>
+        )}
+        <button class="btn" onClick={() => { setPicked(null); setProds(null); setErr(""); setShowCombos(false); }}>Back</button>
       </div>
     );
   }
@@ -106,7 +121,11 @@ function AddMed({ onDone }: { onDone: () => void }) {
       {err && <p class="error">{err}</p>}
       {!names && !err && <p class="busy">Loading medicine names…</p>}
       <ul id="med-suggest" class="picklist" role="listbox">
-        {list.map((n) => <li role="option"><button class="pick" onClick={() => pick(n)}>{n}</button></li>)}
+        {list.map((n) => (
+          <li role="option"><button class="pick" onClick={() => pick(n)}>
+            {isCombo(n) ? <>{n.replace(/ \/ /g, " + ")} <span class="tag">combination</span></> : n}
+          </button></li>
+        ))}
       </ul>
       <button class="btn" onClick={onDone}>Cancel</button>
     </div>
@@ -158,7 +177,7 @@ function MedCard({ med }: { med: Med }) {
   return (
     <li class="card">
       <h2>{shortName(med)}</h2>
-      {med.brand && <p class="sub">{med.ingredient}</p>}
+      {(med.brand || med.ingredient.includes(" / ")) && <p class="sub">Contains: {contents(med).join(" + ")}</p>}
       {editing ? (
         <>
           <TimesEditor times={times} onChange={setTimes} />

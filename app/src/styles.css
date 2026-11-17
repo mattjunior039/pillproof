@@ -61,8 +61,8 @@ p { margin: 0.5rem 0; }
 .sr-only, .skip:not(:focus) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .skip:focus { position: fixed; top: 8px; left: 8px; z-index: 10; background: var(--bg); padding: 12px; }
 
+/* Not sticky: a pinned bar hid page titles on iPhone, and the tab bar already stays on screen. */
 .top {
-  position: sticky; top: 0; z-index: 5;
   display: flex; justify-content: space-between; align-items: center;
   padding: calc(env(safe-area-inset-top) + 6px) 16px 6px;
   background: var(--brand); color: var(--brand-fg);
@@ -199,6 +199,10 @@ summary { min-height: 44px; display: flex; align-items: center; cursor: pointer;
 .update { border-top: 2px solid var(--line); padding: 8px 0; }
 .diff { margin: 10px 0; }
 .tag { margin: 0 0 4px; font-size: 0.85rem; }
+.pick .tag { display: inline-block; margin: 0 0 0 6px; padding: 0 8px; border: 2px solid var(--note); border-radius: 6px; color: var(--note); font-weight: 700; }
+.contains-head { font-weight: 700; margin-bottom: 0; }
+.contains { margin: 4px 0 8px; padding-left: 1.2em; font-size: 1.1rem; font-weight: 700; }
+.notice { background: var(--note-bg); color: var(--note); border: 2px solid var(--note); border-radius: 10px; padding: 8px 12px; font-weight: 600; }
 .kind { display: inline-block; font-weight: 800; padding: 0 8px; border-radius: 6px; border: 2px solid var(--fg); margin-right: 6px; }
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 @media (max-width: 560px) { .pair { grid-template-columns: 1fr; } }

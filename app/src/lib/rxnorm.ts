@@ -20,8 +20,9 @@ export function parseProduct(name: string, rxcui = "", tty = ""): Product {
   const b = /\s*\[([^\]]+)\]\s*$/.exec(core);
   if (b) { brand = b[1]; core = core.slice(0, b.index); }
   let prefix = "";
-  const p = /^(\d+ HR|\d+ DAY|\d+ WEEK)\s+/.exec(core);
-  if (p) { prefix = p[1]; core = core.slice(p[0].length); }
+  // Duration or pack-size prefixes: "24 HR", "100 ML", "0.4 ML".
+  const p = /^((?:\d+(?:\.\d+)? (?:HR|DAY|WEEK|ML|ACTUAT|GM|CM2?)\s+)+)/.exec(core);
+  if (p) { prefix = p[1].trim(); core = core.slice(p[0].length); }
   const parts = core.split(" / ");
   const ingredients: string[] = [], strengths: string[] = [];
   let form = "";
@@ -47,7 +48,24 @@ export function parseProduct(name: string, rxcui = "", tty = ""): Product {
   };
 }
 
-/** Products from a drugs.json response: generics first, single ingredients first, then by strength. */
+// Everyday oral forms first; injections and devices last.
+const FORM_RANK: [RegExp, number][] = [
+  [/^oral tablet$/i, 0], [/^oral capsule$/i, 1], [/tablet|capsule/i, 2],
+  [/oral (solution|suspension)|syrup|elixir/i, 3], [/oral|chew|lozenge|sublingual|buccal|disintegrating/i, 4],
+  [/inject|cartridge|syringe|pen injector|infusion|implant|prefilled/i, 9],
+];
+export const formRank = (form: string) => FORM_RANK.find(([r]) => r.test(form))?.[1] ?? 6;
+
+/** "acetaminophen / aspirin" -> ["acetaminophen", "aspirin"]. */
+export const ingredientList = (ingredient: string) => ingredient.split(" / ").map((x) => x.trim()).filter(Boolean);
+
+/** ["acetaminophen 325 mg", "aspirin 500 mg"]: each ingredient with its own strength. */
+export function contents(p: Pick<Product, "ingredient" | "strength">): string[] {
+  const st = p.strength ? p.strength.split(" / ") : [];
+  return ingredientList(p.ingredient).map((n, i) => [n, st[i]?.toLowerCase()].filter(Boolean).join(" "));
+}
+
+/** Products from a drugs.json response: single ingredients first, common oral forms first, then by strength. */
 export function productsFrom(json: any): Product[] {
   const groups: any[] = json?.drugGroup?.conceptGroup || [];
   const out: Product[] = [];
@@ -58,6 +76,8 @@ export function productsFrom(json: any): Product[] {
   const num = (s: string) => parseFloat(s) || 0;
   return out.sort((a, b) =>
     Number(a.combo) - Number(b.combo) ||
+    ingredientList(a.ingredient).length - ingredientList(b.ingredient).length ||
+    formRank(a.form) - formRank(b.form) ||
     a.ingredient.localeCompare(b.ingredient) ||
     a.form.localeCompare(b.form) ||
     num(a.strength) - num(b.strength) ||
@@ -76,18 +96,24 @@ export function displayNames(): Promise<string[]> {
   return namesCache;
 }
 
-/** Prefix matches first, then word-start matches; short list for the autocomplete. */
+export const isCombo = (name: string) => name.includes(" / ");
+
+/**
+ * Short list for the autocomplete: single-ingredient names before combinations
+ * ("acetaminophen" must not sit next to "acetaminophen / aspirin" as an equal choice),
+ * then prefix matches before word-start matches, then shorter names.
+ */
 export function suggest(names: string[], query: string, limit = 8): string[] {
   const q = query.trim().toLowerCase();
   if (q.length < 2) return [];
-  const pre: string[] = [], word: string[] = [];
+  const hits: [string, number][] = [];
   for (const n of names) {
     const l = n.toLowerCase();
-    if (l.startsWith(q)) pre.push(n);
-    else if (l.includes(" " + q)) word.push(n);
+    const at = l.startsWith(q) ? 0 : l.includes(" " + q) ? 1 : -1;
+    if (at >= 0) hits.push([n, (isCombo(n) ? 2 : 0) + at]);
   }
-  const byLen = (a: string, b: string) => a.length - b.length || a.localeCompare(b);
-  return [...pre.sort(byLen), ...word.sort(byLen)].slice(0, limit);
+  hits.sort((a, b) => a[1] - b[1] || a[0].length - b[0].length || a[0].localeCompare(b[0]));
+  return hits.slice(0, limit).map(([n]) => n);
 }
 
 export async function products(name: string): Promise<Product[]> {
