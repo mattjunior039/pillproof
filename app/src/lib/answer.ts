@@ -1,8 +1,9 @@
 // Label question → retrieval → model (or passage-only) → checks → what the user sees (plan §5 steps 3-5).
 // Pure apart from the injected `generate`, so it runs under node tests too.
-import { DESKTOP, PHONE, retrieve, scores } from "../../../core/retrieval.js";
+import { DESKTOP, PHONE, render, scores, select } from "../../../core/retrieval.js";
 import { checkReply } from "../../../core/checks.js";
 import { sectionName } from "./chunk.ts";
+import { searchQuery } from "./query.ts";
 import type { LabelMeta } from "./types.ts";
 
 export interface Quote { text: string; section: string }
@@ -37,10 +38,27 @@ export interface AnswerOpts {
 
 const heading = (index: any, c: number) => sectionName(index.passages[c][0] || "") || "Label";
 
-/** Top label sentences by the same retrieval score, shown in label order. */
+/** Gate 2 retrieval (core/retrieval.js), scored on the expanded query; the prompt keeps the user's words. */
+export function retrieveFor(index: any, drug: string, question: string, sims: number[] | null | undefined, params: any) {
+  const p = { ...params };
+  const blocks = select(index, scores(index, searchQuery(question), (sims ?? null) as any, p), p);
+  return render(index.passages, blocks, drug, question);
+}
+
+/** Medication Guide / patient leaflet headings are questions ("What should I avoid while taking X?"). */
+const PATIENT_HEAD = /\?\s*$|^(what|how|who|should|can|do|is|are)\b|patient information|medication guide/i;
+/** Table fragments and cross-references like "( 1 )" or "7.1 3.8 4.0 ...". */
+const readable = (s: string) => (s.match(/[A-Za-z]{3,}/g) || []).length >= 4 && (s.match(/\d/g) || []).length < s.length / 6;
+
+/** Best label sentences, best first; patient-leaflet sentences slightly preferred; weak matches dropped. */
 export function topSentences(index: any, question: string, sims: number[] | null | undefined, params: any, n = 3): Quote[] {
-  const sc: number[] = scores(index, question, (sims ?? null) as any, params);
-  const best = sc.map((x, i) => i).filter((i) => sc[i] > 0).sort((a, b) => sc[b] - sc[a] || a - b).slice(0, n).sort((a, b) => a - b);
+  const sc: number[] = scores(index, searchQuery(question), (sims ?? null) as any, params).map((x: number, i: number) => {
+    const [c, s] = index.units[i];
+    if (x <= 0 || !readable(index.passages[c][1][s])) return 0;
+    return x + (PATIENT_HEAD.test(index.passages[c][0] || "") ? 0.08 : 0);
+  });
+  const top = Math.max(0, ...sc);
+  const best = sc.map((x, i) => i).filter((i) => sc[i] > 0 && sc[i] >= 0.6 * top).sort((a, b) => sc[b] - sc[a] || a - b).slice(0, n);
   return best.map((i) => {
     const [c, s] = index.units[i];
     return { text: index.passages[c][1][s], section: heading(index, c) };
@@ -53,7 +71,7 @@ export async function answerQuestion(index: any, label: LabelMeta, question: str
   const passages = (why: "no-model" | "invalid" | "error"): Shown => ({ kind: "passages", why, quotes: topSentences(index, question, o.sims, params, o.passageCount ?? 3) });
   if (!o.generate) return { shown: passages("no-model"), label, ms: Date.now() - t0 };
 
-  const r = retrieve(index, label.title, question, (o.sims ?? null) as any, params);
+  const r = retrieveFor(index, label.title, question, o.sims, params);
   const where = new Map<number, string>();
   for (const [key, n] of r.numbering as Map<string, number>) where.set(n, heading(index, Number(key.split(",")[0])));
   const raw = await o.generate(r.user);

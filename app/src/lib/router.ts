@@ -67,15 +67,20 @@ export function route(question: string, meds: Med[], lexicon: Set<string>, lastM
   if (named.length > 1) return { kind: "choose", meds: named, advice };
   const known = new Set(meds.flatMap(medNames).flatMap((n) => n.split(" ")));
   const others = lexiconMentions(q, lexicon).filter((w) => !known.has(w));
+  const pronoun = /\b(it|this|that|them|these|my (medicine|medication|meds|pill|pills))\b/.test(q);
+  const implied = meds.length === 1 ? meds[0]
+    : lastMed && pronoun && meds.some((m) => m.id === lastMed.id) ? lastMed : null;
+  // "Can I take it with ibuprofen?" asks about a listed medicine's label; "ibuprofen side effects?" doesn't.
+  if (others.length && implied && pronoun && INTERACTION.test(q)) return { kind: "label", med: implied, advice };
+  if (others.length && meds.length > 1 && pronoun && INTERACTION.test(q)) return { kind: "choose", meds, advice };
   if (others.length) return { kind: "not-on-list", names: others };
   if (!MED_WORDS.test(q) && words(q).length > 0) return { kind: "out-of-scope" };
   if (!meds.length) return { kind: "no-meds" };
-  if (meds.length === 1) return { kind: "label", med: meds[0], advice };
-  if (lastMed && meds.some((m) => m.id === lastMed.id) && /\b(it|this|that|them|these)\b/.test(q)) {
-    return { kind: "label", med: lastMed, advice };
-  }
+  if (implied) return { kind: "label", med: implied, advice };
   return { kind: "choose", meds, advice };
 }
+
+const INTERACTION = /\b(with|and|together|interact\w*|mix\w*|combin\w*|while|plus|same time)\b/;
 
 export const NOT_COVERED =
   "The label does not cover this. That does not mean it is safe or unsafe. Please ask your pharmacist; they can answer questions the label doesn't.";

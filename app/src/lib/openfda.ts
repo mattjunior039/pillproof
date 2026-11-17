@@ -19,18 +19,35 @@ async function search(params: Record<string, string>): Promise<any | null> {
 
 /** Searches from most to least specific: the exact product, then the ingredient. */
 function bases(med: Pick<Med, "rxcui" | "ingredient">): string[] {
-  const out = [`openfda.rxcui:${q(med.rxcui)}`];
-  const ingr = med.ingredient.split(" / ").map((i) => `openfda.generic_name:${q(i)}`).join(" AND ");
+  const out: string[] = [];
+  if (med.rxcui?.trim()) out.push(`openfda.rxcui:${q(med.rxcui)}`);
+  const ingr = med.ingredient.split(" / ").filter((i) => i.trim()).map((i) => `openfda.generic_name:${q(i)}`).join(" AND ");
   if (ingr) out.push(ingr);
   return out;
+}
+
+const words = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+/**
+ * The label is for the same ingredient set: "metformin" must not pick a
+ * "sitagliptin and metformin" label, since generic_name search matches any part.
+ */
+export function sameIngredients(rec: any, ingredient: string): boolean {
+  const want = ingredient.split(" / ").map(words).filter(Boolean);
+  const names: string[] = rec?.openfda?.generic_name || [];
+  return names.some((n) => {
+    const have = n.split(/\s*(?:,|\/|\band\b|;)\s*/i).map(words).filter(Boolean);
+    return have.length === want.length && want.every((w) => have.some((h) => h.includes(w.split(" ")[0]) || w.includes(h.split(" ")[0])));
+  });
 }
 
 export async function findLabel(med: Pick<Med, "rxcui" | "ingredient">, manufacturer?: string): Promise<any> {
   const mf = manufacturer ? ` AND openfda.manufacturer_name.exact:${q(manufacturer)}` : "";
   for (const base of bases(med)) {
     for (const patient of [` AND ${PATIENT}`, ""]) {
-      const j = await search({ search: `${base}${patient}${mf}`, sort: "effective_time:desc", limit: "1" });
-      if (j?.results?.length) return j.results[0];
+      const j = await search({ search: `${base}${patient}${mf}`, sort: "effective_time:desc", limit: "25" });
+      const hit = (j?.results || []).find((r: any) => sameIngredients(r, med.ingredient));
+      if (hit) return hit;
     }
   }
   throw new Error("No FDA label found for this medicine in openFDA.");

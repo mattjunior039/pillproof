@@ -28,8 +28,10 @@ export interface Settings {
   modelKey: string | null;
   /** The user agreed to download the model on this device. */
   modelConsent: boolean;
-  /** Sentence embeddings for retrieval (bge-small, ~34 MB once). */
+  /** Sentence embeddings for retrieval (bge-small, ~34 MB once). Gate 2's phone and desktop presets both assume them. */
   smartSearch: boolean;
+  /** Settings schema version, for one-time migrations. */
+  v?: number;
   calendarNames: boolean;
   /** The user agreed to download the speech-to-text model. */
   voiceConsent: boolean;
@@ -66,8 +68,8 @@ export interface State {
 const tier: Tier = isPhone() ? "phone" : "desktop";
 
 const DEFAULT_SETTINGS: Settings = {
-  text: 0, contrast: false, answerMode: "model", modelKey: null, modelConsent: false,
-  smartSearch: tier === "desktop", calendarNames: false, voiceConsent: false, speakAnswers: true,
+  v: 2, text: 0, contrast: false, answerMode: "model", modelKey: null, modelConsent: false,
+  smartSearch: true, calendarNames: false, voiceConsent: false, speakAnswers: true,
 };
 
 let state: State = {
@@ -120,6 +122,8 @@ export async function init() {
   const crash = guard.checkStartup();
   const [meds, saved] = await Promise.all([db.meds(), db.get<Settings>("settings")]);
   const settings = { ...DEFAULT_SETTINGS, ...(saved || {}) };
+  // v1 turned smart search off on phones; keyword-only search missed everyday wording.
+  if (saved && (saved.v ?? 1) < 2) Object.assign(settings, { smartSearch: true, v: 2 });
   // A 2B choice never carries over to a phone.
   if (settings.modelKey && !allowedModels(tier).some((m) => m.key === settings.modelKey)) settings.modelKey = null;
   set({ meds, settings, crash, ready: true, tab: meds.length ? "today" : "meds" });
@@ -130,6 +134,8 @@ export async function init() {
   refreshCached();
   if (settings.modelConsent && settings.answerMode === "model" && !crash && gpu.ok) loadModel().catch(() => {});
   if (settings.smartSearch) for (const m of meds) if (m.label) vectorize(m.label.splId);
+  // Load the embedder now so the first question doesn't time out into keyword-only search.
+  if (settings.smartSearch && meds.some((m) => m.label)) embedQuery("warm up").catch(() => {});
 }
 
 export async function refreshCached() {

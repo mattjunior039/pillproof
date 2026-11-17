@@ -29,8 +29,11 @@ test("schedule, label, choose, not on list, out of scope", () => {
   assert.equal(route("what are the side effects", meds, lex).kind, "choose");
   assert.ok((route("what are the side effects", [metf], lex) as any).med === metf);
   assert.ok((route("what is it used for", meds, lex, metf) as any).med === metf);
-  const n = route("does ibuprofen interact with this", meds, lex);
+  const n = route("what is ibuprofen used for", meds, lex);
   assert.ok(n.kind === "not-on-list" && n.names.includes("ibuprofen"));
+  // Interaction questions about a listed medicine go to that medicine's label.
+  assert.equal(route("does ibuprofen interact with this", meds, lex).kind, "choose");
+  assert.ok((route("can I take it with ibuprofen", [metf], lex) as any).med === metf);
   assert.equal(route("what's the capital of France", meds, lex).kind, "out-of-scope");
   assert.equal(route("tell me a joke", meds, lex).kind, "out-of-scope");
   const a = route("should I stop taking metformin", meds, lex);
