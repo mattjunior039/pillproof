@@ -7,11 +7,17 @@ import { downloadIcs } from "./Today.tsx";
 import { ModelBanner } from "./Ask.tsx";
 
 /** Dev-set numbers from app/models.json, shown as given (the Gate 2 session owns their meaning). */
-function devLine(m: ModelEntry): string {
-  const bits = Object.entries(m.dev || {})
+function devLine(m: ModelEntry, tier: "desktop" | "phone"): string {
+  const all = (m.dev || {}) as Record<string, any>;
+  // models.json nests metrics by prompt set (phone / desktop / oracle); show the one this device uses.
+  const set = all[tier] && typeof all[tier] === "object" ? tier : all.phone && typeof all.phone === "object" ? "phone" : null;
+  const dev = set ? all[set] : all;
+  const pick = ["wrong_rate", "overall_correct", "false_decline_rate", "false_answer_rate"];
+  const bits = Object.entries(dev)
+    .filter(([k]) => !set || pick.includes(k))
     .filter(([, v]) => typeof v === "number")
-    .map(([k, v]) => `${k.replace(/_/g, " ")} ${(v as number) <= 1 && (v as number) >= 0 && !Number.isInteger(v) ? `${((v as number) * 100).toFixed(1)}%` : v}`);
-  return bits.length ? `Development set: ${bits.join(", ")}` : "";
+    .map(([k, v]) => `${k.replace(/_/g, " ")} ${set ? `${v}%` : v}`);
+  return bits.length ? `Development set${set ? ` (${set} prompts, with checks)` : ""}: ${bits.join(", ")}` : "";
 }
 
 export function Settings() {
@@ -52,7 +58,7 @@ export function Settings() {
               <option value={x.key}>{x.key} ({x.size}, {SIZE_MB[x.size]} MB){m.cached[x.key] ? ", downloaded" : ""}</option>
             ))}
           </select>
-          {devLine(cur) && <p class="small">{devLine(cur)}</p>}
+          {devLine(cur, s.tier) && <p class="small">{devLine(cur, s.tier)}</p>}
           {s.tier === "phone" && <p class="small">Phones use the smaller 0.8B model; the 2B model runs out of memory on phones.</p>}
           <div class="row">
             {m.status !== "ready" && m.status !== "loading" && (

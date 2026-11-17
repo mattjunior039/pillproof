@@ -71,6 +71,12 @@ test("answer pipeline: checked answer, blocked restatement, decline, invalid, pa
   assert.equal((await ask("NOT IN LABEL")).shown.kind, "decline");
   const bad = await ask("SENTENCES: 999\nANSWER: whatever");
   assert.equal(bad.shown.kind, "passages");
+  // Degenerate repetition (lite-r3 4-bit on NUZYRA): never shown as the model's answer.
+  const ones = "1" + "0".repeat(120);
+  for (const reply of [`SENTENCES: ${n}\nANSWER: Take ${ones}`, `SENTENCES: ${ones}`, ones]) {
+    const d = await ask(reply);
+    assert.ok(d.shown.kind !== "answer" && !JSON.stringify(d.shown).includes("1000000"), reply.slice(0, 30));
+  }
   const po = await answerQuestion(idx, label, q, { tier: "phone", lexicon });
   assert.ok(po.shown.kind === "passages" && po.shown.why === "no-model" && po.shown.quotes.some((x) => /grapefruit/i.test(x.text)));
 });
