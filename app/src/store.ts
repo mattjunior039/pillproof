@@ -3,12 +3,14 @@ import { useEffect, useState } from "preact/hooks";
 import lexiconList from "../../core/data/lexicon.json";
 import { sentenceSims } from "../../core/embed.js";
 import { answerQuestion, type AnswerResult } from "./lib/answer.ts";
+import { medlineLink, runBackups, unanswered, type BackupOutcome, type DdinterFile, type FdaFile } from "./lib/backup.ts";
 import { db, persistStorage } from "./lib/db.ts";
 import {
   allowedModels, defaultModel, friendlyLoadError, gpuStatus, guard, isFatalGpuError, isPhone,
   modelList, type GpuStatus, type ModelEntry, type Tier,
 } from "./lib/device.ts";
 import { ensureVectors, fetchAndStore, getIndexed, pruneLabels } from "./lib/labels.ts";
+import { otherLabels } from "./lib/openfda.ts";
 import * as llm from "./lib/llm.ts";
 import { embedQuery } from "./lib/ml.ts";
 import { route } from "./lib/router.ts";
@@ -36,6 +38,8 @@ export interface Settings {
   /** The user agreed to download the speech-to-text model. */
   voiceConsent: boolean;
   speakAnswers: boolean;
+  /** When the user's label doesn't answer, check other FDA labels, FDA consumer pages and DDInter (app only; the evaluation is label-only). */
+  backupSources: boolean;
 }
 
 export type ModelStatus = "off" | "loading" | "ready" | "error" | "unsupported" | "crashed";
@@ -44,7 +48,7 @@ export type Reply =
   | { kind: "emergency"; text: string }
   | { kind: "schedule"; text: string }
   | { kind: "choose"; meds: Med[]; question: string; advice: boolean }
-  | { kind: "label"; med: Med; advice: boolean; result: AnswerResult }
+  | { kind: "label"; med: Med; advice: boolean; result: AnswerResult; backup?: BackupOutcome }
   | { kind: "info"; text: string; pharmacist?: boolean };
 
 export interface ChatItem { id: number; question: string; reply: Reply | null; status?: string }
@@ -69,7 +73,7 @@ const tier: Tier = isPhone() ? "phone" : "desktop";
 
 const DEFAULT_SETTINGS: Settings = {
   v: 2, text: 0, contrast: false, answerMode: "model", modelKey: null, modelConsent: false,
-  smartSearch: true, calendarNames: false, voiceConsent: false, speakAnswers: true,
+  smartSearch: true, calendarNames: false, voiceConsent: false, speakAnswers: true, backupSources: true,
 };
 
 let state: State = {
@@ -269,23 +273,40 @@ async function answerFor(med: Med, question: string, advice: boolean, onStatus?:
   const useModel = state.settings.answerMode === "model" && state.model.status === "ready" && !state.crash;
   const key = llm.loadedModel() || undefined;
   const base = { tier, sims, lexicon, modelKey: key };
-  if (!useModel) return { kind: "label", med, advice, result: await answerQuestion(entry.index, entry.label.meta, question, base) };
-  onStatus?.("Reading the label…");
-  try {
-    const result = await answerQuestion(entry.index, entry.label.meta, question, {
-      ...base,
-      generate: async (user) => {
-        guard.start(key || "model");
-        try { return await llm.generate(user, tier); } finally { guard.stop(); }
-      },
-    });
-    return { kind: "label", med, advice, result };
-  } catch (e) {
-    if (isFatalGpuError(e)) crashed(key || "model", "The model stopped working on this device (out of graphics memory). Showing label passages instead.");
-    const result = await answerQuestion(entry.index, entry.label.meta, question, base);
-    if (result.shown.kind === "passages") result.shown.why = "error";
-    return { kind: "label", med, advice, result };
+  const generate = async (user: string) => {
+    guard.start(key || "model");
+    try { return await llm.generate(user, tier); } finally { guard.stop(); }
+  };
+  let result: AnswerResult;
+  let modelOk = useModel;
+  if (!useModel) result = await answerQuestion(entry.index, entry.label.meta, question, base);
+  else {
+    onStatus?.("Reading the label…");
+    try {
+      result = await answerQuestion(entry.index, entry.label.meta, question, { ...base, generate });
+    } catch (e) {
+      if (isFatalGpuError(e)) crashed(key || "model", "The model stopped working on this device (out of graphics memory). Showing label passages instead.");
+      result = await answerQuestion(entry.index, entry.label.meta, question, base);
+      if (result.shown.kind === "passages") result.shown.why = "error";
+      modelOk = false;
+    }
   }
+  if (!state.settings.backupSources || !unanswered(result)) return { kind: "label", med, advice, result };
+  // Backup sources, one at a time, with the same phone limits as the label itself.
+  const backup = await runBackups(med, entry.label.meta, question, result, {
+    fda: async () => (await import("../data/fda_food.json")).default as unknown as FdaFile,
+    ddinter: async () => (await import("../data/ddinter_food.json")).default as unknown as DdinterFile,
+    otherLabels: () => otherLabels(med, entry.label.meta.setId, tier === "phone" ? 8 : 20),
+    medline: () => medlineLink(med),
+  }, {
+    opts: modelOk && !state.crash ? { ...base, sims: null, generate } : { ...base, sims: null },
+    maxLabels: tier === "phone" ? 2 : 3,
+    onStatus,
+  }).catch((e) => {
+    if (isFatalGpuError(e)) crashed(key || "model", "The model stopped working on this device (out of graphics memory). Showing label passages instead.");
+    return undefined;
+  });
+  return { kind: "label", med, advice, result, backup };
 }
 
 /** Route and answer one question. `forced` skips routing (the user picked the medicine). */

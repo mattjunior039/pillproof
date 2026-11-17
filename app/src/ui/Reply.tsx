@@ -1,7 +1,8 @@
 import type { ComponentChildren } from "preact";
 import { ADVICE_LINE, NOT_COVERED, POISON_HELP, STANDING_LINE } from "../lib/router.ts";
 import { labelDate, dailyMedUrl } from "../lib/openfda.ts";
-import { notMentioned } from "../lib/answer.ts";
+import { notMentioned, type Quote } from "../lib/answer.ts";
+import { noneMention, type BackupOutcome } from "../lib/backup.ts";
 import { shortName } from "../lib/schedule.ts";
 import type { Med } from "../lib/types.ts";
 import type { Reply } from "../store.ts";
@@ -52,45 +53,85 @@ export function ReplyView({ reply, onChoose }: { reply: Reply; onChoose?: (m: Me
   }
 }
 
+function Quotes({ quotes, caption }: { quotes: Quote[]; caption: ComponentChildren }) {
+  return (
+    <figure class="quotes">
+      {quotes.map((q) => (
+        <blockquote>
+          {q.before && <span class="lead-in">{q.before} </span>}
+          <mark>{q.text}</mark>
+          <cite>{q.url ? <a href={q.url} target="_blank" rel="noopener">{q.section}</a> : q.section}</cite>
+        </blockquote>
+      ))}
+      <figcaption>{caption}</figcaption>
+    </figure>
+  );
+}
+
+/** What the backup sources found, or an honest "none of them mention it". */
+function BackupAnswer({ b }: { b: BackupOutcome }) {
+  if (!b.hit) {
+    return (
+      <Box tone="note">
+        <p class="lead">{noneMention(b.topic)}</p>
+        <p class="small">We checked: your label, {b.checked.join(", ")}.</p>
+        <PharmacistPrompt />
+        <p>Read about this medicine: <a href={b.medline.url} target="_blank" rel="noopener">{b.medline.title}</a> (opens MedlinePlus)</p>
+      </Box>
+    );
+  }
+  const { source, result } = b.hit;
+  const s = result.shown;
+  return (
+    <div class="backup">
+      <p class="badge">{source.badge}</p>
+      {s.kind === "answer" && <p class="plain">{s.restatement}</p>}
+      {s.kind === "quotes" && <p class="plain">Here is what it says:</p>}
+      {s.kind === "passages" && <p class="plain-sub">What it says about this (please read it yourself):</p>}
+      {"quotes" in s && s.quotes.length > 0 && (
+        <Quotes quotes={s.quotes} caption={<>
+          <a href={source.url} target="_blank" rel="noopener">Open the source</a>
+          {source.credit && <> · <a href={source.credit.url} target="_blank" rel="noopener">{source.credit.text}</a></>}
+        </>} />
+      )}
+      <PharmacistPrompt />
+      <p class="small">More about this medicine: <a href={b.medline.url} target="_blank" rel="noopener">{b.medline.title}</a></p>
+    </div>
+  );
+}
+
 function LabelAnswer({ reply }: { reply: Extract<Reply, { kind: "label" }> }) {
-  const { result, advice, med } = reply;
+  const { result, advice, med, backup } = reply;
   const s = result.shown;
   const meta = result.label;
+  const ask = backup ? null : <PharmacistPrompt />;
   return (
     <div class="answer">
       {advice && <Box tone="note"><p>{ADVICE_LINE}</p></Box>}
       {s.kind === "not-found" && (
-        <Box tone="note"><p class="lead">{notMentioned(s.missing)}</p><PharmacistPrompt /></Box>
+        <Box tone="note"><p class="lead">{notMentioned(s.missing)}</p>{ask}</Box>
       )}
       {result.missing && s.kind !== "not-found" && s.kind !== "decline" && <p class="missing">{notMentioned(result.missing)}</p>}
       {s.kind === "answer" && <p class="plain">{s.restatement}</p>}
       {s.kind === "quotes" && <p class="plain">Here is what the label says:</p>}
       {s.kind === "decline" && (
-        <Box tone="note"><p class="lead">{NOT_COVERED}</p><PharmacistPrompt /></Box>
+        <Box tone="note"><p class="lead">{NOT_COVERED}</p>{ask}</Box>
       )}
       {s.kind === "passages" && (s.quotes.length ? (
         <p class="plain-sub">
           {s.why === "no-model" ? "What the label says about this (please read it yourself):" : "The answer couldn't be checked. What the label says about this:"}
         </p>
       ) : (
-        <Box tone="note"><p class="lead">{NOT_COVERED}</p><PharmacistPrompt /></Box>
+        <Box tone="note"><p class="lead">{NOT_COVERED}</p>{ask}</Box>
       ))}
       {"quotes" in s && s.quotes.length > 0 && (
-        <figure class="quotes">
-          {s.quotes.map((q) => (
-            <blockquote>
-              {q.before && <span class="lead-in">{q.before} </span>}
-              <mark>{q.text}</mark>
-              <cite>{q.section}</cite>
-            </blockquote>
-          ))}
-          <figcaption>
-            From the {meta.title} label ({shortName(med)}), {meta.manufacturer}, dated {labelDate(meta.effective)}.{" "}
-            <a href={dailyMedUrl(meta.setId)} target="_blank" rel="noopener">Full label</a>
-          </figcaption>
-        </figure>
+        <Quotes quotes={s.quotes} caption={<>
+          From the {meta.title} label ({shortName(med)}), {meta.manufacturer}, dated {labelDate(meta.effective)}.{" "}
+          <a href={dailyMedUrl(meta.setId)} target="_blank" rel="noopener">Full label</a>
+        </>} />
       )}
       {s.kind === "passages" && s.quotes.length > 0 && <PharmacistPrompt />}
+      {backup && <BackupAnswer b={backup} />}
       <p class="standing">{STANDING_LINE}</p>
       {result.raw !== undefined && (
         <details class="small">

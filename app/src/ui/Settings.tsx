@@ -80,6 +80,10 @@ export function Settings() {
         }} />
         Smarter label search (finds sentences that use different words; downloads 34 MB once)
       </label>
+      <label class="check">
+        <input type="checkbox" checked={st.backupSources} onChange={(e) => saveSettings({ backupSources: (e.target as HTMLInputElement).checked })} />
+        When my label doesn't answer, check other trusted sources: other FDA labels for the same medicine, FDA consumer pages on food and drink, and the DDInter drug–food database. Answers from them are marked.
+      </label>
       {Object.keys(s.vectors).length > 0 && <p class="small">Preparing label search… {Object.values(s.vectors).join(", ")}</p>}
 
       <h2>Calendar</h2>

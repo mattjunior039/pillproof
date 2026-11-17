@@ -75,6 +75,26 @@ export async function manufacturers(med: Pick<Med, "rxcui" | "ingredient">): Pro
   return [];
 }
 
+/**
+ * Other makers' labels for the exact same ingredient set (backup source 2), newest first,
+ * one per label set, excluding `setId`. Same route as the user's product when the form says it.
+ */
+export async function otherLabels(med: Pick<Med, "rxcui" | "ingredient" | "form">, setId: string, limit: number): Promise<any[]> {
+  const route = /\boral\b/i.test(med.form) ? "ORAL" : null;
+  const seen = new Set([setId]);
+  const out: any[] = [];
+  for (const base of bases(med)) {
+    const j = await search({ search: base, sort: "effective_time:desc", limit: String(limit) });
+    for (const r of j?.results || []) {
+      if (seen.has(r.set_id) || !sameIngredients(r, med.ingredient)) continue;
+      if (route && r.openfda?.route?.length && !r.openfda.route.includes(route)) continue;
+      seen.add(r.set_id);
+      out.push(r);
+    }
+  }
+  return out;
+}
+
 export function toStored(rec: any): StoredLabel {
   const o = rec.openfda || {};
   const generic = (o.generic_name || [])[0] || "";

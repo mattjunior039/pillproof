@@ -215,3 +215,8 @@ summary { min-height: 44px; display: flex; align-items: center; cursor: pointer;
 :root[data-contrast="high"] .pair ins { color: #000; }
 .old { border-color: var(--alert) !important; }
 .new { border-color: var(--ok) !important; }
+
+/* Backup sources: always say clearly that this is not from the user's label. */
+.backup { border: 2px dashed var(--note); border-radius: 12px; padding: 8px 14px; margin: 12px 0; }
+.badge { display: inline-block; font-weight: 700; color: var(--note); background: var(--note-bg); border: 2px solid var(--note); border-radius: 8px; padding: 4px 10px; margin: 4px 0 8px; }
+cite a { color: inherit; }

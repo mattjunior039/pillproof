@@ -7,7 +7,7 @@ import { concepts, searchQuery } from "./query.ts";
 import type { LabelMeta } from "./types.ts";
 
 /** A cited label sentence; `before` is an unhighlighted lead-in ("…if you have:") for context. */
-export interface Quote { text: string; section: string; before?: string }
+export interface Quote { text: string; section: string; before?: string; url?: string }
 
 export type Shown =
   /** Checked restatement plus the quoted label sentences it came from. */
@@ -39,6 +39,8 @@ export interface AnswerOpts {
   generate?: (user: string) => Promise<string>;
   modelKey?: string;
   passageCount?: number;
+  /** General sources (FDA pages, DDInter): sentences matching this, e.g. the drug's name, rank higher. */
+  prefer?: RegExp;
 }
 
 const heading = (index: any, c: number) => sectionName(index.passages[c][0] || "") || "Label";
@@ -137,7 +139,8 @@ export async function answerQuestion(index: any, label: LabelMeta, question: str
   const missing = cov.missing.length ? cov.missing : undefined;
   if (cov.any && !cov.covered.length) return { shown: { kind: "not-found", missing: cov.missing }, label, ms: Date.now() - t0 };
   const passages = (why: "no-model" | "invalid" | "error"): Shown => {
-    const quotes = topSentences(index, question, o.sims, params, o.passageCount ?? 2, cov.keep, cov.boost);
+    const prefer = (i: number) => (o.prefer?.test(index.passages[index.units[i][0]][1][index.units[i][1]]) ? 1 : 0);
+    const quotes = topSentences(index, question, o.sims, params, o.passageCount ?? 2, cov.keep, (i) => cov.boost(i) + prefer(i));
     return !quotes.length && cov.any ? { kind: "not-found", missing: cov.missing.length ? cov.missing : cov.covered.map((c) => c.name) } : { kind: "passages", why, quotes };
   };
   if (!o.generate) return { shown: passages("no-model"), label, missing, ms: Date.now() - t0 };

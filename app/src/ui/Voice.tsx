@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { plainText } from "../lib/answer.ts";
+import { backupText } from "../lib/backup.ts";
 import { ASR_MODEL, transcribe, warmAsr } from "../lib/ml.ts";
 import { correctNames } from "../lib/names.ts";
 import { ADVICE_LINE, NOT_COVERED, STANDING_LINE } from "../lib/router.ts";
@@ -17,7 +18,9 @@ export function spoken(r: Reply): string {
   switch (r.kind) {
     case "emergency": case "schedule": case "info": return r.text;
     case "choose": return `Which medicine is this about? ${r.meds.map(shortName).join(", or ")}. Tap one on the screen.`;
-    case "label": return plainText(r.result, r.advice, ADVICE_LINE, STANDING_LINE, NOT_COVERED);
+    case "label": return r.backup
+      ? [r.advice ? ADVICE_LINE : "", backupText(r.result, r.backup), STANDING_LINE].filter(Boolean).join(" ")
+      : plainText(r.result, r.advice, ADVICE_LINE, STANDING_LINE, NOT_COVERED);
   }
 }
 

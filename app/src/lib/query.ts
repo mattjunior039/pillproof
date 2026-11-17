@@ -25,7 +25,7 @@ const TOPICS: Topic[] = [
   { q: /\bbreast[- ]?(feed\w*|fed|milk)|\bnursing\b/, add: "breastfeeding breast milk lactation nursing", hit: /breast|lactat|nursing/, name: "breastfeeding", head: /breast|lactation/ },
   { q: /\b(miss|missed|missing|skip|skipped|forget|forgot|forgotten)\b/, add: "miss missed dose", hit: /\bmiss|\bforget|\bskip/, name: "a missed dose", head: /how should i (take|use)|missed/ },
   { q: /\b(food|meals?|eat|eating|empty stomach|breakfast|lunch|dinner|supper)\b/, add: "food meals", hit: /\bfood|\bmeal|empty stomach|\beat/, name: "food", head: /how should i (take|use)|dosage/ },
-  { q: /\b(alcohol\w*|beer|wine|liquor|drunk)\b/, add: "alcohol alcoholic drinks", hit: /alcohol/, name: "alcohol", head: /avoid/ },
+  { q: /\b(alcohol\w*|beer|wine|liquor|drunk)\b/, add: "alcohol alcoholic drinks", hit: /(?<!(?:soluble|miscible) in |(?:benzyl|cetyl|stearyl|cetostearyl|polyvinyl|isopropyl|dehydrated|ethyl|lauryl|oleyl|myristyl) )alcohol(?! ?\(?(?:usp|nf)\b)|\bbeer\b|\bwine\b|liquor/, name: "alcohol", head: /avoid/ },
   { q: /\b(coffee|caffeine|energy drinks?|soda|cola)\b/, add: "caffeine coffee", hit: /caffeine|coffee/ },
   { q: /\b(store|storage|stored|fridge|refrigerat\w*|temperature)\b/, add: "store storage temperature", hit: /\bstor|temperature|refrigerat|°/, name: "storage", head: /stor/ },
   { q: /\b(overdose\w*|too (much|many)|extra (dose|pill|tablet)s?|double (dose|up)|took two)\b/, add: "overdose overdosage too much", hit: /overdos|too much|more than (directed|prescribed)/, name: "taking too much", head: /overdos|how should i (take|use)/ },

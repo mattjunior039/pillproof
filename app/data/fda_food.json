@@ -1,0 +1,243 @@
+{
+ "note": "Sentences quoted verbatim from FDA consumer pages (U.S. government works, public domain). A group applies only to products whose active ingredients are all named in it.",
+ "pages": [
+  {
+   "id": "grapefruit",
+   "title": "Grapefruit Juice and Some Drugs Don't Mix",
+   "url": "https://www.fda.gov/consumers/consumer-updates/grapefruit-juice-and-some-drugs-dont-mix",
+   "content_date": "2021-07-01",
+   "groups": [
+    {
+     "ingredients": [
+      "simvastatin",
+      "atorvastatin"
+     ],
+     "passages": [
+      [
+       "Grapefruit Juice and Some Drugs Don't Mix",
+       [
+        "Grapefruit juice and grapefruit can affect the way your medicines work, and that food and drug interaction can be a concern.",
+        "Here are examples of some types of drugs that grapefruit juice can cause problems (interact) with:",
+        "Some statin drugs to lower cholesterol, such as Zocor (simvastatin) and Lipitor (atorvastatin).",
+        "Grapefruit juice does not affect all the drugs in the categories above.",
+        "The severity of the interaction can be different depending on the person, the drug, and the amount of grapefruit juice you drink."
+       ]
+      ],
+      [
+       "How Grapefruit Juice Can Interfere With Medications",
+       [
+        "For example, if you drink a lot of grapefruit juice while taking certain statin drugs to lower cholesterol, too much of the drug may stay in your body, increasing your risk for liver and muscle damage that can lead to kidney failure."
+       ]
+      ],
+      [
+       "Find Out if You Should Avoid Grapefruit or Other Juices",
+       [
+        "Seville oranges (often used to make orange marmalade), pomelos, and tangelos (a cross between tangerines and grapefruit) might have the same effect as grapefruit juice.",
+        "Do not eat those fruits if your medicine interacts with grapefruit juice."
+       ]
+      ]
+     ]
+    },
+    {
+     "ingredients": [
+      "nifedipine"
+     ],
+     "passages": [
+      [
+       "Grapefruit Juice and Some Drugs Don't Mix",
+       [
+        "Grapefruit juice and grapefruit can affect the way your medicines work, and that food and drug interaction can be a concern.",
+        "Here are examples of some types of drugs that grapefruit juice can cause problems (interact) with:",
+        "Some drugs that treat high blood pressure, such as Procardia and Adalat CC (both nifedipine).",
+        "Grapefruit juice does not affect all the drugs in the categories above.",
+        "The severity of the interaction can be different depending on the person, the drug, and the amount of grapefruit juice you drink."
+       ]
+      ],
+      [
+       "Find Out if You Should Avoid Grapefruit or Other Juices",
+       [
+        "Seville oranges (often used to make orange marmalade), pomelos, and tangelos (a cross between tangerines and grapefruit) might have the same effect as grapefruit juice.",
+        "Do not eat those fruits if your medicine interacts with grapefruit juice."
+       ]
+      ]
+     ]
+    },
+    {
+     "ingredients": [
+      "cyclosporine"
+     ],
+     "passages": [
+      [
+       "Grapefruit Juice and Some Drugs Don't Mix",
+       [
+        "Grapefruit juice and grapefruit can affect the way your medicines work, and that food and drug interaction can be a concern.",
+        "Here are examples of some types of drugs that grapefruit juice can cause problems (interact) with:",
+        "Some organ-transplant rejection drugs, such as Neoral and Sandimmune capsule or oral solution (both cyclosporine).",
+        "Grapefruit juice does not affect all the drugs in the categories above.",
+        "The severity of the interaction can be different depending on the person, the drug, and the amount of grapefruit juice you drink."
+       ]
+      ],
+      [
+       "Find Out if You Should Avoid Grapefruit or Other Juices",
+       [
+        "Seville oranges (often used to make orange marmalade), pomelos, and tangelos (a cross between tangerines and grapefruit) might have the same effect as grapefruit juice.",
+        "Do not eat those fruits if your medicine interacts with grapefruit juice."
+       ]
+      ]
+     ]
+    },
+    {
+     "ingredients": [
+      "buspirone"
+     ],
+     "passages": [
+      [
+       "Grapefruit Juice and Some Drugs Don't Mix",
+       [
+        "Grapefruit juice and grapefruit can affect the way your medicines work, and that food and drug interaction can be a concern.",
+        "Here are examples of some types of drugs that grapefruit juice can cause problems (interact) with:",
+        "Some anti-anxiety drugs, such as BuSpar (buspirone).",
+        "Grapefruit juice does not affect all the drugs in the categories above.",
+        "The severity of the interaction can be different depending on the person, the drug, and the amount of grapefruit juice you drink."
+       ]
+      ],
+      [
+       "Find Out if You Should Avoid Grapefruit or Other Juices",
+       [
+        "Seville oranges (often used to make orange marmalade), pomelos, and tangelos (a cross between tangerines and grapefruit) might have the same effect as grapefruit juice.",
+        "Do not eat those fruits if your medicine interacts with grapefruit juice."
+       ]
+      ]
+     ]
+    },
+    {
+     "ingredients": [
+      "budesonide"
+     ],
+     "passages": [
+      [
+       "Grapefruit Juice and Some Drugs Don't Mix",
+       [
+        "Grapefruit juice and grapefruit can affect the way your medicines work, and that food and drug interaction can be a concern.",
+        "Here are examples of some types of drugs that grapefruit juice can cause problems (interact) with:",
+        "Some corticosteroids that treat Crohn’s disease or ulcerative colitis, such as Entocort EC and Uceris tablet (both budesonide).",
+        "Grapefruit juice does not affect all the drugs in the categories above.",
+        "The severity of the interaction can be different depending on the person, the drug, and the amount of grapefruit juice you drink."
+       ]
+      ],
+      [
+       "Find Out if You Should Avoid Grapefruit or Other Juices",
+       [
+        "Seville oranges (often used to make orange marmalade), pomelos, and tangelos (a cross between tangerines and grapefruit) might have the same effect as grapefruit juice.",
+        "Do not eat those fruits if your medicine interacts with grapefruit juice."
+       ]
+      ]
+     ]
+    },
+    {
+     "ingredients": [
+      "amiodarone"
+     ],
+     "passages": [
+      [
+       "Grapefruit Juice and Some Drugs Don't Mix",
+       [
+        "Grapefruit juice and grapefruit can affect the way your medicines work, and that food and drug interaction can be a concern.",
+        "Here are examples of some types of drugs that grapefruit juice can cause problems (interact) with:",
+        "Some drugs that treat abnormal heart rhythms, such as Pacerone and Cordarone tablet (both amiodarone).",
+        "Grapefruit juice does not affect all the drugs in the categories above.",
+        "The severity of the interaction can be different depending on the person, the drug, and the amount of grapefruit juice you drink."
+       ]
+      ],
+      [
+       "Find Out if You Should Avoid Grapefruit or Other Juices",
+       [
+        "Seville oranges (often used to make orange marmalade), pomelos, and tangelos (a cross between tangerines and grapefruit) might have the same effect as grapefruit juice.",
+        "Do not eat those fruits if your medicine interacts with grapefruit juice."
+       ]
+      ]
+     ]
+    },
+    {
+     "ingredients": [
+      "fexofenadine"
+     ],
+     "passages": [
+      [
+       "Grapefruit Juice and Some Drugs Don't Mix",
+       [
+        "Grapefruit juice and grapefruit can affect the way your medicines work, and that food and drug interaction can be a concern.",
+        "Here are examples of some types of drugs that grapefruit juice can cause problems (interact) with:",
+        "Some antihistamines, such as Allegra (fexofenadine).",
+        "Grapefruit juice does not affect all the drugs in the categories above.",
+        "The severity of the interaction can be different depending on the person, the drug, and the amount of grapefruit juice you drink."
+       ]
+      ],
+      [
+       "How Grapefruit Juice Can Interfere With Medications",
+       [
+        "“Grapefruit juice can cause less fexofenadine to enter the blood,” decreasing how well the drug works, Huang says.",
+        "Fexofenadine may also not work as well if taken with orange or apple juice, so the drug label says, “Do not take with fruit juices.”"
+       ]
+      ],
+      [
+       "Find Out if You Should Avoid Grapefruit or Other Juices",
+       [
+        "Seville oranges (often used to make orange marmalade), pomelos, and tangelos (a cross between tangerines and grapefruit) might have the same effect as grapefruit juice.",
+        "Do not eat those fruits if your medicine interacts with grapefruit juice."
+       ]
+      ]
+     ]
+    }
+   ],
+   "publisher": "U.S. Food and Drug Administration",
+   "accessed": "2026-11-16"
+  },
+  {
+   "id": "drug-interactions",
+   "title": "Drug Interactions: What You Should Know",
+   "url": "https://www.fda.gov/drugs/resources-drugs/drug-interactions-what-you-should-know",
+   "content_date": "2013-09-25",
+   "groups": [
+    {
+     "ingredients": [
+      "acetaminophen",
+      "aspirin",
+      "ibuprofen",
+      "ketoprofen",
+      "magnesium salicylate",
+      "naproxen"
+     ],
+     "passages": [
+      [
+       "Pain Relievers",
+       [
+        "Ask a doctor before taking if you:",
+        "consume three or more alcohol-containing drinks per day",
+        "It is important to read the label of pain reliever products to learn about different drug interaction warnings for each ingredient."
+       ]
+      ]
+     ]
+    },
+    {
+     "ingredients": [
+      "caffeine"
+     ],
+     "passages": [
+      [
+       "Stimulants",
+       [
+        "When using this product:",
+        "limit the use of foods, beverages, and other drugs that have caffeine.",
+        "Too much caffeine can cause nervousness, irritability, sleeplessness, and occasional rapid heart beat",
+        "be aware that the recommended dose of this product contains about as much caffeine as a cup of coffee"
+       ]
+      ]
+     ]
+    }
+   ],
+   "publisher": "U.S. Food and Drug Administration",
+   "accessed": "2026-11-16"
+  }
+ ]
+}
