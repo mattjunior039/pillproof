@@ -127,7 +127,13 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
   const named = new RegExp(`\\b(${ingr.map((x) => x.replace(/[^a-z0-9 ]/g, "")).join("|")})\\b`, "i");
   const ask = async (passages: Passage[], label: LabelMeta, general = false) => {
     const index = new LabelIndex(passages);
-    return answerQuestion(index, label, question, { ...o.opts, sims: null, prefer: general ? named : undefined });
+    const prefer = general ? named : undefined;
+    const r = await answerQuestion(index, label, question, { ...o.opts, sims: null, prefer });
+    // Curated sources are about this drug and (after the relevance gate) this topic by construction,
+    // so a model that only knows labels declining them still leaves the sentences worth showing.
+    if (!general || r.shown.kind !== "decline") return r;
+    const quoted = await answerQuestion(index, label, question, { ...o.opts, sims: null, prefer, generate: undefined });
+    return { ...quoted, raw: r.raw, modelKey: r.modelKey };
   };
   const done = async (source: Source, result: AnswerResult, url: (t: string) => string): Promise<BackupOutcome> =>
     ({ hit: { source, result: withUrls(result, url) }, checked, topic, medline: await deps.medline() });

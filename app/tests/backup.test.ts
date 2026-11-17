@@ -89,3 +89,17 @@ test("chemistry mentions of alcohol (solubility, excipients) don't count as answ
   const r = await answerQuestion(ix, meta("Lisinopril"), "Can I drink alcohol?", opts.opts);
   assert.deepEqual(r.shown, { kind: "not-found", missing: ["alcohol"] });
 });
+
+test("a model decline on a curated source still shows its sentences; on other labels it counts as no answer", async () => {
+  const m = med({ ingredient: "fexofenadine hydrochloride" });
+  const first = await answerQuestion(plainLabel("fexofenadine"), meta("Fexofenadine"), "Can I drink grapefruit juice?", opts.opts);
+  let calls = 0;
+  const declines = { ...opts, opts: { ...opts.opts, generate: async () => { calls++; return "NOT IN LABEL"; } } };
+  const other = { openfda: { generic_name: ["FEXOFENADINE HYDROCHLORIDE"] }, set_id: "set-2", effective_time: "20250101",
+    indications_and_usage: ["Fexofenadine is used for allergies. Do not take with grapefruit juice."] };
+  const out = await runBackups(m, meta("Fexofenadine"), "Can I drink grapefruit juice?", first, deps({ otherLabels: async () => [other] }), declines);
+  assert.ok(calls >= 2, "the other label and the FDA page were both sent to the model");
+  assert.equal(out.hit?.source.kind, "fda-page");
+  assert.equal(out.hit!.result.shown.kind, "passages");
+  assert.match((out.hit!.result.shown as any).quotes[0].text, /fexofenadine/i);
+});
