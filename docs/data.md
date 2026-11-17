@@ -79,6 +79,8 @@ The output format for the model is in [output-format.md](output-format.md).
 
   (Before the decline fix: 7,577 / 1,260 / 3,397, with 2,273 / 378 / 949 declines.)
 
+  The Gate 2 fine-tunes were retrained on this build (the "r2" adapters). Results, and the comparison with the adapters trained before the fix, are in [gate2.md](gate2.md#round-2-decline-fix-and-retrain).
+
 - **Hand audit (for the project owner).** `data/build/fdarx/audit/audit_100.md` (readable) and `audit_100.csv` (fill in `verdict` and `notes`). The sheet has 100 random train items: 67 answerable and 33 decline. Check that the cited sentences really answer the question and that each decline is truly unanswerable from the prompt. Targets come from `mlx_plain/` when it exists. For the 65 answerable items whose ANSWER line was rewritten, the original line is shown beside it, so the audit also checks the rewrite. This sheet was drawn before the decline fix and has not been regenerated, so any verdicts already filled in are kept. Re-running `audit` would draw a different sample.
 - **Decline spot-check (for the project owner).** `data/build/fdarx/audit/decline_check_50.md` and `decline_check_50.csv` contain 50 random decline items that survived the support check (40 train, 10 valid; never test).
   - Each item shows the question, the answer that was removed, the removed section headings, and the closest remaining sentences the check found.

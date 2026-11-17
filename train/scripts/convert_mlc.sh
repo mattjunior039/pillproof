@@ -2,6 +2,7 @@
 # Merge a Gate 2 LoRA adapter into the HF checkpoint and convert it for WebLLM (Gate 1 pipeline).
 #   train/scripts/convert_mlc.sh 2B medlabel-2b-r1
 #   train/scripts/convert_mlc.sh 0.8B medlabel-08-r1
+#   train/scripts/convert_mlc.sh 2B medlabel-2b-r2 medlabel-r2     (r2, after the decline fix)
 # Output: ~/waicy-work/models/mlc/Qwen3.5-<size>-medlabel-r1-q4f16_1-MLC (served by gate1/scripts/serve.py).
 # The merged HF checkpoint is deleted after conversion to save disk (re-create it with the merge step).
 set -euo pipefail

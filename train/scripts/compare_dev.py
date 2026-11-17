@@ -10,6 +10,7 @@ The ablations (B + checks, C without checks) are reported too.
 Usage:
   python compare_dev.py --pairs B2b_oracle:C2b_oracle B08_phone:C08_phone ... \
       --chart docs/img/gate2_size.png --md /tmp/gate2_tables.md
+  python compare_dev.py --both-checks --pairs C2b_phone:C08_phone C2b_r1_phone:C2b_phone   # C vs C
 """
 
 import argparse
@@ -90,7 +91,10 @@ def main():
     ap.add_argument("--pairs", nargs="+", required=True, help="B_run:C_run")
     ap.add_argument("--chart")
     ap.add_argument("--md")
+    ap.add_argument("--both-checks", action="store_true",
+                    help="score the first run with checks too (C vs C: size gap, r1 vs r2 adapters)")
     a = ap.parse_args()
+    b_mode = "checks" if a.both_checks else "nochecks"
     out, summary = [], {}
     head = "| Pair | n | Metric | B | B + checks | C (no checks) | C | C - B [95% CI] |\n|---|---|---|---|---|---|---|---|"
     out.append(head)
@@ -101,7 +105,7 @@ def main():
         rb, rc = [b[k] for k in keys], [c[k] for k in keys]
         summary[pair] = {}
         for key in METRICS:
-            d, lo, hi, n = paired(b, c, key)
+            d, lo, hi, n = paired(b, c, key, b_mode=b_mode)
             vals = [metric(rb, "nochecks", key), metric(rb, "checks", key), metric(rc, "nochecks", key), metric(rc, "checks", key)]
             summary[pair][key] = {"B": vals[0], "B_checks": vals[1], "C_nochecks": vals[2], "C": vals[3], "diff": d, "ci": [lo, hi]}
             if d is None:

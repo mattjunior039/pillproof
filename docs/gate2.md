@@ -1,6 +1,15 @@
 # Gate 2: fine-tune plus checks (C) against base model plus passages (B), dev set
 
-**Result: Gate 2 passes for the 2B (the primary model) at every prompt setting. For the 0.8B lite model the headline measure goes the other way. The base 0.8B is not a usable B, though: it declines 79–90% of answerable questions.**
+> **Round 2 update (decline fix).** The "should decline" items were rebuilt so that items whose answer is still in the label are dropped ([data.md](data.md)). Both fine-tunes were then retrained with the same settings (the r2 adapters), and Gate 2 was re-run on the cleaned dev set. Details are in [Round 2](#round-2-decline-fix-and-retrain).
+>
+> - C still clearly beats B for the 2B: 17.2% against 38.9% wrong on phone prompts, −21.7 points [−25.1, −18.2]. The 0.8B result is unchanged in kind: B-0.8B declines 79% of answerable questions.
+> - The "declines answerable questions" gap against B is gone. It was +5.0 points on phone prompts; it is now +0.8 [−0.4, +2.1]. The decline audit is also much cleaner: only 30% of C-2B's answered decline items are actually supported by the label, against 73% before.
+> - The cost: on the same cleaned items, the r2 adapters have a **higher** wrong-answer rate than the round-1 adapters, +3.4 points at both sizes (2B 17.2% against 13.8%). They answer more items that should be declined and more retrieval misses.
+> - Recommendation: by the plan's headline measure, keep the **round-1 adapters** as the default and ship the r2 builds as the alternative with fewer refusals. Both are converted and tested in the browser.
+>
+> The sections from "What was built" to "Browser check" describe round 1 unless stated otherwise.
+
+**Round 1 result: Gate 2 passes for the 2B (the primary model) at every prompt setting. For the 0.8B lite model the headline measure goes the other way. The base 0.8B is not a usable B, though: it declines 79–90% of answerable questions.**
 
 - **2B.** C (fine-tune plus checks) gives about a third as many wrong answers as B (base model plus the same label passages): 14.0% against 40.6% on phone retrieval, −26.6 points [95% CI −31.1, −22.2]. It is also better on correct answers, overall correctness and sentence choice, with the same result on oracle and desktop prompts. C's one weakness is that, on phone retrieval, it declines answerable questions 5 points more often. Under the lenient sensitivity grading (no limit on extra cited sentences), B finds the answer more often, and on desktop prompts the two have the same wrong rate. Much of C's gain comes from declining correctly and citing precisely.
 - **0.8B.** C's wrong rate is *higher* than B's (18.6% against 11.8% on phone, +6.8 [+3.7, +9.9]). B gets its low wrong rate by declining almost everything: it answers 3% of answerable questions correctly, against 76% for C. Counting both right answers and right declines, C is correct on 77.6% of items and B on 41.0%. On the plan's literal measure the 0.8B fails Gate 2. In practice, C is the only 0.8B system worth shipping.
@@ -8,7 +17,7 @@
 - **Caveat on "should decline" items.** A hand audit shows many of them are actually answerable from elsewhere in the label (see [the audit](#decline-audit)). Both systems' false-answer rates are inflated, C's most in relative terms: 22 of C-2B's 30 phone "false answers" are correct. C stays clearly ahead. B's real errors there include a dangerous one.
 - **Browser.** Both fine-tunes were converted with the Gate 1 MLC pipeline. They load and answer in the SENTENCES/ANSWER format in the Gate 1 page (Chrome, WebGPU). On 100 phone-budget dev prompts, the browser replies give the same graded outcome as the MLX runs on 98 items (2B) and 94 items (0.8B). They are not less accurate: 11 vs 13 wrong for 2B, 13 vs 18 for 0.8B. Mac decode speed is 57 tok/s (2B) and 74 tok/s (0.8B); see [Browser check](#browser-check).
 
-Everything here uses the **development split only**: 43 dev labels with kept items, 882 answerable and 378 decline items. T1 test, T2, T3, T4 and T5 were not used for any run, tuning or choice (see [Data hygiene](#data-hygiene)).
+Everything here uses the **development split only**: 43 dev labels with kept items, 882 answerable items, and 378 decline items in round 1 (311 in round 2). T1 test, T2, T3, T4 and T5 were not used for any run, tuning or choice (see [Data hygiene](#data-hygiene)).
 
 ## What was built
 
@@ -277,7 +286,7 @@ Verdicts are in `docs/gate2_decline_audit.csv`.
 
 So the headline wrong rates above overstate both systems' errors on decline items, C's much more in relative terms. With cleaner decline labels C would still be clearly ahead on these items. The gap would be about 11 points (0.5% against about 11%) if only unsupported answers count as errors, and about 27 points (2.2% against about 29%) if partial answers count as errors too.
 
-Caveats: one grader, not blind to the system, and only the 2B on phone prompts was audited. The T3 human and pharmacist grading in the plan is the real test of this.
+Caveats: **the decline audit was done by a single, unblinded grader**, who knew which system wrote each reply. Only the 2B on phone prompts was audited. The T3 human and pharmacist grading in the plan is the real test of this.
 
 ### Browser check
 
@@ -312,6 +321,161 @@ Phone speeds will be much lower. These numbers come from the M5 Pro, not the iPh
 One hand prompt also shows that the two pipelines can differ on single items. On the NUZYRA label prompt from Gate 1, the browser 2B answered `SENTENCES: 1, 12` (gold 2, 12), while MLX bf16 declined. Both sizes declined the OPSYNVI decline prompt in both pipelines.
 
 
+## Round 2: decline fix and retrain
+
+### What changed
+
+The round-1 audit showed that many "should decline" items could still be answered from other parts of the label. Each built decline item, in every split, was therefore checked against all the label sentences that remain in the prompt. The check is `datapipe/src/medlabel_data/support.py`: loose alignment (threshold 0.5, up to 4 sentences) plus a key-fact check on numbers, units and drug names. Items the label still supports were dropped and replaced with new decline items that pass the same check. No items were converted to answerable ones. The full rule, the counts per split and a negative control are in [data.md](data.md).
+
+| | Round 1 (r1) | Round 2 (r2) |
+|---|---|---|
+| Train examples | 7,577 (2,273 declines, 30.0%) | 7,234 (1,930 declines, 26.7%) |
+| Dev decline items | 378 | 311 |
+| Answerable examples | — | byte-identical to r1 |
+
+The refill could not find enough clean decline items to keep the 30% target, so the decline share in training fell. FDARxBench's own refusal items exist only in T1 and were not touched.
+
+**Training.** Same configs apart from data and output paths (`train/configs/lora_2b_r2.yaml`, `lora_08_r2.yaml`): rank 16, scale 20, one epoch, LR 5e-5 cosine, seed 0, prompt masked, thinking off. The final checkpoint was kept with no checkpoint selection, as in round 1.
+
+| | 2B r2 | 0.8B r2 |
+|---|---|---|
+| Steps | 1,809 × batch 4 | 1,809 × batch 4 |
+| Wall time | 3 h 38 min (about 7.2 s per step; slowed by memory pressure and swap from other apps) | about 1 h 46 min of running time. The first attempt died at step 380 when a tool session was interrupted; the restart was from scratch, and was paused once for 2 h at the user's request |
+| Val loss, start → end (min) | 1.056 → 0.529 (0.495 at step 1800) | 1.110 → 0.631 (0.602 at step 1800) |
+
+Val loss is on the new valid file, so it is not comparable with round 1.
+
+**Grading.** Same grader as round 1. Prompt sets on the r2 dev split:
+
+| Prompt set | Answerable | Miss | Decline |
+|---|---|---|---|
+| Oracle | 882 | — | 311 |
+| Phone | 746 | 136 | 311 |
+| Desktop | 799 | 83 | 308 |
+
+The answerable and miss prompts are identical to round 1; only the decline items differ.
+
+### Results: B against C (r2 adapters)
+
+![Gate 2 size versus accuracy, round 2](img/gate2_size_r2.png)
+
+| Model | Prompts | Measure | B | C | C − B [95% CI] |
+|---|---|---|---|---|---|
+| **2B** | **Phone** | **wrong-answer rate** | **38.9** | **17.2** | **−21.7 [−25.1, −18.2]** |
+| | | overall correct | 59.3 | 80.5 | +21.2 [+17.8, +24.5] |
+| | | answerable answered correctly | 56.8 | 79.6 | +22.8 [+18.1, +27.5] |
+| | | declined, should answer | 2.9 | 3.8 | +0.8 [−0.4, +2.1] |
+| | | answered, should decline | 26.0 | 9.6 | −16.4 [−20.7, −11.9] |
+| | | declined when retrieval missed the answer | 39.0 | 62.5 | +23.5 [+15.8, +31.3] |
+| | | sentence selection | 48.3 | 74.3 | +26.0 [+21.8, +30.2] |
+| | | lenient correct / lenient wrong | 88.7 / 18.9 | 81.0 / 16.3 | −7.8 [−10.9, −4.9] / −2.6 [−5.0, +0.1] |
+| | **Oracle** | **wrong-answer rate** | **27.7** | **13.4** | **−14.3 [−17.5, −11.3]** |
+| | | answerable answered correctly | 60.3 | 83.0 | +22.7 [+19.2, +26.3] |
+| | | declined, should answer | 10.3 | 1.8 | −8.5 [−11.0, −6.2] |
+| | | answered, should decline | 23.2 | 8.4 | −14.8 [−19.2, −10.3] |
+| | | sentence selection | 62.9 | 82.1 | +19.2 [+15.6, +22.9] |
+| | **Desktop** | **wrong-answer rate** | **48.7** | **20.7** | **−28.0 [−31.6, −24.1]** |
+| | | answerable answered correctly | 40.2 | 78.2 | +38.0 [+33.7, +42.4] |
+| | | declined, should answer | 3.9 | 1.9 | −2.0 [−3.5, −0.5] |
+| | | answered, should decline | 26.6 | 14.0 | −12.7 [−17.4, −7.6] |
+| **0.8B** | **Phone** | **wrong-answer rate** | **12.0** | **21.0** | **+9.0 [+6.0, +12.2]** |
+| | | overall correct | 38.5 | 76.8 | +38.3 [+34.6, +41.5] |
+| | | answerable answered correctly | 3.4 | 76.8 | +73.5 [+69.3, +77.0] |
+| | | declined, should answer | 79.2 | 3.6 | −75.6 [−78.7, −72.5] |
+| | | answered, should decline | 0.0 | 14.1 | +14.1 [+9.6, +19.1] |
+| | **Oracle** | **wrong-answer rate** | **5.8** | **17.1** | **+11.3 [+8.6, +14.3]** |
+| | | answerable answered correctly | 2.4 | 78.3 | +76.0 [+72.5, +78.8] |
+| | | declined, should answer | 90.4 | 2.2 | −88.2 [−90.3, −86.2] |
+
+- **The pattern is the same as in round 1.** C-2B beats B-2B on every prompt set. The base 0.8B still declines nearly everything, so its literal wrong rate is lower and C-0.8B fails the plan's headline measure, as before.
+- **"Declined, should answer" against B is fixed for the 2B.** On phone prompts C − B was +5.0 [+3.2, +6.9] in round 1. It is now +0.8 [−0.4, +2.1], and C is better than B on oracle and desktop prompts.
+
+**Size (C against C, both with checks):**
+
+| Prompts | Measure | C-2B r2 | C-0.8B r2 | 0.8B − 2B [95% CI] |
+|---|---|---|---|---|
+| Phone | wrong-answer rate | 17.2 | 21.0 | +3.8 [+2.0, +5.6] |
+| | answerable answered correctly | 79.6 | 76.8 | |
+| | answered, should decline | 9.6 | 14.1 | |
+| | sentence selection | 74.3 | 69.6 | |
+| Oracle | wrong-answer rate | 13.4 | 17.1 | +3.7 [+2.1, +5.5] |
+
+### r1 adapters against r2 adapters on the same items
+
+Round-1 and round-2 numbers above use different decline items, so they cannot be compared directly. To separate the effect of the retrained adapters from the effect of the cleaner dev set, the round-1 adapters were also run on the r2 phone prompts (`C2b_r1_phone`, `C08_r1_phone`; same checks):
+
+| Measure (phone, r2 dev) | 2B r1 | 2B r2 | r2 − r1 [95% CI] | 0.8B r1 | 0.8B r2 | r2 − r1 [95% CI] |
+|---|---|---|---|---|---|---|
+| **wrong-answer rate** | **13.8** | **17.2** | **+3.4 [+1.2, +5.8]** | **17.6** | **21.0** | **+3.4 [+1.1, +5.5]** |
+| overall correct | 81.2 | 80.5 | −0.8 (CI spans 0) | 78.5 | 76.8 | −1.7 (CI spans 0) |
+| answerable answered correctly | 77.2 | 79.6 | +2.4 [+0.2, +4.7] | 76.1 | 76.8 | +0.7 |
+| declined, should answer | 7.9 | 3.8 | −4.2 [−6.1, −2.6] | 6.3 | 3.6 | −2.7 [−4.3, −1.3] |
+| answered, should decline | 6.1 | 9.6 | +3.5 [+0.7, +6.7] | 10.0 | 14.1 | +4.2 [+1.1, +7.3] |
+| declined when retrieval missed the answer | 74.3 | 62.5 | −11.8 | 64.7 | 55.9 | −8.8 |
+| sentence selection | 77.7 | 74.3 | −3.4 | 73.1 | 69.6 | −3.5 |
+
+In counts for the 2B (r1 → r2):
+- Answerable items: 576 → 594 correct, 59 → 28 declined, 111 → 124 wrong.
+- Retrieval misses: 35 → 51 answered wrongly.
+- Decline items: 19 → 30 answered.
+
+The 0.8B moves the same way.
+
+- **Fewer refusals of answerable questions, as intended.** The r2 adapters decline answerable questions about half as often at both sizes, and answer 2.4 points more of them correctly (2B).
+- **But they answer more in general.** They answer more decline items and more items where retrieval missed the answer. The wrong-answer rate rises by 3.4 points at both sizes; overall correctness is unchanged within noise.
+- **Likely cause:** the lower decline share in training (30.0% → 26.7%). The removed declines were also exactly the items that taught the model to decline when the facts are only nearby, which is also what a retrieval miss looks like. This is a hypothesis, not tested.
+
+### Decline audit, round 2
+
+I used the same procedure and grade definitions as in round 1 (supported / partial / unsupported), on the r2 phone decline items (311). I graded:
+- all 30 replies where C-2B r2 answered;
+- all 19 where the r1 adapter answered on the same items;
+- a random 30 of B-2B's 81 (seed 0).
+
+The sheet is made by `train/scripts/decline_audit_sheet.py`; verdicts are in `docs/gate2_decline_audit_r2.csv`. **The decline audit was done by a single, unblinded grader**: one person, who could see which system wrote each reply.
+
+| | supported | partial | unsupported | unsupported, % of 311 | unsupported + partial, % of 311 |
+|---|---|---|---|---|---|
+| C-2B r2 (30 of 30) | 9 (30%) | 15 (50%) | 6 (20%) | 1.9% | 6.8% |
+| C-2B r1 adapter (19 of 19) | 6 (32%) | 8 (42%) | 5 (26%) | 1.6% | 4.2% |
+| B-2B (30 of 81) | 9 (30%) | 15 (50%) | 6 (20%) | about 5.2% | about 18% |
+
+- **The decline set is much cleaner.** In round 1, 22 of C-2B's 30 answered decline items (73%) were actually supported by the label. Now 9 of 30 (30%) are, and 6 of 19 (32%) for the r1 adapter on the same items. The automatic "answered, should decline" rate is now a much better guide to real errors, though it still overstates them.
+- **On these items the r2 adapter is not safer.** The r2 adapter has 6 unsupported answers against 5 for r1, and 21 unsupported or partial against 13. The 11 extra answers are mostly partial.
+- **B still makes about three times as many unsupported answers as C** (about 5.2% against 1.9% of decline items).
+- **Notable unsupported answers:**
+  - C-2B r2 restated a venlafaxine caution as "should be taken with" serotonergic drugs. That is a negation flip, which the number/unit/drug check cannot catch.
+  - Both adapters gave Tikosyn's 10.5% Torsade de Pointes subgroup rate instead of the 0.8% overall rate.
+  - B gave a hypertension mechanism as the BPH action, and pediatric statements in answer to an RA dosing question.
+- **The round-2 grading was stricter than round 1.** Off-target but true replies were graded partial more consistently. So compare r1 and r2 adapters only within this table, not against the round-1 audit.
+
+### Browser check, round 2
+
+`train/scripts/convert_mlc.sh 2B medlabel-2b-r2 medlabel-r2` (and the same for 0.8B) merged 186 LoRA pairs per model, none missing. The merged HF checkpoints were deleted afterwards.
+
+| Build | Size | Cold load | Cached load |
+|---|---|---|---|
+| `Qwen3.5-2B-medlabel-r2-q4f16_1-MLC` | 1.0 GB | 3.3 s | 1.9 s |
+| `Qwen3.5-0.8B-medlabel-r2-q4f16_1-MLC` | 426 MB | 2.9 s | 1.2 s |
+
+- Both load in the Gate 1 page (Chrome 157, WebGPU, M5 Pro) as `?models=r2-ft,lite-r2-ft&prompts=label`, at the default context and at the phone `ctx=2048`.
+- Both answer in the exact format:
+  - NUZYRA: `SENTENCES: 1, 12` (gold 2, 12; the same as the r1 browser 2B);
+  - OPSYNVI decline prompt: `NOT IN LABEL`.
+- Decode speed is about 50 tok/s (2B) and 53–65 tok/s (0.8B) on two short prompts.
+- The 100-prompt browser fidelity run was not repeated: the conversion pipeline is unchanged, and r1 showed it does not erode the fine-tune.
+
+### Which adapters to ship
+
+Both systems are C. The plan says to ship the better one, and its headline measure is the wrong-answer rate. By that measure the **r1 adapters are better at both sizes** (13.8% against 17.2% for the 2B on the cleaned phone set). Their audit numbers are also slightly better. The r2 adapters' advantage is half as many refusals of answerable questions (3.8% against 7.9%) with the same overall correctness.
+
+Recommendation:
+- Ship **C-2B r1** (primary) and **C-0.8B r1** (lite) by default.
+- Keep the r2 builds (`r2-ft`, `lite-r2-ft`) as the "fewer refusals" alternative.
+- A possible fix within the plan's one extra day: retrain with the decline share restored to 30% by refilling more decline items. That costs about 5 h of GPU time and was not done here.
+
+The round-2 dev numbers are the reference for T1. T1 test was rebuilt with the same code, but no model has been run on it.
+
 ## Data hygiene
 
 - Training read only `mlx_plain/train.jsonl`, through a data directory of symlinks to train and valid. Choices (learning rate, checkpoint, retrieval weights and budgets) used the dev split only.
@@ -326,8 +490,10 @@ One hand prompt also shows that the two pipelines can differ on single items. On
 - **Automatic grading.**
   - select_ok is a word-coverage proxy for "the right sentences". The lenient rows show how much the extra-sentence limit matters.
   - Restatements are checked only for numbers, units and drug names, not for meaning.
-  - The decline audit above was done by one grader who knew which system wrote each reply. The plan's blind human and pharmacist grading on T3 is the real test.
-- **Decline items are built by removing the passage that holds the answer.** Labels repeat facts (Medication Guide, counseling, warnings), so some "decline" items are still answerable from what remains (see the audit). This penalises answering in general, and B more than C.
+  - The decline audits (round 1 and round 2) were each done by a single, unblinded grader, who knew which system wrote each reply. The plan's blind human and pharmacist grading on T3 is the real test.
+- **Decline items are built by removing the passage that holds the answer.** Labels repeat facts (Medication Guide, counseling, warnings), so some "decline" items are still answerable from what remains.
+  - In round 1 this penalised answering in general, and B more than C.
+  - Round 2 drops items whose answer is still supported, using a loose code check. The audit shows about 30% of answered r2 decline items are still supported, so the r2 rates still overstate errors on decline items.
 - **One run per condition** (greedy decoding, seed 0 training). Variation between training seeds is not measured.
 - **MLX on the Mac is not WebLLM on a phone.** The browser uses q4f16_1 weights. The browser check on 100 dev items shows the 4-bit builds behave like the MLX runs, but that ran in Chrome on the Mac. Speed and memory on the iPhone 17e are not measured here.
 
@@ -361,4 +527,20 @@ python3 -u gate1/scripts/serve.py --http --host 127.0.0.1 --port 8080   # then /
 ~/waicy-work/envs/mlx/bin/python train/scripts/grade_dev.py ~/waicy-work/eval/W2b_phone.jsonl ~/waicy-work/eval/W08_phone.jsonl
 # tests (Python and JS share core/fixtures)
 node --test core/tests && (cd datapipe && uv run pytest -q)
+
+# ---- round 2 (decline fix): data rebuilt per docs/data.md, then ----
+~/waicy-work/envs/mlx/bin/python train/scripts/lora_train.py -c train/configs/lora_2b_r2.yaml
+~/waicy-work/envs/mlx/bin/python train/scripts/lora_train.py -c train/configs/lora_08_r2.yaml
+export EVAL_DIR=$HOME/waicy-work/eval_r2 ROUND=r2        # outputs go to eval_r2/, adapters medlabel-*-r2
+~/waicy-work/envs/mlx/bin/python train/scripts/eval_dev.py prompts
+train/scripts/run_gate2.sh all
+~/waicy-work/envs/mlx/bin/python train/scripts/compare_dev.py \
+  --pairs B2b_oracle:C2b_oracle B2b_phone:C2b_phone B2b_desktop:C2b_desktop B08_oracle:C08_oracle B08_phone:C08_phone \
+  --chart docs/img/gate2_size_r2.png --md /tmp/gate2_r2_tables.md
+# r1 against r2 adapters, and 2B against 0.8B (both sides with checks)
+~/waicy-work/envs/mlx/bin/python train/scripts/compare_dev.py --both-checks --pairs C2b_r1_phone:C2b_phone C08_r1_phone:C08_phone C2b_phone:C08_phone
+# decline audit sheet (fill verdict/note in the CSV)
+~/waicy-work/envs/mlx/bin/python train/scripts/decline_audit_sheet.py --runs C2b_phone C2b_r1_phone B2b_phone --seed 0 --tag phone_2b
+train/scripts/convert_mlc.sh 2B medlabel-2b-r2 medlabel-r2
+train/scripts/convert_mlc.sh 0.8B medlabel-08-r2 medlabel-r2     # then /?models=r2-ft,lite-r2-ft&prompts=label
 ```

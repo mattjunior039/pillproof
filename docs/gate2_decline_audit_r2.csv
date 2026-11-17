@@ -1,0 +1,80 @@
+id,system,run,qid,verdict,note
+C00,C,C2b_phone,060c09c70182545a,P,dose frequency only; no 0.5 mg
+C01,C,C2b_phone,73dd42090d21a6d3,P,"gives indication, not mechanism"
+C02,C,C2b_phone,cf4f6b0d3f7372d3,P,true contraindication (active liver disease); restatement garbles 'unexplained persistent abnormalities'
+C03,C,C2b_phone,03574c386c9a50d3,S,
+C04,C,C2b_phone,fe812c8cf653b257,U,cited sentence is a list fragment; 'other heart medicines' overstated
+C05,C,C2b_phone,98db132a93a1c5a9,P,"true adverse reactions, incomplete vs question"
+C06,C,C2b_phone,2545d9d57d177a08,S,
+C07,C,C2b_phone,1c7c694cc386bce4,P,lithium toxicity only
+C08,C,C2b_phone,26be928209ce1c2c,P,restatement says levels 'lower' in renal impairment; label says clearance 'altered'
+C09,C,C2b_phone,f58682fbdc022ca2,P,"true numbers, but cimetidine/verapamil are contraindicated with dofetilide, not 'caution' drugs"
+C10,C,C2b_phone,183704e08e4ef885,P,vague restatement of P-gp inducer sentence
+C11,C,C2b_phone,b5ae233567b021fa,U,restatement inverts meaning: says venlafaxine 'should be taken with' serotonergic drugs; label says caution
+C12,C,C2b_phone,df09c5e518148b25,S,
+C13,C,C2b_phone,cfe4dd38434404a7,S,
+C14,C,C2b_phone,962bc25821298294,S,
+C15,C,C2b_phone,1f63a91307831070,U,says cimetidine/verapamil 'should be taken with caution'; both are contraindicated with TIKOSYN
+C16,C,C2b_phone,2481dd567039a1b9,S,
+C17,C,C2b_phone,d0c83995adb9a9e6,P,nursing only
+C18,C,C2b_phone,6e57d5dce4a9a596,P,acidification instead of the alkaline-urine effect
+C19,C,C2b_phone,0b55356ed1ad3bb3,P,one of three contraindications
+C20,C,C2b_phone,d5bffd638e5a1c71,P,"'lower doses', no numbers"
+C21,C,C2b_phone,4bef8ce5ed51ff82,S,
+C22,C,C2b_phone,d61bd8c565492ad2,U,"overdose management, not the CNS-depressant precaution; restatement garbled"
+C23,C,C2b_phone,ff7c9add8b0bf484,P,"more monitoring, does not say PT/INR"
+C24,C,C2b_phone,d6dfc33eb680469e,P,"oral, dilute; not the before-meals schedule"
+C25,C,C2b_phone,5878e0dd5544ae40,P,"dermatologic rule only, labelled as skin"
+C26,C,C2b_phone,677624168ff2b295,S,anaphylaxis/angioedema are reported serious events
+C27,C,C2b_phone,461f664656d0df0a,U,"overdose management, not prescribing precaution"
+C28,C,C2b_phone,8a04797b869c7829,U,10.5% from a 38-patient subgroup instead of 0.8% overall
+C29,C,C2b_phone,19efe8019bf71047,S,
+C1-00,C,C2b_r1_phone,060c09c70182545a,P,dose frequency only; no 0.5 mg
+C1-01,C,C2b_r1_phone,cf4f6b0d3f7372d3,P,"true contraindication, not the renal one"
+C1-02,C,C2b_r1_phone,03574c386c9a50d3,S,
+C1-03,C,C2b_r1_phone,5dada0737b985a83,P,"higher incidence, no 8%"
+C1-04,C,C2b_r1_phone,2545d9d57d177a08,S,
+C1-05,C,C2b_r1_phone,0a9381fbfd2d4e4e,U,does not give indication; says 'not mixed with anything' but label says MUST BE DILUTED
+C1-06,C,C2b_r1_phone,183704e08e4ef885,P,P-gp inducers only
+C1-07,C,C2b_r1_phone,b5ae233567b021fa,S,
+C1-08,C,C2b_r1_phone,df09c5e518148b25,S,
+C1-09,C,C2b_r1_phone,508c5e4ffe3ee923,P,dose instead of how to take
+C1-10,C,C2b_r1_phone,cfe4dd38434404a7,S,
+C1-11,C,C2b_r1_phone,d0c83995adb9a9e6,P,nursing only
+C1-12,C,C2b_r1_phone,f198e2cdb4d1414d,U,"renal-function rate, not discontinuation rate"
+C1-13,C,C2b_r1_phone,d5bffd638e5a1c71,P,"'lower doses', no numbers"
+C1-14,C,C2b_r1_phone,a4f550a779800b42,U,5-20 years from one sentence; gold 2-40
+C1-15,C,C2b_r1_phone,d6dfc33eb680469e,P,"oral, dilute; not schedule"
+C1-16,C,C2b_r1_phone,5878e0dd5544ae40,U,restatement drops 'dermatologic': applies a skin-reaction rule to any side effect
+C1-17,C,C2b_r1_phone,677624168ff2b295,S,
+C1-18,C,C2b_r1_phone,8a04797b869c7829,U,10.5% subgroup instead of 0.8% overall
+B00,B,B2b_phone,32b0ed5ed2536a86,P,says not in label in its own words (harmless)
+B01,B,B2b_phone,d5bffd638e5a1c71,P,"'lower doses', no numbers"
+B02,B,B2b_phone,73dd42090d21a6d3,U,hypertension mechanism given as BPH action
+B03,B,B2b_phone,62b835a8e201f427,P,qualitative only
+B04,B,B2b_phone,ff7c9add8b0bf484,P,"more monitoring, not PT/INR"
+B05,B,B2b_phone,11d0e858015ae876,S,
+B06,B,B2b_phone,f198e2cdb4d1414d,U,"renal-function rate, not discontinuation rate"
+B07,B,B2b_phone,106c030e83a4e328,P,"EGFR, not the specific mutations"
+B08,B,B2b_phone,ce09208a38ff2f27,S,
+B09,B,B2b_phone,99b53fd3c385d1c8,S,
+B10,B,B2b_phone,df09c5e518148b25,S,
+B11,B,B2b_phone,095e5efd016f1b19,P,partial list
+B12,B,B2b_phone,507da825027c9879,S,tablets and oral pellets
+B13,B,B2b_phone,70b12f5932bf273c,P,"counseling list, not swallow-whole instructions"
+B14,B,B2b_phone,80854d0fd2f52fa2,U,drug interactions instead of QTc threshold; 'other cardiovascular drugs' overstated
+B15,B,B2b_phone,5dada0737b985a83,P,"higher incidence, no 8%"
+B16,B,B2b_phone,c2efb858b847ddd6,P,says not in label in its own words (harmless)
+B17,B,B2b_phone,0a9381fbfd2d4e4e,P,'oral use only' does not answer indication
+B18,B,B2b_phone,26be928209ce1c2c,P,true pediatric/renal points; CAPD conflated
+B19,B,B2b_phone,cf4f6b0d3f7372d3,P,"true contraindications, not the renal one"
+B20,B,B2b_phone,189da029e802b0fc,S,
+B21,B,B2b_phone,7e4b94a82bdb5126,S,
+B22,B,B2b_phone,0c0e1e7cbdfa8968,U,pediatric statements instead of RA doses
+B23,B,B2b_phone,a74325e49f972d64,P,no actual recommendation
+B24,B,B2b_phone,2481dd567039a1b9,S,
+B25,B,B2b_phone,f58682fbdc022ca2,P,"true numbers; these drugs are contraindicated, not caution drugs"
+B26,B,B2b_phone,508c5e4ffe3ee923,P,dose instead of how to take
+B27,B,B2b_phone,cfe4dd38434404a7,S,
+B28,B,B2b_phone,937372c0462108af,U,"dosage instead of indication; 3.8 g/day is the trial dose, label dose is 3.75 g"
+B29,B,B2b_phone,f6d2daf2622e93de,U,lactation toxicities attributed to fetal exposure
