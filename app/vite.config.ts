@@ -49,7 +49,7 @@ function copyOrt(): Plugin {
       const src = path.join(root, "node_modules/onnxruntime-web/dist");
       const dst = path.join(root, "public/ort");
       fs.mkdirSync(dst, { recursive: true });
-      for (const f of ["ort-wasm-simd-threaded.jsep.mjs", "ort-wasm-simd-threaded.jsep.wasm"]) {
+      for (const f of ["ort-wasm-simd-threaded.asyncify.mjs", "ort-wasm-simd-threaded.asyncify.wasm"]) {
         const a = path.join(src, f), b = path.join(dst, f);
         if (fs.existsSync(a) && (!fs.existsSync(b) || fs.statSync(a).size !== fs.statSync(b).size)) fs.copyFileSync(a, b);
       }
@@ -89,7 +89,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,mjs,css,html,png,svg,json,webmanifest}", "ort/*.wasm"],
+        globPatterns: ["**/*.{js,mjs,css,html,png,svg,json,webmanifest,wasm}"],
         maximumFileSizeToCacheInBytes: 40 * 1024 * 1024,
         navigateFallbackDenylist: [/^\/models\//, /^\/libs\//],
         runtimeCaching: [

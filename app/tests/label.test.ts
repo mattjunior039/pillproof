@@ -53,3 +53,24 @@ test("rxnorm product parsing", () => {
   assert.ok(ps.findIndex((p) => p.combo) > ps.findIndex((p) => p.brand === "Lipitor"));
   assert.deepEqual(suggest(["Lipitor", "atorvastatin", "Atorvaliq", "amlodipine / atorvastatin"], "ator"), ["Atorvaliq", "atorvastatin", "amlodipine / atorvastatin"]);
 });
+
+test("answer pipeline: checked answer, blocked restatement, decline, invalid, passage-only", async () => {
+  const { answerQuestion } = await import("../src/lib/answer.ts");
+  const idx = new LabelIndex(chunkLabel(rec));
+  const label: any = { title: "Atorvastatin calcium", effective: "20250101" };
+  const lexicon = new Set(["atorvastatin", "warfarin"]);
+  const q = "Can I drink grapefruit juice?";
+  const r = retrieve(idx, label.title, q, null, PHONE);
+  const n = Number(Object.entries(r.sentences).find(([, s]: any) => /grapefruit/i.test(s))![0]);
+  const ask = (reply: string) => answerQuestion(idx, label, q, { tier: "phone", lexicon, generate: async () => reply });
+
+  const ok = await ask(`SENTENCES: ${n}\nANSWER: Avoid large amounts of grapefruit juice.`);
+  assert.equal(ok.shown.kind, "answer");
+  if (ok.shown.kind === "answer") assert.ok(/grapefruit/i.test(ok.shown.quotes[0].text) && ok.shown.quotes[0].section.length > 0);
+  assert.equal((await ask(`SENTENCES: ${n}\nANSWER: Do not take more than 99 mg with warfarin.`)).shown.kind, "quotes");
+  assert.equal((await ask("NOT IN LABEL")).shown.kind, "decline");
+  const bad = await ask("SENTENCES: 999\nANSWER: whatever");
+  assert.equal(bad.shown.kind, "passages");
+  const po = await answerQuestion(idx, label, q, { tier: "phone", lexicon });
+  assert.ok(po.shown.kind === "passages" && po.shown.why === "no-model" && po.shown.quotes.some((x) => /grapefruit/i.test(x.text)));
+});

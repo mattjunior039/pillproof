@@ -76,3 +76,6 @@ export function route(question: string, meds: Med[], lexicon: Set<string>, lastM
   }
   return { kind: "choose", meds, advice };
 }
+
+export const NOT_COVERED =
+  "The label does not cover this. That does not mean it is safe or unsafe. Please ask your pharmacist; they can answer questions the label doesn't.";
