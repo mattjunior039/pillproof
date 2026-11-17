@@ -89,10 +89,13 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,mjs,css,html,png,svg,json,webmanifest,wasm}"],
+        globPatterns: ["**/*.{js,mjs,css,html,png,svg,json,webmanifest}"],
+        // transformers.js also emits an unused copy of the ORT wasm; ours lives in /ort and is cached on first use.
+        globIgnores: ["assets/ort-wasm*"],
         maximumFileSizeToCacheInBytes: 40 * 1024 * 1024,
         navigateFallbackDenylist: [/^\/models\//, /^\/libs\//],
         runtimeCaching: [
+          { urlPattern: /\/ort\/ort-wasm/, handler: "CacheFirst", options: { cacheName: "ort-runtime" } },
           { urlPattern: /^https:\/\/rxnav\.nlm\.nih\.gov\/REST\/displaynames/, handler: "StaleWhileRevalidate", options: { cacheName: "rxnav-names" } },
         ],
       },

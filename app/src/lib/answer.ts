@@ -39,7 +39,7 @@ const heading = (index: any, c: number) => sectionName(index.passages[c][0] || "
 
 /** Top label sentences by the same retrieval score, shown in label order. */
 export function topSentences(index: any, question: string, sims: number[] | null | undefined, params: any, n = 3): Quote[] {
-  const sc: number[] = scores(index, question, sims ?? null, params);
+  const sc: number[] = scores(index, question, (sims ?? null) as any, params);
   const best = sc.map((x, i) => i).filter((i) => sc[i] > 0).sort((a, b) => sc[b] - sc[a] || a - b).slice(0, n).sort((a, b) => a - b);
   return best.map((i) => {
     const [c, s] = index.units[i];
@@ -53,7 +53,7 @@ export async function answerQuestion(index: any, label: LabelMeta, question: str
   const passages = (why: "no-model" | "invalid" | "error"): Shown => ({ kind: "passages", why, quotes: topSentences(index, question, o.sims, params, o.passageCount ?? 3) });
   if (!o.generate) return { shown: passages("no-model"), label, ms: Date.now() - t0 };
 
-  const r = retrieve(index, label.title, question, o.sims ?? null, params);
+  const r = retrieve(index, label.title, question, (o.sims ?? null) as any, params);
   const where = new Map<number, string>();
   for (const [key, n] of r.numbering as Map<string, number>) where.set(n, heading(index, Number(key.split(",")[0])));
   const raw = await o.generate(r.user);

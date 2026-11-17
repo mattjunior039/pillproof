@@ -72,3 +72,12 @@ test("ics export hides names by default", () => {
   assert.ok(named.includes("SUMMARY:Medication time: Lipitor 20 mg tablet\\, metformin"));
   for (const line of named.split("\r\n")) assert.ok(new TextEncoder().encode(line).length <= 75, line);
 });
+
+test("label-change history matches medicines by ingredient or brand", async () => {
+  const { historyKeys } = await import("../src/lib/changes.ts");
+  const data = JSON.parse((await import("node:fs")).readFileSync(new URL("../data/label_changes.json", import.meta.url), "utf8"));
+  assert.deepEqual(historyKeys({ ingredient: "atorvastatin calcium" }, data), ["atorvastatin"]);
+  assert.deepEqual(historyKeys({ ingredient: "hydrochlorothiazide / lisinopril" }, data).sort(), ["hydrochlorothiazide", "lisinopril"]);
+  assert.deepEqual(historyKeys({ ingredient: "xyz", brand: "Lipitor" }, data), ["atorvastatin"]);
+  assert.deepEqual(historyKeys({ ingredient: "ibuprofen" }, data), []);
+});

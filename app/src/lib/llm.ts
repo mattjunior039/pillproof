@@ -1,5 +1,8 @@
 // The fine-tuned model in the browser (WebLLM in a worker), loaded only after the user agrees to download.
-import * as webllm from "@mlc-ai/web-llm";
+import type * as webllm from "@mlc-ai/web-llm";
+
+// Loaded on demand so the 6 MB library stays out of the first-paint bundle.
+const lib = () => import("@mlc-ai/web-llm");
 import { BASE, type ModelEntry, type Tier } from "./device.ts";
 
 // Same system prompt as training (datapipe/src/medlabel_data/fdarx/build.py SYSTEM).
@@ -14,7 +17,8 @@ export const SYSTEM =
 const MODEL_BASE = (import.meta.env.VITE_MODEL_BASE as string | undefined) || `${location.origin}${import.meta.env.BASE_URL}models/`;
 const LIB_BASE = (import.meta.env.VITE_LIB_BASE as string | undefined) || `${location.origin}${import.meta.env.BASE_URL}libs/`;
 
-export function appConfigFor(m: ModelEntry, tier: Tier) {
+export async function appConfigFor(m: ModelEntry, tier: Tier) {
+  const webllm = await lib();
   const base = webllm.prebuiltAppConfig.model_list.find((r) => r.model_id === BASE[m.size]);
   if (!base) throw new Error(`WebLLM has no prebuilt record for ${BASE[m.size]}`);
   const rec = structuredClone(base);
@@ -25,14 +29,14 @@ export function appConfigFor(m: ModelEntry, tier: Tier) {
   return { appConfig: { ...webllm.prebuiltAppConfig, model_list: [rec] }, modelId: rec.model_id };
 }
 
-export const isCached = (m: ModelEntry, tier: Tier) => {
-  const { appConfig, modelId } = appConfigFor(m, tier);
-  return webllm.hasModelInCache(modelId, appConfig).catch(() => false);
-};
+export async function isCached(m: ModelEntry, tier: Tier): Promise<boolean> {
+  const { appConfig, modelId } = await appConfigFor(m, tier);
+  return (await lib()).hasModelInCache(modelId, appConfig).catch(() => false);
+}
 
 export async function deleteCached(m: ModelEntry, tier: Tier) {
-  const { appConfig, modelId } = appConfigFor(m, tier);
-  await webllm.deleteModelAllInfoInCache(modelId, appConfig);
+  const { appConfig, modelId } = await appConfigFor(m, tier);
+  await (await lib()).deleteModelAllInfoInCache(modelId, appConfig);
 }
 
 let engine: webllm.WebWorkerMLCEngine | null = null;
@@ -44,7 +48,8 @@ export const loadedModel = () => loadedKey;
 export function load(m: ModelEntry, tier: Tier, onProgress: (p: { text: string; progress: number }) => void): Promise<void> {
   if (loadedKey === m.key && engine) return Promise.resolve();
   loading = (async () => {
-    const { appConfig, modelId } = appConfigFor(m, tier);
+    const { appConfig, modelId } = await appConfigFor(m, tier);
+    const webllm = await lib();
     if (engine) { await engine.unload().catch(() => {}); }
     engine ??= new webllm.WebWorkerMLCEngine(new Worker(new URL("../workers/llm.worker.ts", import.meta.url), { type: "module" }), {
       initProgressCallback: (p) => onProgress({ text: p.text, progress: p.progress }),
@@ -75,7 +80,7 @@ export async function generate(user: string, tier: Tier, onText?: (t: string) =>
     extra_body: { enable_thinking: false },
   } as any);
   let text = "";
-  for await (const chunk of stream as AsyncIterable<webllm.ChatCompletionChunk>) {
+  for await (const chunk of stream as unknown as AsyncIterable<webllm.ChatCompletionChunk>) {
     text += chunk.choices[0]?.delta?.content || "";
     onText?.(text.replace(/<think>[\s\S]*?<\/think>\s*/g, ""));
   }
