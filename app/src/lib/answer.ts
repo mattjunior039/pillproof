@@ -133,9 +133,18 @@ export function topSentences(index: any, question: string, sims: number[] | null
   const low = (i: number) => index.passages[index.units[i][0]][1][index.units[i][1]].toLowerCase();
   for (const i of ranked) {
     if (best.length >= n) break;
-    if (!best.some((j) => low(j).includes(low(i)) || low(i).includes(low(j)))) best.push(i);
+    if (!best.some((j) => low(j).includes(low(i)) || low(i).includes(low(j)) || sameWords(low(i), low(j)))) best.push(i);
   }
   return best.map((i) => quoteAt(index, index.units[i][0], index.units[i][1]));
+}
+
+/** Two sentences say nearly the same thing (labels often repeat the indication in Highlights and section 1). */
+export function sameWords(a: string, b: string): boolean {
+  const A = new Set<string>(contentTokens(a)), B = new Set<string>(contentTokens(b));
+  if (!A.size || !B.size) return false;
+  let both = 0;
+  for (const t of A) if (B.has(t)) both++;
+  return both / Math.min(A.size, B.size) >= 0.85;
 }
 
 /**
@@ -192,7 +201,8 @@ export async function answerQuestion(index: any, label: LabelMeta, question: str
   const raw = await o.generate(r.user);
   const chk = checkReply(raw, r.sentences, label.title, o.lexicon);
   const base = { label, raw, modelKey: o.modelKey, missing, near };
-  const quotes = (): Quote[] => chk.quotes.slice(0, MAX_QUOTES).map(([n, text]: [number, string]) => {
+  const cited = (chk.quotes as [number, string][]).filter(([, t], k, all) => !all.slice(0, k).some(([, u]) => sameWords(t, u)));
+  const quotes = (): Quote[] => cited.slice(0, MAX_QUOTES).map(([n, text]: [number, string]) => {
     const at = where.get(n);
     return at ? { ...quoteAt(index, at[0], at[1]), text } : { text, section: "Label" };
   });

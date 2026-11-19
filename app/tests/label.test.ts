@@ -248,3 +248,10 @@ test("phone tier: 'what is it for' shows the label's own sentences, not the smal
   const { concepts } = await import("../src/lib/query.ts");
   assert.deepEqual(concepts("Why am I taking this?", []).map((c) => c.name), ["what it is used for"]);
 });
+
+test("near-duplicate label sentences are quoted once", async () => {
+  const { sameWords } = await import("../src/lib/answer.ts");
+  assert.ok(sameWords("Metformin hydrochloride tablets are indicated as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus.",
+    "Metformin hydrochloride tablets is a biguanide indicated as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus."));
+  assert.ok(!sameWords("Avoid drinking more than 1.2 liters of grapefruit juice each day.", "Your chances of muscle problems are higher if you drink large amounts of grapefruit juice."));
+});
