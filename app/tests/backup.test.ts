@@ -90,7 +90,7 @@ test("chemistry mentions of alcohol (solubility, excipients) don't count as answ
   assert.deepEqual(r.shown, { kind: "not-found", missing: ["alcohol"] });
 });
 
-test("a model decline on a curated source still shows its sentences; on other labels it counts as no answer", async () => {
+test("a model decline still shows the matching sentences: other labels as 'Your label says', curated sources as passages", async () => {
   const m = med({ ingredient: "fexofenadine hydrochloride" });
   const first = await answerQuestion(plainLabel("fexofenadine"), meta("Fexofenadine"), "Can I drink grapefruit juice?", opts.opts);
   let calls = 0;
@@ -98,8 +98,14 @@ test("a model decline on a curated source still shows its sentences; on other la
   const other = { openfda: { generic_name: ["FEXOFENADINE HYDROCHLORIDE"] }, set_id: "set-2", effective_time: "20250101",
     indications_and_usage: ["Fexofenadine is used for allergies. Do not take with grapefruit juice."] };
   const out = await runBackups(m, meta("Fexofenadine"), "Can I drink grapefruit juice?", first, deps({ otherLabels: async () => [other] }), declines);
-  assert.ok(calls >= 2, "the other label and the FDA page were both sent to the model");
-  assert.equal(out.hit?.source.kind, "fda-page");
-  assert.equal(out.hit!.result.shown.kind, "passages");
-  assert.match((out.hit!.result.shown as any).quotes[0].text, /fexofenadine/i);
+  // The other label mentions grapefruit, so its decline is overridden by the matching sentence (A1).
+  assert.equal(calls, 1);
+  assert.equal(out.hit?.source.kind, "label");
+  assert.ok(out.hit!.result.shown.kind === "passages" && out.hit!.result.shown.why === "declined");
+  assert.match((out.hit!.result.shown as any).quotes[0].text, /grapefruit/i);
+  // Without it, the FDA page is next; a decline there still shows its sentences about this drug.
+  const out2 = await runBackups(m, meta("Fexofenadine"), "Can I drink grapefruit juice?", first, deps({ otherLabels: async () => [] }), declines);
+  assert.equal(out2.hit?.source.kind, "fda-page");
+  assert.equal(out2.hit!.result.shown.kind, "passages");
+  assert.match((out2.hit!.result.shown as any).quotes[0].text, /fexofenadine/i);
 });

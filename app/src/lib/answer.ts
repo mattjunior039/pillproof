@@ -3,7 +3,7 @@
 import { DESKTOP, PHONE, render, scores, select } from "../../../core/retrieval.js";
 import { checkReply } from "../../../core/checks.js";
 import { sectionName } from "./chunk.ts";
-import { concepts, searchQuery } from "./query.ts";
+import { concepts, nearMisses, searchQuery } from "./query.ts";
 import type { LabelMeta } from "./types.ts";
 
 /** A cited label sentence; `before` is an unhighlighted lead-in ("…if you have:") for context. */
@@ -16,8 +16,12 @@ export type Shown =
   | { kind: "quotes"; quotes: Quote[] }
   /** The model said the retrieved sentences don't answer it. */
   | { kind: "decline" }
-  /** No model (or its reply was unusable): the closest label sentences, clearly labelled as such. */
-  | { kind: "passages"; quotes: Quote[]; why: "no-model" | "invalid" | "error" }
+  /**
+   * No model (or its reply was unusable): the closest label sentences, clearly labelled as such.
+   * "declined": the model said NOT IN LABEL but the relevance gate found sentences about the
+   * question's topic, so those are quoted as "Your label says:" (extractive, no model text).
+   */
+  | { kind: "passages"; quotes: Quote[]; why: "no-model" | "invalid" | "error" | "declined" }
   /** No label sentence mentions what the question is about (e.g. "grapefruit juice"); the model is not run. */
   | { kind: "not-found"; missing: string[] };
 
@@ -26,6 +30,8 @@ export interface AnswerResult {
   label: LabelMeta;
   /** Topics of the question that no label sentence mentions (shown as a note when the rest is answered). */
   missing?: string[];
+  /** Similar-looking things the label does mention instead ("grapefruit juice" for "grape juice"). */
+  near?: string[];
   /** Raw model reply, for the "details" disclosure. */
   raw?: string;
   modelKey?: string;
@@ -99,10 +105,12 @@ export function coverage(index: any, question: string, ownNames: string[]) {
   const cs = concepts(question, ownNames);
   const texts: string[] = index.units.map((_: unknown, i: number) => unitText(index, i));
   const covered = cs.filter((c) => texts.some((t) => c.covers(t)));
+  const notCovered = cs.filter((c) => !covered.includes(c));
   return {
     any: cs.length > 0,
     covered,
-    missing: cs.filter((c) => !covered.includes(c)).map((c) => c.name),
+    missing: notCovered.map((c) => c.name),
+    near: notCovered.flatMap((c) => nearMisses(c, texts)),
     keep: (i: number) => !cs.length || covered.some((c) => c.covers(texts[i])),
     /** Sentences under a heading about the asked topic ("How do I store …?") rank a little higher. */
     boost: (i: number) => (covered.some((c) => c.head?.test((index.passages[index.units[i][0]][0] || "").toLowerCase())) ? 0.1 : 0),
@@ -137,26 +145,32 @@ export async function answerQuestion(index: any, label: LabelMeta, question: str
   const params = o.tier === "phone" ? PHONE : DESKTOP;
   const cov = coverage(index, question, [label.title, ...(label.brandNames || []), ...(label.genericNames || [])]);
   const missing = cov.missing.length ? cov.missing : undefined;
-  if (cov.any && !cov.covered.length) return { shown: { kind: "not-found", missing: cov.missing }, label, ms: Date.now() - t0 };
-  const passages = (why: "no-model" | "invalid" | "error"): Shown => {
+  const near = cov.near.length ? cov.near : undefined;
+  if (cov.any && !cov.covered.length) return { shown: { kind: "not-found", missing: cov.missing }, label, near, ms: Date.now() - t0 };
+  const passages = (why: "no-model" | "invalid" | "error" | "declined", n = o.passageCount ?? 2): Shown => {
     const prefer = (i: number) => (o.prefer?.test(index.passages[index.units[i][0]][1][index.units[i][1]]) ? 1 : 0);
-    const quotes = topSentences(index, question, o.sims, params, o.passageCount ?? 2, cov.keep, (i) => cov.boost(i) + prefer(i));
+    const quotes = topSentences(index, question, o.sims, params, n, cov.keep, (i) => cov.boost(i) + prefer(i));
     return !quotes.length && cov.any ? { kind: "not-found", missing: cov.missing.length ? cov.missing : cov.covered.map((c) => c.name) } : { kind: "passages", why, quotes };
   };
-  if (!o.generate) return { shown: passages("no-model"), label, missing, ms: Date.now() - t0 };
+  if (!o.generate) return { shown: passages("no-model"), label, missing, near, ms: Date.now() - t0 };
 
   const r = retrieveFor(index, label.title, question, o.sims, params);
   const where = new Map<number, [number, number]>();
   for (const [key, n] of r.numbering as Map<string, number>) where.set(n, key.split(",").map(Number) as [number, number]);
   const raw = await o.generate(r.user);
   const chk = checkReply(raw, r.sentences, label.title, o.lexicon);
-  const base = { label, raw, modelKey: o.modelKey, missing };
+  const base = { label, raw, modelKey: o.modelKey, missing, near };
   const quotes = (): Quote[] => chk.quotes.slice(0, MAX_QUOTES).map(([n, text]: [number, string]) => {
     const at = where.get(n);
     return at ? { ...quoteAt(index, at[0], at[1]), text } : { text, section: "Label" };
   });
   let shown: Shown;
-  if (chk.status === "decline") shown = { kind: "decline" };
+  if (chk.status === "decline") {
+    // Over-declining: when the gate found sentences about the asked topic, quote them instead
+    // (only then: with no topic words, or none in the label, unrelated sentences are never shown).
+    const q = cov.any && cov.covered.length ? passages("declined", MAX_QUOTES) : null;
+    shown = q && q.kind === "passages" && q.quotes.length ? q : { kind: "decline" };
+  }
   else if (chk.status === "answer" && chk.quotes.length) {
     shown = chk.blocked ? { kind: "quotes", quotes: quotes() } : { kind: "answer", restatement: chk.restatement!, quotes: quotes() };
   } else shown = passages("invalid");
@@ -168,19 +182,22 @@ export async function answerQuestion(index: any, label: LabelMeta, question: str
 export const listWords = (xs: string[]) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
 
 /** The label is silent on this: say so plainly, and never let silence read as "safe". */
-export const notMentioned = (missing: string[]) =>
-  `The label does not mention ${listWords(missing.map((m) => `“${m}”`))}. That does not mean it is safe or unsafe.`;
+export const notMentioned = (missing: string[], near?: string[]) =>
+  `The label does not mention ${listWords(missing.map((m) => `“${m}”`))}.` +
+  (near?.length ? ` It does mention ${listWords(near.map((m) => `“${m}”`))}, which ${near.length > 1 ? "are" : "is"} different.` : "") +
+  " That does not mean it is safe or unsafe.";
 
 export function plainText(res: AnswerResult, advice: boolean, adviceLine: string, standing: string, notCovered: string): string {
   const s = res.shown;
   const parts: string[] = [];
   if (advice) parts.push(adviceLine);
-  if (s.kind === "not-found") parts.push(notMentioned(s.missing), "Ask your pharmacist.");
-  else if (res.missing?.length && s.kind !== "decline") parts.push(notMentioned(res.missing));
+  if (s.kind === "not-found") parts.push(notMentioned(s.missing, res.near), "Ask your pharmacist.");
+  else if (res.missing?.length && s.kind !== "decline") parts.push(notMentioned(res.missing, res.near));
   if (s.kind === "answer") parts.push(s.restatement, "The label says: " + s.quotes.map((q) => q.text).join(" "));
   else if (s.kind === "quotes") parts.push("The label says: " + s.quotes.map((q) => q.text).join(" "));
   else if (s.kind === "decline") parts.push(notCovered);
   else if (s.kind === "not-found") { /* said above */ }
+  else if (s.why === "declined") parts.push("Your label says: " + s.quotes.map((q) => q.text).join(" "));
   else if (s.quotes.length) parts.push("The closest sentences in the label: " + s.quotes.map((q) => q.text).join(" "));
   else parts.push(notCovered);
   parts.push(standing);

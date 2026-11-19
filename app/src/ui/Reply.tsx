@@ -109,17 +109,19 @@ function LabelAnswer({ reply }: { reply: Extract<Reply, { kind: "label" }> }) {
     <div class="answer">
       {advice && <Box tone="note"><p>{ADVICE_LINE}</p></Box>}
       {s.kind === "not-found" && (
-        <Box tone="note"><p class="lead">{notMentioned(s.missing)}</p>{ask}</Box>
+        <Box tone="note"><p class="lead">{notMentioned(s.missing, result.near)}</p>{ask}</Box>
       )}
-      {result.missing && s.kind !== "not-found" && s.kind !== "decline" && <p class="missing">{notMentioned(result.missing)}</p>}
+      {result.missing && s.kind !== "not-found" && s.kind !== "decline" && <p class="missing">{notMentioned(result.missing, result.near)}</p>}
       {s.kind === "answer" && <p class="plain">{s.restatement}</p>}
       {s.kind === "quotes" && <p class="plain">Here is what the label says:</p>}
       {s.kind === "decline" && (
         <Box tone="note"><p class="lead">{NOT_COVERED}</p>{ask}</Box>
       )}
       {s.kind === "passages" && (s.quotes.length ? (
-        <p class="plain-sub">
-          {s.why === "no-model" ? "What the label says about this (please read it yourself):" : "The answer couldn't be checked. What the label says about this:"}
+        <p class={s.why === "declined" ? "plain" : "plain-sub"}>
+          {s.why === "no-model" ? "What the label says about this (please read it yourself):"
+            : s.why === "declined" ? "Your label says:"
+            : "The answer couldn't be checked. What the label says about this:"}
         </p>
       ) : (
         <Box tone="note"><p class="lead">{NOT_COVERED}</p>{ask}</Box>

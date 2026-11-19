@@ -55,7 +55,7 @@ test("rxnorm product parsing", () => {
 });
 
 test("answer pipeline: checked answer, blocked restatement, decline, invalid, passage-only", async () => {
-  const { answerQuestion } = await import("../src/lib/answer.ts");
+  const { answerQuestion, plainText } = await import("../src/lib/answer.ts");
   const idx = new LabelIndex(chunkLabel(rec));
   const label: any = { title: "Atorvastatin calcium", effective: "20250101" };
   const lexicon = new Set(["atorvastatin", "warfarin"]);
@@ -71,7 +71,14 @@ test("answer pipeline: checked answer, blocked restatement, decline, invalid, pa
   // Qualifier check: an unqualified "Yes" over "Avoid … more than 1.2 liters" shows the cited sentence instead.
   const yes = await ask(`SENTENCES: ${n}\nANSWER: Yes, you can drink grapefruit juice.`);
   assert.ok(yes.shown.kind === "quotes" && /grapefruit/i.test(yes.shown.quotes[0].text));
-  assert.equal((await ask("NOT IN LABEL")).shown.kind, "decline");
+  // Over-declining (A1): the gate found grapefruit sentences, so they are quoted ("Your label says:"), not declined.
+  const dec = await ask("NOT IN LABEL");
+  assert.ok(dec.shown.kind === "passages" && dec.shown.why === "declined" && dec.shown.quotes.length >= 1 && dec.shown.quotes.length <= 3);
+  if (dec.shown.kind === "passages") for (const x of dec.shown.quotes) assert.match(x.text, /grapefruit/i);
+  assert.match(plainText(dec, false, "", "", "NOT COVERED"), /^Your label says: .*grapefruit/i);
+  // With no topic words to match, a decline stays a decline (no unrelated sentences).
+  const plain = await answerQuestion(idx, label, "Is it any good?", { tier: "phone", lexicon, generate: async () => "NOT IN LABEL" });
+  assert.equal(plain.shown.kind, "decline");
   const bad = await ask("SENTENCES: 999\nANSWER: whatever");
   assert.equal(bad.shown.kind, "passages");
   // Degenerate repetition (lite-r3 4-bit on NUZYRA): never shown as the model's answer.
@@ -134,6 +141,22 @@ test("relevance gate: a topic the label never mentions is 'not found', never gen
   assert.equal(m.shown.kind, "passages");
   assert.deepEqual(m.missing, ["kombucha"]);
   if (m.shown.kind === "passages") assert.ok(m.shown.quotes.every((q) => /grapefruit/i.test(q.text)));
+});
+
+test("near-miss terms: grape juice is not grapefruit juice", async () => {
+  const { answerQuestion, plainText } = await import("../src/lib/answer.ts");
+  const { concepts } = await import("../src/lib/query.ts");
+  const idx = new LabelIndex(chunkLabel(rec));
+  const label: any = { title: "Atorvastatin calcium", brandNames: [], genericNames: ["ATORVASTATIN CALCIUM"], effective: "" };
+  let called = false;
+  const r = await answerQuestion(idx, label, "Can I take this with grape juice?", { tier: "phone", lexicon: new Set(), generate: async () => { called = true; return "NOT IN LABEL"; } });
+  assert.deepEqual(r.shown, { kind: "not-found", missing: ["grape juice"] });
+  assert.equal(called, false);
+  assert.deepEqual(r.near, ["grapefruit juice"]);
+  assert.match(plainText(r, false, "", "", ""), /does not mention “grape juice”\. It does mention “grapefruit juice”, which is different\. That does not mean it is safe or unsafe/);
+  // Whole words by stem: plurals still match, longer words don't.
+  const c = concepts("Can I eat grapes?", []).find((x) => x.name === "grapes")!;
+  assert.ok(c.covers("avoid eating grapes") && c.covers("one grape") && !c.covers("grapefruit"));
 });
 
 test("lead-in context: a list item is shown with its unhighlighted lead-in", async () => {

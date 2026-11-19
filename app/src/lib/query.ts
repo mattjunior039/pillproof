@@ -5,7 +5,7 @@
 //  2. concepts: what the question is about, so the app can tell when the label does not
 //     mention it at all ("grapefruit juice") instead of showing sentences that only share
 //     generic words like "take" or "drink".
-import { contentTokens } from "../../../core/text.js";
+import { contentTokens, stem } from "../../../core/text.js";
 
 interface Topic {
   q: RegExp;
@@ -83,12 +83,48 @@ export interface Concept {
   covers: (s: string) => boolean;
   /** Section headings about this topic (lowercased), if any. */
   head?: RegExp;
+  /** For a run of the user's own words ("grape juice"): the words, lowercased. */
+  words?: string[];
+}
+
+/** Stemmed content words of a sentence (memoized: the same label sentences are checked for every concept). */
+const tokCache = new Map<string, Set<string>>();
+function stems(s: string): Set<string> {
+  let t = tokCache.get(s);
+  if (!t) {
+    if (tokCache.size > 20000) tokCache.clear();
+    tokCache.set(s, (t = new Set(contentTokens(s))));
+  }
+  return t;
+}
+
+/**
+ * Label words that start with a word of a concept the label doesn't mention but are a different
+ * word ("grape" -> "grapefruit"), as a phrase when the label has it ("grapefruit juice").
+ * Used to say "It does mention grapefruit juice, which is different."
+ */
+export function nearMisses(c: Concept, texts: string[]): string[] {
+  const out: string[] = [];
+  for (const w of c.words || []) {
+    if (w.length < 4) continue;
+    const count = new Map<string, number>();
+    for (const t of texts) {
+      for (const [x] of t.matchAll(new RegExp(`\\b${w}[a-z]{3,}\\b`, "g"))) if (stem(x) !== stem(w)) count.set(x, (count.get(x) || 0) + 1);
+    }
+    const best = [...count].sort((a, b) => b[1] - a[1])[0]?.[0];
+    if (!best) continue;
+    const phrase = c.name.replace(new RegExp(`\\b${w}\\b`), best);
+    const x = phrase !== best && texts.some((t) => t.includes(phrase)) ? phrase : best;
+    if (!out.includes(x)) out.push(x);
+  }
+  return out;
 }
 
 /**
  * What a question is about: everyday topics with their label wording, plus runs of other
  * content words ("grapefruit juice"). The medicine's own names and generic verbs are dropped.
- * A run of n words is covered by a sentence containing at least ⌈(n+1)/2⌉ of them.
+ * A run of n words is covered by a sentence containing at least ⌈(n+1)/2⌉ of them as whole words
+ * (same stem; "grapes" counts for "grape", "grapefruit" does not).
  */
 export function concepts(question: string, ownNames: string[]): Concept[] {
   let q = ages(question.toLowerCase().replace(/[’']/g, "'"));
@@ -103,10 +139,10 @@ export function concepts(question: string, ownNames: string[]): Concept[] {
   let run: string[] = [];
   const flush = () => {
     if (run.length) {
+      // Whole words by stem: "grape" must not match "grapefruit", but "juice" matches "juices".
       const words = run.map((w) => contentTokens(w)[0]);
-      const res = words.map((w) => new RegExp(`\\b${w.replace(/[^a-z0-9]/g, "")}`));
       const need = Math.ceil((run.length + 1) / 2);
-      out.push({ name: run.join(" "), covers: (s) => res.filter((r) => r.test(s)).length >= need });
+      out.push({ name: run.join(" "), words: [...run], covers: (s) => { const t = stems(s); return words.filter((w) => t.has(w)).length >= need; } });
     }
     run = [];
   };

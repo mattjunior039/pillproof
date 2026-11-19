@@ -230,7 +230,7 @@ export async function medlineLink(med: Pick<Med, "rxcui" | "ingredient">, fetchF
 /** Spoken/copied text for a label reply that went to the backup sources. */
 export function backupText(first: AnswerResult, b: BackupOutcome): string {
   const s0 = first.shown;
-  const parts = [s0.kind === "not-found" ? notMentioned(s0.missing) : "Your label doesn't answer this."];
+  const parts = [s0.kind === "not-found" ? notMentioned(s0.missing, first.near) : "Your label doesn't answer this."];
   if (!b.hit) parts.push(noneMention(b.topic));
   else {
     const s = b.hit.result.shown;
