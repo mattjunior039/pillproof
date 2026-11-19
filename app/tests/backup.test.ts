@@ -98,8 +98,9 @@ test("a model decline still shows the matching sentences: other labels as 'Your 
   const other = { openfda: { generic_name: ["FEXOFENADINE HYDROCHLORIDE"] }, set_id: "set-2", effective_time: "20250101",
     indications_and_usage: ["Fexofenadine is used for allergies. Do not take with grapefruit juice."] };
   const out = await runBackups(m, meta("Fexofenadine"), "Can I drink grapefruit juice?", first, deps({ otherLabels: async () => [other] }), declines);
-  // The other label mentions grapefruit, so its decline is overridden by the matching sentence (A1).
-  assert.equal(calls, 1);
+  // The other label mentions grapefruit, so its decline is overridden by the matching sentence (A1);
+  // later sources are still asked for a checked answer, and none gives one here.
+  assert.ok(calls >= 1);
   assert.equal(out.hit?.source.kind, "label");
   assert.ok(out.hit!.result.shown.kind === "passages" && out.hit!.result.shown.why === "declined");
   assert.match((out.hit!.result.shown as any).quotes[0].text, /grapefruit/i);
@@ -108,4 +109,28 @@ test("a model decline still shows the matching sentences: other labels as 'Your 
   assert.equal(out2.hit?.source.kind, "fda-page");
   assert.equal(out2.hit!.result.shown.kind, "passages");
   assert.match((out2.hit!.result.shown as any).quotes[0].text, /fexofenadine/i);
+});
+
+test("matching sentences without an answer don't stop the search: a later checked answer wins; ER labels are skipped for an ordinary tablet", async () => {
+  const m = med({ ingredient: "fexofenadine hydrochloride", form: "Oral Tablet" });
+  const first = await answerQuestion(plainLabel("fexofenadine"), meta("Fexofenadine"), "Can I drink grapefruit juice?", opts.opts);
+  const label = (text: string, extra = {}) => ({ openfda: { generic_name: ["FEXOFENADINE HYDROCHLORIDE"] }, set_id: "set-2", effective_time: "20250101",
+    indications_and_usage: [text], ...extra });
+  let n = 0;
+  const answers = { ...opts, opts: { ...opts.opts, generate: async (prompt: any) => {
+    const p = JSON.stringify(prompt);
+    const at = p.match(/\[(\d+)\][^\[]*less fexofenadine/);
+    return n++ && at ? `SENTENCES: ${at[1]}\nANSWER: Grapefruit juice can cause less fexofenadine to enter the blood.` : "NOT IN LABEL";
+  } } };
+  const out = await runBackups(m, meta("Fexofenadine"), "Can I drink grapefruit juice?", first,
+    deps({ otherLabels: async () => [label("Fexofenadine is used for allergies. Grapefruit juice was studied in healthy adults.")] }), answers);
+  assert.notEqual(out.hit?.source.kind, "label");
+  assert.equal(out.hit?.result.shown.kind, "answer");
+  // An extended-release label is not used for an ordinary tablet ("do not crush" would be wrong).
+  let seen = 0;
+  const er = label("Do not crush extended-release fexofenadine tablets. Grapefruit juice lowers absorption.", { openfda: { generic_name: ["FEXOFENADINE HYDROCHLORIDE"], brand_name: ["Fexofenadine ER"] } });
+  const out2 = await runBackups(m, meta("Fexofenadine"), "Can I drink grapefruit juice?", first,
+    deps({ otherLabels: async () => { seen++; return [er]; } }), opts);
+  assert.equal(seen, 1);
+  assert.notEqual(out2.hit?.source.kind, "label");
 });

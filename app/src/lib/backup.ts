@@ -61,6 +61,17 @@ export function unanswered(r: AnswerResult): boolean {
 }
 
 const answered = (r: AnswerResult) => !unanswered(r);
+/** Sentences shown without a model answer: kept while later sources are checked for a real answer. */
+const weak = (r: AnswerResult) => r.shown.kind === "passages" || r.shown.kind === "quotes";
+
+const MODIFIED = /\b(extended|delayed|sustained|controlled|modified)[- ]release\b|\b24 hr\b/i;
+const MODIFIED_ABBR = /\b(ER|XR|XL|SR|DR|CR)\b/;
+/** Extended/delayed-release or not: "do not crush ER tablets" is wrong advice for an ordinary tablet. */
+export const releaseKind = (text: string) => MODIFIED.test(text) || MODIFIED_ABBR.test(text) ? "modified" : "immediate";
+const recordForm = (rec: any) => [
+  ...(rec.openfda?.brand_name || []), ...(rec.openfda?.generic_name || []),
+  ...(rec.spl_product_data_elements || []), (rec.package_label_principal_display_panel || []).join(" ").slice(0, 400),
+].join(" ");
 
 const SALT = /\s+(hydrochloride|hcl|hydrobromide|sodium|potassium|calcium|magnesium|besylate|besilate|maleate|mesylate|succinate|tartrate|sulfate|citrate|fumarate|acetate|bromide|phosphate|monohydrate|dihydrate|trihydrate|hemihydrate|anhydrous)$/;
 const METAL = /^(ferrous|ferric|calcium|magnesium|zinc|potassium|sodium|aluminum|lithium)$/;
@@ -147,6 +158,14 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
   };
   const done = async (source: Source, result: AnswerResult, url: (t: string) => string): Promise<BackupOutcome> =>
     ({ hit: { source, result: withUrls(result, url) }, checked, topic, medline: await deps.medline() });
+  // The first source that only had matching sentences; a later source with a checked answer wins.
+  let fallback: Parameters<typeof done> | null = null;
+  const found = (args: Parameters<typeof done>) => {
+    if (!weak(args[1])) return done(...args);
+    fallback ??= args;
+    return null;
+  };
+  const myRelease = releaseKind(`${med.name} ${med.form}`);
 
   // 2. Other FDA labels for the same ingredient(s).
   o.onStatus?.("Checking other FDA labels for the same medicine…");
@@ -156,6 +175,7 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
     let tried = 0;
     for (const rec of recs) {
       if (tried >= o.maxLabels) break;
+      if (releaseKind(recordForm(rec)) !== myRelease) continue;
       const st = toStored(rec);
       const sig = st.passages.map((p) => p[1].join(" ")).join("\n");
       if (!st.passages.length || seenText.has(sig)) continue;
@@ -166,11 +186,13 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
       const r = await ask(st.passages, { ...st.meta, title: meta.title });
       if (answered(r)) {
         const date = labelDate(st.meta.effective);
-        return done({
+        const out = await found([{
           kind: "label",
           badge: `Not on your label — from the FDA label for ${st.meta.title} (${st.meta.manufacturer}), dated ${date}`,
           url: dailyMedUrl(st.meta.setId),
-        }, { ...r, label: st.meta }, () => dailyMedUrl(st.meta.setId));
+        }, { ...r, label: st.meta }, () => dailyMedUrl(st.meta.setId)]);
+        if (out) return out;
+        break;
       }
     }
     checked.push(`other FDA labels for ${listWords(ingr)}`);
@@ -185,8 +207,9 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
     if (!g) continue;
     const r = await ask(g.passages, asLabel(meta), true);
     if (answered(r)) {
-      return done({ kind: "fda-page", badge: `Not on your label — from FDA: ${page.title} (page dated ${page.content_date})`, url: page.url },
-        r, (t) => fragment(page.url, t));
+      const out = await found([{ kind: "fda-page", badge: `Not on your label — from FDA: ${page.title} (page dated ${page.content_date})`, url: page.url },
+        r, (t) => fragment(page.url, t)]);
+      if (out) return out;
     }
   }
   checked.push("FDA consumer pages on food and drink");
@@ -201,12 +224,13 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
     if (answered(r)) {
       const ids = rows[0].ddinter_id;
       const url = dd.detail_url.replace("{id}", ids);
-      return done({
+      const out = await found([{
         kind: "ddinter",
         badge: "Not on your label — from DDInter 2.0, a drug interaction database written for health professionals",
         url,
         credit: { text: `DDInter 2.0, ${dd.license}, accessed ${dd.accessed}`, url: dd.license_url },
-      }, r, () => url);
+      }, r, () => url]);
+      if (out) return out;
     }
   }
   checked.push("the DDInter 2.0 drug–food database");
@@ -222,7 +246,11 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
       let calls = 0;
       for (const page of pages) {
         if (calls >= (o.maxWeb ?? 3)) break;
-        const passages = pagePassages(page);
+        // A page whose title doesn't name the medicine (a list of many drugs) only counts for sentences that do.
+        const titled = aboutDrug({ title: page.title, content: "", raw: "" }, ingr, meta.brandNames || []);
+        const passages = pagePassages(page)
+          .map(([h, ss]): Passage => [h, titled ? ss : ss.filter((x) => aboutDrug({ title: x, content: "", raw: "" }, ingr, meta.brandNames || []))])
+          .filter(([, ss]) => ss.length);
         if (!passages.length) continue;
         const index = new LabelIndex(passages);
         const cov = coverage(index, question, own);
@@ -246,6 +274,7 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
     }
   } else if (o.webOff) checked.push(`the web (not checked: ${WEB_SKIP[o.webOff]})`);
 
+  if (fallback) return done(...(fallback as Parameters<typeof done>));
   return { checked, topic, medline: await deps.medline() };
 }
 

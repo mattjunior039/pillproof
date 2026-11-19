@@ -184,3 +184,20 @@ test("dosing tables become one sentence per row (NUZYRA)", async () => {
   const t = retrieve(idx, "NUZYRA", "ABSSSI loading doses and maintenance dose for NUZYRA tablets", null, PHONE);
   assert.ok(Object.values(t.sentences).some((x: any) => x.startsWith("For ABSSSI: Loading Doses")), JSON.stringify(t.sentences));
 });
+
+test("question topics: the drug's own name isn't a topic; milk isn't breast milk; stopping suddenly; 'what is X for'", async () => {
+  const { concepts, nearMisses } = await import("../src/lib/query.ts");
+  const names = (q: string, own: string[] = []) => concepts(q, own).map((c) => c.name);
+  assert.deepEqual(names("Can I drink alcohol while taking ibuprofen?", ["Ibuprofen"]), ["alcohol"]);
+  assert.deepEqual(names("Can I take it with milk?"), ["milk"]);
+  const milk = concepts("Can I take it with milk?", [])[0];
+  assert.ok(milk.covers("Take with food or milk.") && !milk.covers("It is excreted in human milk."));
+  assert.deepEqual(names("Is it in breast milk?"), ["breastfeeding"]);
+  const stop = concepts("Can I stop taking it suddenly?", [])[0];
+  assert.equal(stop.name, "stopping suddenly");
+  assert.ok(stop.covers("Withdrawal should be gradual.") && !stop.covers("Should be discontinued if no response."));
+  assert.deepEqual(names("What is atorvastatin for?", ["Atorvastatin"]), ["what it is used for"]);
+  // Inflections of the asked word are the same thing, not a near miss ("controlled" for "control").
+  const c = concepts("Is it birth control?", []).find((x) => /control/.test(x.name))!;
+  assert.deepEqual(nearMisses(c, ["Use controlled doses."]), []);
+});

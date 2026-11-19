@@ -164,12 +164,24 @@ export async function answerQuestion(index: any, label: LabelMeta, question: str
     const at = where.get(n);
     return at ? { ...quoteAt(index, at[0], at[1]), text } : { text, section: "Label" };
   });
+  const unitOf = new Map<string, number>(index.units.map((u: [number, number], i: number) => [`${u[0]},${u[1]}`, i]));
+  const onTopic = (qs: [number, string][]) => qs.some(([n]) => {
+    const at = where.get(n);
+    const i = at && unitOf.get(`${at[0]},${at[1]}`);
+    return i !== undefined && cov.keep(i);
+  });
   let shown: Shown;
   if (chk.status === "decline") {
     // Over-declining: when the gate found sentences about the asked topic, quote them instead
     // (only then: with no topic words, or none in the label, unrelated sentences are never shown).
-    const q = cov.any && cov.covered.length ? passages("declined", MAX_QUOTES) : null;
+    // Every topic must be covered: for "stop suddenly" a sentence about stopping is not the answer.
+    const q = cov.any && cov.covered.length && !cov.missing.length ? passages("declined", MAX_QUOTES) : null;
     shown = q && q.kind === "passages" && q.quotes.length ? q : { kind: "decline" };
+  }
+  else if (chk.status === "answer" && chk.quotes.length && cov.any && !onTopic(chk.quotes)) {
+    // The model cited only sentences that don't mention what was asked ("used for" answered from a
+    // varicella sentence): its answer is not grounded, so show the on-topic sentences instead.
+    shown = passages("invalid");
   }
   else if (chk.status === "answer" && chk.quotes.length) {
     shown = chk.blocked ? { kind: "quotes", quotes: quotes() } : { kind: "answer", restatement: chk.restatement!, quotes: quotes() };
