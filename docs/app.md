@@ -28,7 +28,7 @@ The model weights are served by the dev and preview servers from `~/waicy-work/m
 | **Ask** | The chat (see below). |
 | **Voice** | One large hold-to-ask button. Speech is recognised in the browser by Moonshine (tiny on phones, base on desktop) through transformers.js, never by the browser's cloud speech service. Answers are spoken. Typing always works. |
 | **Changes** | Label-change history from `app/data/label_changes.json`: the old sentence beside the new one, how far back the history goes, and "ask your pharmacist or doctor before changing anything". |
-| **Settings** | Text size, high contrast, answer mode (model or passages only), model download/delete, smart search (bge-small embeddings), backup sources, and calendar export. |
+| **Settings** | Text size, high contrast, answer mode (model or passages only), model download/delete, smart search (bge-small embeddings), backup sources, web search (with the note "Your question is sent to a search service."), and calendar export. |
 
 The UI has large text (three sizes), a high-contrast theme and big touch targets (52 px buttons, 64 px tabs).
 
@@ -45,6 +45,7 @@ The calendar export is an `.ics` file. Events are titled "Medication time" unles
 2. **Relevance gate** (`answer.ts` `coverage`, `query.ts` `concepts`):
    - The question's content concepts (grapefruit, alcohol, pregnancy, …) must appear in the label. Generic words like take, drink, use and can don't count.
    - If a concept is missing, the reply is: "The label does not mention X. That does not mean it is safe or unsafe." plus the pharmacist prompt.
+   - **Near-miss terms are never merged.** "grape juice" does not match "grapefruit juice", and the reply says so: "The label does not mention “grape juice”. It does mention “grapefruit juice”, which is different." (`query.ts` `nearMisses`).
 3. **Retrieval and prompt.** These are the Gate 2 hybrid retrieval and SENTENCES prompt format, shared from `core/`, with the phone and desktop presets.
 4. **Model.** WebLLM runs in a worker.
 5. **Checks.** The JS quote, number and drug-name checks from Gate 2 run on the reply.
@@ -53,6 +54,10 @@ The calendar export is an `.ics` file. Events are titled "Medication time" unles
    - At most 3 quotes are shown.
    - Each quote shows its section name; the caption gives the maker, the label date and a DailyMed link.
    - Every answer ends with the standing line "This is information from the FDA label, not medical advice for you."
+   - **Over-declining.** If the model says NOT IN LABEL but the relevance gate found sentences matching every concept in the question, the app shows "Your label says:" with the top 1 to 3 sentences (extractive, no model text). Unrelated sentences are never shown (Accord atorvastatin + grapefruit → "Avoid drinking more than 1.2 liters of grapefruit juice each day.").
+   - **Unreliable model text is dropped and the quotes stay:** an answer cut off mid-sentence keeps only its complete sentences; an abbreviation spelled out differently from the label ("premature menstruation (PMDD)") shows quotes only; near-duplicate label sentences are quoted once.
+   - **Phone tier, "what is it for".** The 0.8B model's plain-language glosses of indication lists were wrong in 3 of our dev questions ("a statin (a type of cholesterol)", "sleepiness" for "sleeplessness"), so on phones this question shows the label's own sentences.
+   - **Dosing tables** become sentences ("For <row header>: <cells>") in `datapipe/sentences.py` and the JS port, so retrieval and the model can use them. Numbering stays in parity, and the T1 gold refs still resolve.
 7. **Passage-only fallback.** On devices without WebGPU, with the model off, or after a crash, the app shows the best matching label sentences under "please read it yourself".
 
 **iPhone guards** (docs/gate1.md):
@@ -78,7 +83,8 @@ This is a separate feature, on by default in the app (Settings → "check other 
    - [Drug Interactions: What You Should Know](https://www.fda.gov/drugs/resources-drugs/drug-interactions-what-you-should-know) (2013). It is co-branded with the Council on Family Health and covers pain relievers with alcohol, and caffeine.
    - Each page is split into groups of exact sentences, one group per named drug. The builder checks each sentence against the live page text.
 4. **DDInter 2.0 drug–food interactions.** Stored in `app/data/ddinter_food.json` (857 rows, 726 drugs). Used for single-ingredient products only, and a route qualifier like "(ophthalmic)" must match.
-5. **If nothing answers:** "None of the sources we checked mention X with this medicine. Ask your pharmacist." This is followed by the list of sources checked and a MedlinePlus link (see below).
+5. **The web** (see "Web search" below), if the setting is on.
+6. **If nothing answers:** "None of the sources we checked mention X with this medicine. Ask your pharmacist." This is followed by the list of sources checked and a MedlinePlus link (see below).
 
 **Rules:**
 - **Exact ingredients.** A source is used only if it names every active ingredient of the confirmed product. Salts are stripped (atorvastatin calcium → atorvastatin), metal names are kept (ferrous sulfate), and DDInter synonyms are applied (aspirin → acetylsalicylic acid). So a combination such as Goody's (acetaminophen + aspirin) only matches the FDA pain-reliever group, which names both, and never matches DDInter.
@@ -117,6 +123,44 @@ This is a separate feature, on by default in the app (Settings → "check other 
 | lisinopril (RemedyRepack) | Can I drink alcohol? | Label silent → DDInter: "Some authorities recommend avoiding alcohol in patients receiving vasodilating antihypertensive drugs." |
 | rosuvastatin (Torrent) | Can I drink grapefruit juice? | No source names rosuvastatin with grapefruit → "None of the sources we checked mention “grapefruit juice” with this medicine. Ask your pharmacist." plus the MedlinePlus link. |
 | atorvastatin | Can I drink kombucha? | "None of the sources we checked mention “kombucha” …" plus the MedlinePlus link. |
+
+## Web search (last step before "none of the sources")
+
+A separate, optional step, on by default in the app (Settings → "If those don't answer either, search the web", with the note "Your question is sent to a search service, with only the medicine's ingredient name."). **Off for the frozen evaluation**: T1 to T5 and systems A to E stay label-only.
+
+**Method:**
+- **Proxy.** The browser posts only `{ingredients, question}` to `/api/search`. Nothing else from the medicine list is sent. The proxy (`app/server/search.js`) adds the Tavily key and calls Tavily. The key is read from `~/waicy-work/.env` (`TAVILY_API_KEY`) by the Vite dev and preview servers. It is never logged, committed or sent to the browser. If the key is missing, the step is skipped and the reply lists the web as "not set up on this server".
+- **Search.** `search_depth: "advanced"`, raw page text included, 15 s timeout with one retry, and a "Searching the web…" status. The first search is limited to consumer health sites (MedlinePlus, NHS, FDA, Mayo Clinic, Cleveland Clinic, drugs.com, …). If fewer than 3 come back, an open search over any site is added. That is 2 Tavily credits per question, or 4 with the open search.
+- **Ranking and filtering** (`app/src/lib/web.ts`, `backup.ts`):
+  - Consumer and government sites first, then other sites, then research papers (PubMed etc.), which are only used if nothing else answers.
+  - The top pages' text is split into sentences and goes through the same retrieval and relevance gate as labels; every concept in the question must be covered.
+  - Dropped: sentences naming other drugs, sentences about other dose forms (suspension, injection, extended-release for an immediate-release user), questions, "X + Y" pair pages unless the user named Y, and extended-release pages for immediate-release users.
+- **Answering.** The model answers from the best sentences of one page at a time in the usual SENTENCES format; the number/name and qualifier checks apply. If its wording strays from the quotes (less than 60% of its words supported), or it declines on relevant sentences, the matching sentences are quoted instead. Each quote links to its page.
+
+**Display.** The site name is shown in large text on every web answer, with the badge "From the web (site) — not your label, may be wrong". Sites not on the known list also get "Unverified website", forums are labelled "(discussion forum)", and research papers are labelled "research paper — technical". Nothing is ever presented as "safe" because a source is silent.
+
+**Cache and limits.** Results are cached on disk per (ingredients, question) in `~/waicy-work/cache/web-search.json`, so repeat questions cost nothing. The rate limit is 12 searches per client per minute and 300 a day; the free plan has 1,000 credits a month.
+
+**Public deployment (not done yet).** `app/worker/` is a Cloudflare Worker version of the same proxy, using the Cache API for 30 days. To deploy: `npx wrangler secret put TAVILY_API_KEY`, set `ALLOWED_ORIGIN` in `wrangler.toml`, run `npx wrangler deploy`, and build the app with `VITE_SEARCH_URL=https://<worker>/api/search`. Without it, the static site has no web step.
+
+**Limits:**
+- Web pages can be wrong or out of date, and the badge says so. Attributed quotes may themselves say "generally considered safe" (for example Medical News Today on atorvastatin + ibuprofen). That is the site's wording, shown as a quote, never ours.
+- Results depend on what the search returns that day; the cache keeps repeats stable.
+- It needs the internet; offline, the step is listed as "not checked: no internet".
+
+## Answer quality on everyday questions (dev only)
+
+We wrote 41 everyday questions of our own (none from T1 to T5) over 9 medicines: atorvastatin (Accord), ibuprofen, amoxicillin, prednisone, cetirizine, metformin, lisinopril, sertraline and Tylenol PM. They cover what it's for, how to take it, missed dose, dose, side effects, alcohol, grapefruit vs grape juice, an unusual food, splitting/crushing, pregnancy, use with another common drug, a combination OTC product, and questions with no good answer. Each answer was hand-graded as useful and correct / correct but unhelpful / wrong / dangerous. Harness: Playwright on the real app in Chrome, with backup sources and web search on.
+
+| Run | Useful & correct | Unhelpful | Wrong | Dangerous |
+|---|---|---|---|---|
+| Before (label-only app, first 20 questions) | about 9/20 | | | 0 |
+| Desktop, r1-ft (2B), final | 37/41 (90%) | 4 | 0 | 0 |
+| Phone tier, lite-r1-ft (0.8B, iPhone user agent, phone guards), final | 37/41 (90%) | 4 | 0 | 0 |
+
+**Remaining unhelpful answers:** amoxicillin + milk (the only web match is an NHS sentence about mixing it with a baby's milk); prednisone "cut in half" (the label only says "scored"); cetirizine + grapefruit and metformin "crush" (correctly "none of the sources", because the only pages found were pair pages or extended-release pages). Phone "what is it for" answers are correct but in label wording.
+
+Web answers: 4 per run, all from medical or consumer sites (Drugs.com, MedlinePlus, NHS, Medical News Today); none from unverified sites. Tavily usage while building and evaluating: 25 credits of 1,000.
 
 ## Known limits
 
