@@ -226,3 +226,11 @@ test("an abbreviation spelled out differently from the label is caught", async (
   assert.equal(wrongExpansion("It treats social anxiety disorder (SAD) and premenstrual dysphoric disorder (PMDD).", q), null);
   assert.equal(wrongExpansion("It is an ACE inhibitor (ACE).", q), null, "abbreviations the quotes don't define are not checked");
 });
+
+test("an answer cut off mid-sentence keeps only its complete sentences", async () => {
+  const { completeSentences } = await import("../src/lib/answer.ts");
+  assert.equal(completeSentences("It lowers cholesterol. It is used with diet to treat adults with primary dysb"), "It lowers cholesterol.");
+  assert.equal(completeSentences("Used along with diet to treat adults with primary dysb"), null);
+  assert.equal(completeSentences("Take 1 tablet (10 mg) daily."), "Take 1 tablet (10 mg) daily.");
+  assert.equal(completeSentences("Do not use it (see Warnings)"), null);
+});

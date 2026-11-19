@@ -156,6 +156,17 @@ export function wrongExpansion(restatement: string, quotes: string[]): string | 
   return null;
 }
 
+/**
+ * An answer cut off mid-sentence ("… adults with primary dysb") keeps its complete sentences only;
+ * null if none is complete (then only the quoted label sentences are shown).
+ */
+export function completeSentences(restatement: string): string | null {
+  const t = restatement.trim();
+  if (/[.!?]["”’)]?$/.test(t)) return t;
+  const m = t.match(/^[\s\S]*[.!?]["”’)]?(?=\s)/);
+  return m ? m[0].trim() : null;
+}
+
 /** Most quotes shown under a model answer: highlighting only helps if it is selective. */
 export const MAX_QUOTES = 3;
 
@@ -204,7 +215,8 @@ export async function answerQuestion(index: any, label: LabelMeta, question: str
   }
   else if (chk.status === "answer" && chk.quotes.length) {
     const qs = quotes();
-    shown = chk.blocked || wrongExpansion(chk.restatement || "", qs.map((x) => x.text)) ? { kind: "quotes", quotes: qs } : { kind: "answer", restatement: chk.restatement!, quotes: qs };
+    const said = completeSentences(chk.restatement || "");
+    shown = chk.blocked || !said || wrongExpansion(said, qs.map((x) => x.text)) ? { kind: "quotes", quotes: qs } : { kind: "answer", restatement: said, quotes: qs };
   } else shown = passages("invalid");
   return { ...base, shown, ms: Date.now() - t0 };
 }
