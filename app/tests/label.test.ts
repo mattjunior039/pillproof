@@ -168,3 +168,19 @@ test("lead-in context: a list item is shown with its unhighlighted lead-in", asy
   assert.equal(quoteAt(p, 0, 2).before, "Ask a doctor before use if you have:");
   assert.equal(quoteAt(p, 0, 3).before, undefined);
 });
+
+test("dosing tables become one sentence per row (NUZYRA)", async () => {
+  const nuz = fx("nuzyra_tables_openfda.json");
+  const p = chunkLabel(nuz);
+  const rows = p.filter(([h]) => /^Dosage and Administration table/.test(h)).flatMap(([, s]) => s);
+  const cabp = rows.find((r) => r.startsWith("For CABP: "))!;
+  assert.match(cabp, /Loading Doses: NUZYRA Injection: Day 1: 200 mg by intravenous infusion over 60 minutes/);
+  assert.match(cabp, /NUZYRA Tablets: Day 1: 300 mg orally twice; Maintenance Dose: .*300 mg orally once daily\.$/);
+  assert.ok(rows.every((r) => !/[<>]|\( ?2\.\d/.test(r)), "no tags or cross-references");
+  const idx = new LabelIndex(p);
+  const r = retrieve(idx, "NUZYRA", "How many NUZYRA tablets do I take on day 2 for a skin infection (ABSSSI)?", null, PHONE);
+  assert.ok(Object.values(r.sentences).some((x: any) => /450 mg orally once (a day|daily)/.test(x)));
+  // The row sentence itself is retrievable when the question uses the table's words.
+  const t = retrieve(idx, "NUZYRA", "ABSSSI loading doses and maintenance dose for NUZYRA tablets", null, PHONE);
+  assert.ok(Object.values(t.sentences).some((x: any) => x.startsWith("For ABSSSI: Loading Doses")), JSON.stringify(t.sentences));
+});

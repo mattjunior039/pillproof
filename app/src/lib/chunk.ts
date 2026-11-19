@@ -202,8 +202,77 @@ function splitPatient(text: string, title: string, otc: boolean): Passage[] {
   return out;
 }
 
-/** Bump when chunking changes so cached labels are re-fetched and re-split. */
-export const CHUNKER = 2;
+/** Bump when chunking changes so cached labels are re-fetched and re-split. 3: table rows as sentences. */
+export const CHUNKER = 3;
+
+/**
+ * Tables whose rows are turned into sentences. The plain-text fields flatten tables into one
+ * run-on block (doses split from the row they belong to); a row sentence keeps them together:
+ * "For CABP: Loading Doses: NUZYRA Tablets: Day 1: 300 mg orally twice; Maintenance Dose: …".
+ * App only: the FDARxBench/T1 passages and the Python splitter are untouched.
+ */
+const TABLES: [string, string][] = [
+  ["dosage_and_administration_table", "Dosage and Administration"],
+  ["dosage_forms_and_strengths_table", "Dosage Forms and Strengths"],
+  ["drug_interactions_table", "Drug Interactions"],
+  ["use_in_specific_populations_table", "Use in Specific Populations"],
+];
+
+const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", ge: "≥", le: "≤", micro: "µ", mu: "µ", deg: "°", plusmn: "±", times: "×", ndash: "–", mdash: "—" };
+const decode = (t: string) => t.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, e: string) =>
+  e[0] === "#" ? String.fromCodePoint(e[1].toLowerCase() === "x" ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10)) : ENTITIES[e.toLowerCase()] ?? m);
+/** Cell HTML -> text: inline tags become spaces (SPL runs words into tags), cross-references go. */
+const cellText = (h: string) => clean(decode(h.replace(/<[^>]*>/g, " ")))
+  .replace(/\(\s*(?:\d+(?:\.\d+)*\s*,?\s*)+\)/g, "").replace(/\s+([,.;:)])/g, "$1").replace(/\(\s+/g, "(").replace(/\s+/g, " ").trim();
+const cells = (row: string) => [...row.matchAll(/<(t[hd])\b[^>]*>([\s\S]*?)<\/\1>/gi)].map((m) => ({ th: m[1].toLowerCase() === "th", text: cellText(m[2]) }));
+
+/** One sentence per table row: "For <row header>: <column>: <cell>; …" (regex parsing; tests run without a DOM). */
+export function tableSentences(html: string): { caption: string; rows: string[] } {
+  const caption = cellText(/<caption\b[^>]*>([\s\S]*?)<\/caption>/i.exec(html)?.[1] ?? "");
+  const thead = /<thead\b[^>]*>([\s\S]*?)<\/thead>/i.exec(html)?.[1];
+  let rows = [...html.replace(/<thead\b[\s\S]*?<\/thead>/i, "").matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map((m) => cells(m[1]));
+  let head: string[] = [];
+  if (thead) {
+    const hr = [...thead.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map((m) => cells(m[1]).map((c) => c.text));
+    head = hr[hr.length - 1] || [];
+  } else if (rows[0]?.length > 1 && rows[0].every((c) => c.th)) {
+    head = rows[0].map((c) => c.text);
+    rows = rows.slice(1);
+  }
+  const out: string[] = [];
+  let group = "";
+  for (const r of rows) {
+    const full = r.filter((c) => c.text);
+    if (!full.length) continue;
+    // A row with one filled cell is a group label ("Adults", "Pediatric Patients").
+    if (full.length === 1 && r.length > 1) { group = full[0].text.replace(/:$/, ""); continue; }
+    const [first, ...rest] = r.map((c) => c.text);
+    const parts = rest.map((t, k) => (t ? (head[k + 1] ? `${head[k + 1].replace(/:$/, "")}: ${t}` : t) : "")).filter(Boolean);
+    if (!parts.length) continue;
+    const who = [group, first].filter(Boolean).join(", ");
+    let line = `${who ? `For ${who}` : head[0] || "Row"}: ${parts.join("; ")}`;
+    if (!/[.!?]$/.test(line)) line += ".";
+    out.push(line);
+  }
+  return { caption, rows: out };
+}
+
+function tablePassages(rec: Rec): Passage[] {
+  const out: Passage[] = [];
+  const seen = new Set<string>();
+  for (const [field, name] of TABLES) {
+    const vals = rec[field];
+    if (!Array.isArray(vals)) continue;
+    for (const html of vals) {
+      const { caption, rows } = tableSentences(String(html));
+      const fresh = rows.filter((r) => !seen.has(r) && (seen.add(r), true)).flatMap(capSentence);
+      if (!fresh.length) continue;
+      const head = `${name} table${caption ? `: ${caption.replace(/[.:]$/, "")}` : ""}`;
+      for (let i = 0; i < fresh.length; i += 4) out.push([head, fresh.slice(i, i + 4)]);
+    }
+  }
+  return out;
+}
 
 /** OTC Drug Facts labels arrive from openFDA with their list items run together. */
 export const isOtc = (rec: Rec) => (rec.openfda?.product_type || []).some((t: string) => /OTC/i.test(t));
@@ -240,7 +309,7 @@ export function chunkLabel(rec: Rec): Passage[] {
       }
     }
   }
-  return out;
+  return [...out, ...tablePassages(rec)];
 }
 
 export function titleCase(s: string): string {
