@@ -14,6 +14,8 @@ uv run python -m medlabel_data.medqa               # T2 (MedicationQA)
 uv run python -m medlabel_data.labelfetch          # T3/T5 label versions (needs confirmed drug list)
 uv run python -m medlabel_data.t3 snapshot         # T3: fix the label per drug, number sentences
 uv run python -m medlabel_data.t3 build            # T3: check hand-written items, write the draft sheet
+uv run python -m medlabel_data.t6 labels           # T6: OTC labels, numbered like T3
+uv run python -m medlabel_data.t6 build            # T6: check web-search test items, write the draft sheet
 uv run pytest -q                                   # splitter/section/alignment tests
 ```
 
@@ -213,6 +215,23 @@ The list was confirmed by the project owner on 2026-11-15 and is in `config/t3_d
 - DailyMed history only includes versions it has archived. Some labels restarted their history, for example Zestril has only 2 versions.
 - To pin a different label, set `set_id` for that drug in the config.
 - **T3 questions** (143 items, 30% not answerable, DRAFT) are in `data/build/t3/`. They were drafted by an AI assistant (Claude Opus 5.5) with no access to any system outputs, and are reviewed, edited and locked by the student before any model is run on them. Method, label choice and disclosure: [t3.md](t3.md). T5 is marked by the student separately.
+
+## T6: web-search mode questions (DRAFT)
+
+There are 30 everyday questions on 10 products:
+- 7 T3 drugs;
+- Excedrin (acetaminophen/aspirin/caffeine), Advil and Benadryl.
+
+They split into three groups of 10:
+- answered by the label;
+- not on the label but covered by reputable public sources;
+- ask a pharmacist or doctor, or mixed evidence.
+
+Each item has a reference note in the drafter's own words, 1–2 checked source URLs and a `dangerous_if` note. The files are in `data/build/t6/`.
+
+The items were drafted by an AI assistant (Claude Opus 5.5) with no access to any model, app or web-search output. The student reviews, edits and locks them.
+
+Method and grading scale: [t6.md](t6.md).
 
 ## Licenses
 
