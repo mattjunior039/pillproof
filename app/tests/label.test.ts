@@ -234,3 +234,17 @@ test("an answer cut off mid-sentence keeps only its complete sentences", async (
   assert.equal(completeSentences("Take 1 tablet (10 mg) daily."), "Take 1 tablet (10 mg) daily.");
   assert.equal(completeSentences("Do not use it (see Warnings)"), null);
 });
+
+test("phone tier: 'what is it for' shows the label's own sentences, not the small model's gloss", async () => {
+  const { answerQuestion } = await import("../src/lib/answer.ts");
+  const { LabelIndex } = await import("../../core/retrieval.js");
+  const idx = new LabelIndex([["Uses", ["Atorvastatin is used to lower cholesterol along with diet."]], ["Dosage", ["Take one tablet daily."]]]);
+  const m = { splId: "s", setId: "x", manufacturer: "M", effective: "20260101", title: "Atorvastatin", brandNames: [], genericNames: ["atorvastatin"], hasPatient: true, fetched: 0 };
+  const gen = async (p: any) => `SENTENCES: ${JSON.stringify(p).match(/\[(\d+)\][^\[]*lower cholesterol/)![1]}\nANSWER: Atorvastatin is a statin (a type of cholesterol).`;
+  const phone = await answerQuestion(idx, m, "What is atorvastatin for?", { tier: "phone", lexicon: new Set(), generate: gen });
+  assert.equal(phone.shown.kind, "quotes");
+  const desk = await answerQuestion(idx, m, "What is atorvastatin for?", { tier: "desktop", lexicon: new Set(), generate: gen });
+  assert.equal(desk.shown.kind, "answer");
+  const { concepts } = await import("../src/lib/query.ts");
+  assert.deepEqual(concepts("Why am I taking this?", []).map((c) => c.name), ["what it is used for"]);
+});

@@ -167,6 +167,8 @@ export function completeSentences(restatement: string): string | null {
   return m ? m[0].trim() : null;
 }
 
+const USED_FOR = "what it is used for";
+
 /** Most quotes shown under a model answer: highlighting only helps if it is selective. */
 export const MAX_QUOTES = 3;
 
@@ -215,7 +217,10 @@ export async function answerQuestion(index: any, label: LabelMeta, question: str
   }
   else if (chk.status === "answer" && chk.quotes.length) {
     const qs = quotes();
-    const said = completeSentences(chk.restatement || "");
+    // On the phone model, plain-language glosses of what a medicine treats were often wrong in our
+    // dev questions ("a statin (a type of cholesterol)", "sleepiness" for "sleeplessness"): show the label's words.
+    const glossRisk = o.tier === "phone" && cov.covered.some((c) => c.name === USED_FOR);
+    const said = glossRisk ? null : completeSentences(chk.restatement || "");
     shown = chk.blocked || !said || wrongExpansion(said, qs.map((x) => x.text)) ? { kind: "quotes", quotes: qs } : { kind: "answer", restatement: said, quotes: qs };
   } else shown = passages("invalid");
   return { ...base, shown, ms: Date.now() - t0 };
