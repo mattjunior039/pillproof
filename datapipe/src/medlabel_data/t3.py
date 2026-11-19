@@ -303,12 +303,20 @@ def build() -> None:
     (T3 / "t3_checks.md").write_text("\n".join(report + ["## Problems", ""] + [f"- {e}" for e in errors]))
     if errors:
         sys.exit(1)
-    with open(T3 / "t3_draft.csv", "w", newline="") as f:
-        w = csv.DictWriter(f, CSV_COLS)
-        w.writeheader()
-        w.writerows(rows)
+    write_sheet(T3 / "t3_draft.csv", CSV_COLS, rows, old, "t3_id")
     write_md(rows, spec)
     stats(rows)
+
+
+def write_sheet(path, cols: list[str], rows: list[dict], old: dict, key: str) -> None:
+    """Writes the draft CSV, keeping any extra columns of the old sheet (annotator, *_2 from
+    `medlabel_data.annotation.merge`) with their values, matched by id."""
+    extra = [c for r in old.values() for c in r if c not in cols]
+    extra = list(dict.fromkeys(extra))
+    with open(path, "w", newline="") as f:
+        w = csv.DictWriter(f, cols + extra)
+        w.writeheader()
+        w.writerows({**r, **{c: old.get(r[key], {}).get(c, "") for c in extra}} for r in rows)
 
 
 def write_md(rows: list[dict], spec: dict) -> None:

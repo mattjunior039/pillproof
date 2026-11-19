@@ -31,7 +31,7 @@ from collections import Counter
 
 from . import labels, paths
 from .spl import parse_spl
-from .t3 import _number, _title, _words, decline_checks, dump, in_openfda, load_label, resolve, LEXICON
+from .t3 import _number, _title, _words, decline_checks, dump, in_openfda, load_label, resolve, write_sheet, LEXICON
 
 T6 = paths.BUILD / "t6"
 LABEL_DIR = T6 / "labels"
@@ -166,10 +166,7 @@ def build() -> None:
     (T6 / "t6_checks.md").write_text("\n".join(report + ["## Problems", ""] + [f"- {e}" for e in errors]))
     if errors:
         sys.exit(1)
-    with open(T6 / "t6_draft.csv", "w", newline="") as f:
-        w = csv.DictWriter(f, CSV_COLS)
-        w.writeheader()
-        w.writerows(rows)
+    write_sheet(T6 / "t6_draft.csv", CSV_COLS, rows, old, "t6_id")
     write_md(rows, spec)
     print(len(rows), "items;", dict(Counter(r["category"] for r in rows)))
     print("per drug:", dict(Counter(r["drug"] for r in rows)))
