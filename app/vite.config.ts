@@ -4,6 +4,8 @@ import { VitePWA } from "vite-plugin-pwa";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+// @ts-ignore plain JS module shared with the Cloudflare Worker
+import { handleSearch, limiter } from "./server/search.js";
 
 // Model weights and wasm libraries are served from outside the repo, with the same routes as
 // gate1/scripts/serve.py: /models/<name>/resolve/main/<file> and /libs/<file>.
@@ -40,6 +42,58 @@ function localModels(): Plugin {
   };
 }
 
+// Web search proxy: POST /api/search {ingredients, question}. The Tavily key is read from
+// ~/waicy-work/.env (TAVILY_API_KEY) and never sent to the browser. Results are cached on disk
+// so repeated questions (and evaluation reruns) cost no credits.
+function webSearch(): Plugin {
+  const envFile = process.env.WAICY_ENV || path.join(os.homedir(), "waicy-work/.env");
+  const cacheFile = path.join(os.homedir(), "waicy-work/cache/web-search.json");
+  const key = () => {
+    if (process.env.TAVILY_API_KEY) return process.env.TAVILY_API_KEY;
+    try {
+      const m = fs.readFileSync(envFile, "utf8").match(/^\s*(?:export\s+)?TAVILY_API_KEY\s*=\s*["']?([^"'\s#]+)/m);
+      return m?.[1];
+    } catch { return undefined; }
+  };
+  let store: Record<string, unknown> | null = null;
+  const load = () => {
+    if (!store) { try { store = JSON.parse(fs.readFileSync(cacheFile, "utf8")); } catch { store = {}; } }
+    return store!;
+  };
+  const cache = {
+    get: (k: string) => load()[k],
+    set: (k: string, v: unknown) => {
+      load()[k] = v;
+      fs.mkdirSync(path.dirname(cacheFile), { recursive: true });
+      fs.writeFileSync(cacheFile, JSON.stringify(store));
+    },
+  };
+  const allow = limiter();
+  const handler = (req: any, res: any, next: () => void) => {
+    if ((req.url || "").split("?")[0] !== "/api/search") return next();
+    const send = (status: number, body: unknown) => {
+      res.statusCode = status;
+      res.setHeader("Content-Type", "application/json");
+      res.setHeader("Cache-Control", "no-store");
+      res.end(JSON.stringify(body));
+    };
+    if (req.method !== "POST") return send(405, { error: "method" });
+    let raw = "";
+    req.on("data", (c: Buffer) => { raw += c; if (raw.length > 4000) req.destroy(); });
+    req.on("end", async () => {
+      let body: unknown;
+      try { body = JSON.parse(raw); } catch { return send(400, { error: "bad-json" }); }
+      const [status, out] = await handleSearch(body, { key: key(), fetchFn: fetch, cache, allow, ip: req.socket?.remoteAddress || "local" });
+      send(status, out);
+    });
+  };
+  return {
+    name: "web-search",
+    configureServer: (s) => { s.middlewares.use(handler); },
+    configurePreviewServer: (s) => { s.middlewares.use(handler); },
+  };
+}
+
 // onnxruntime-web's wasm is copied into public/ort so speech and search work offline
 // (transformers.js would otherwise fetch it from a CDN).
 function copyOrt(): Plugin {
@@ -70,6 +124,7 @@ export default defineConfig({
   plugins: [
     copyOrt(),
     localModels(),
+    webSearch(),
     preact(),
     VitePWA({
       registerType: "autoUpdate",
@@ -93,7 +148,7 @@ export default defineConfig({
         // transformers.js also emits an unused copy of the ORT wasm; ours lives in /ort and is cached on first use.
         globIgnores: ["assets/ort-wasm*"],
         maximumFileSizeToCacheInBytes: 40 * 1024 * 1024,
-        navigateFallbackDenylist: [/^\/models\//, /^\/libs\//],
+        navigateFallbackDenylist: [/^\/models\//, /^\/libs\//, /^\/api\//],
         runtimeCaching: [
           { urlPattern: /\/ort\/ort-wasm/, handler: "CacheFirst", options: { cacheName: "ort-runtime" } },
           { urlPattern: /^https:\/\/rxnav\.nlm\.nih\.gov\/REST\/displaynames/, handler: "StaleWhileRevalidate", options: { cacheName: "rxnav-names" } },

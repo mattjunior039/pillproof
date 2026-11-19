@@ -84,16 +84,22 @@ function BackupAnswer({ b }: { b: BackupOutcome }) {
   const s = result.shown;
   return (
     <div class="backup">
+      {source.site && <p class="site">{source.site.name}</p>}
       <p class="badge">{source.badge}</p>
+      {source.site?.kind === "technical" && <p class="warn">Research paper — technical. It may be about a different situation from yours.</p>}
+      {source.site?.kind === "other" && <p class="warn">Unverified website: we don't know who wrote this page or whether it is accurate.</p>}
       {s.kind === "answer" && <p class="plain">{s.restatement}</p>}
       {s.kind === "quotes" && <p class="plain">Here is what it says:</p>}
       {s.kind === "passages" && <p class="plain-sub">What it says about this (please read it yourself):</p>}
       {"quotes" in s && s.quotes.length > 0 && (
         <Quotes quotes={s.quotes} caption={<>
-          <a href={source.url} target="_blank" rel="noopener">Open the source</a>
-          {source.credit && <> · <a href={source.credit.url} target="_blank" rel="noopener">{source.credit.text}</a></>}
+          {source.kind === "web"
+            ? <>Page: <a href={source.url} target="_blank" rel="noopener">{source.credit?.text || source.site?.host}</a> ({source.site?.host})</>
+            : <><a href={source.url} target="_blank" rel="noopener">Open the source</a>
+              {source.credit && <> · <a href={source.credit.url} target="_blank" rel="noopener">{source.credit.text}</a></>}</>}
         </>} />
       )}
+      {b.checked.some((c) => c.includes("not checked")) && <p class="small">Not checked: {b.checked.filter((c) => c.includes("not checked")).join(", ")}.</p>}
       <PharmacistPrompt />
       <p class="small">More about this medicine: <a href={b.medline.url} target="_blank" rel="noopener">{b.medline.title}</a></p>
     </div>

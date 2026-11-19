@@ -3,7 +3,8 @@
 //   2. other FDA labels with exactly the same active ingredient(s),
 //   3. FDA consumer pages (app/data/fda_food.json),
 //   4. DDInter 2.0 drug-food rows (app/data/ddinter_food.json, CC BY-NC-SA 4.0),
-//   5. otherwise a MedlinePlus link (link only).
+//   5. a web search (web.ts; any site, consumer health sites first, always marked "may be wrong"),
+//   6. otherwise "None of the sources we checked …" and a MedlinePlus link (link only).
 // Each source goes through the same relevance gate, model and checks as the label (answer.ts).
 // Not used by the frozen evaluation (T1-T5, systems A-E), which stays label-only.
 import { LabelIndex } from "../../../core/retrieval.js";
@@ -13,6 +14,7 @@ import { concepts } from "./query.ts";
 import { dailyMedUrl, labelDate, toStored } from "./openfda.ts";
 import { ingredientList } from "./rxnorm.ts";
 import type { LabelMeta, Med, Passage } from "./types.ts";
+import { aboutDrug, IMPLIES_SAFE, pagePassages, rankResults, WEB_SKIP, type Site, type WebResponse } from "./web.ts";
 
 export interface FdaPage {
   id: string; title: string; url: string; publisher: string; content_date: string; accessed: string;
@@ -23,12 +25,14 @@ export interface DdinterRow { id: number; drug: string; food: string; level: str
 export interface DdinterFile { source: string; url: string; detail_url: string; license: string; license_url: string; accessed: string; rows: DdinterRow[] }
 
 export interface Source {
-  kind: "label" | "fda-page" | "ddinter";
+  kind: "label" | "fda-page" | "ddinter" | "web";
   /** Badge text, e.g. "Not on your label — from the FDA label for Lipitor (Pfizer), dated Mar 3, 2025". */
   badge: string;
   url: string;
   /** Licence/attribution line, when the source needs one. */
   credit?: { text: string; url: string };
+  /** Web answers: the site, shown in large text; "other" sites get an "Unverified website" warning. */
+  site?: Site;
 }
 
 export interface BackupOutcome {
@@ -46,6 +50,8 @@ export interface BackupDeps {
   /** openFDA records for the same ingredients (excluding the user's label); throws offline. */
   otherLabels: () => Promise<any[]>;
   medline: () => Promise<{ title: string; url: string }>;
+  /** Web search through our proxy (only ingredients and question are sent); throws Error(reason). */
+  web?: (ingredients: string[], question: string) => Promise<WebResponse>;
 }
 
 /** The user's label gave no usable answer. */
@@ -117,6 +123,10 @@ export interface BackupOpts {
   /** Most other-maker labels sent to the model (they are tried one at a time). */
   maxLabels: number;
   onStatus?: (s: string) => void;
+  /** Most web pages sent to the model, one at a time. */
+  maxWeb?: number;
+  /** Why the web was not searched (e.g. "off"), when deps.web is absent. */
+  webOff?: keyof typeof WEB_SKIP;
 }
 
 export async function runBackups(med: Med, meta: LabelMeta, question: string, first: AnswerResult, deps: BackupDeps, o: BackupOpts): Promise<BackupOutcome> {
@@ -201,7 +211,57 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
   }
   checked.push("the DDInter 2.0 drug–food database");
 
+  // 5. The web: pages that name every ingredient, consumer sites first, research papers only last.
+  if (deps.web) {
+    o.onStatus?.("Searching the web…");
+    try {
+      const res = await deps.web(ingr, question);
+      o.onStatus?.("Reading web pages…");
+      const pages = rankResults(res.results).filter((r) => aboutDrug(r, ingr, meta.brandNames || []));
+      const own = [meta.title, ...(meta.brandNames || []), ...(meta.genericNames || [])];
+      let calls = 0;
+      for (const page of pages) {
+        if (calls >= (o.maxWeb ?? 3)) break;
+        const passages = pagePassages(page);
+        if (!passages.length) continue;
+        const index = new LabelIndex(passages);
+        const cov = coverage(index, question, own);
+        if (cov.any && !cov.covered.length) continue; // the page never mentions what was asked
+        calls++;
+        const r = webAnswer(await answerQuestion(index, asLabel(meta), question, { ...o.opts, sims: null, prefer: named }), cov.covered.length > 0);
+        if (r) {
+          const { site } = page;
+          return done({
+            kind: "web",
+            badge: `From the web (${site.name}) — not your label, may be wrong`,
+            url: page.url,
+            site,
+            credit: { text: page.title, url: page.url },
+          }, r, (t) => fragment(page.url, t));
+        }
+      }
+      checked.push(pages.length ? `${pages.length} web page${pages.length > 1 ? "s" : ""} about ${listWords(ingr)}` : "a web search");
+    } catch (e) {
+      checked.push(`the web (not checked: ${WEB_SKIP[(e as Error).message] ?? WEB_SKIP.failed})`);
+    }
+  } else if (o.webOff) checked.push(`the web (not checked: ${WEB_SKIP[o.webOff]})`);
+
   return { checked, topic, medline: await deps.medline() };
+}
+
+/**
+ * What a web page may show. A checked plain answer that says or implies "safe" (or starts with
+ * "Yes") becomes the site's own sentences only; sentences without a model answer count only
+ * when the relevance gate found the asked topic on the page.
+ */
+export function webAnswer(r: AnswerResult, onTopic: boolean): AnswerResult | null {
+  const s = r.shown;
+  if (s.kind === "answer") {
+    return IMPLIES_SAFE.test(s.restatement) || /^\s*yes\b/i.test(s.restatement) ? { ...r, shown: { kind: "quotes", quotes: s.quotes } } : r;
+  }
+  if (s.kind === "quotes") return s.quotes.length ? r : null;
+  if (s.kind === "passages") return onTopic && s.quotes.length ? r : null;
+  return null;
 }
 
 /** Nothing answered: never let silence read as "safe". */

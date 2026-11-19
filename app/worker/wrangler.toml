@@ -1,0 +1,8 @@
+# Not deployed. See docs/app.md, "Web search". The key is a secret: npx wrangler secret put TAVILY_API_KEY
+name = "medlabel-search"
+main = "search-worker.js"
+compatibility_date = "2026-11-01"
+
+[vars]
+# Set to the app's public origin, e.g. "https://medlabel.example.org".
+ALLOWED_ORIGIN = "*"

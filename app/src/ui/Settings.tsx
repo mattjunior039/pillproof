@@ -90,6 +90,11 @@ export function Settings() {
         <input type="checkbox" checked={st.backupSources} onChange={(e) => saveSettings({ backupSources: (e.target as HTMLInputElement).checked })} />
         When my label doesn't answer, check other trusted sources: other FDA labels for the same medicine, FDA consumer pages on food and drink, and the DDInter drug–food database. Answers from them are marked.
       </label>
+      <label class="check">
+        <input type="checkbox" checked={st.webSearch} disabled={!st.backupSources} onChange={(e) => saveSettings({ webSearch: (e.target as HTMLInputElement).checked })} />
+        If those don't answer either, search the web (health sites first). Web answers are marked "may be wrong".
+        <span class="small block">Your question is sent to a search service, with only the medicine's ingredient name. Nothing else from your list is sent.</span>
+      </label>
       {Object.keys(s.vectors).length > 0 && <p class="small">Preparing label search… {Object.values(s.vectors).join(", ")}</p>}
 
       <h2>Calendar</h2>

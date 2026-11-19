@@ -16,6 +16,7 @@ import { embedQuery } from "./lib/ml.ts";
 import { route } from "./lib/router.ts";
 import { answerSchedule, shortName } from "./lib/schedule.ts";
 import type { Med } from "./lib/types.ts";
+import { webSearch } from "./lib/web.ts";
 
 export const lexicon = new Set<string>(lexiconList as string[]);
 
@@ -40,6 +41,8 @@ export interface Settings {
   speakAnswers: boolean;
   /** When the user's label doesn't answer, check other FDA labels, FDA consumer pages and DDInter (app only; the evaluation is label-only). */
   backupSources: boolean;
+  /** Last backup step: a web search through our proxy (sends only the ingredient names and the question). */
+  webSearch: boolean;
 }
 
 export type ModelStatus = "off" | "loading" | "ready" | "error" | "unsupported" | "crashed";
@@ -74,6 +77,7 @@ const tier: Tier = isPhone() ? "phone" : "desktop";
 const DEFAULT_SETTINGS: Settings = {
   v: 2, text: 0, contrast: false, answerMode: "model", modelKey: null, modelConsent: false,
   smartSearch: true, calendarNames: false, voiceConsent: false, speakAnswers: true, backupSources: true,
+  webSearch: true,
 };
 
 let state: State = {
@@ -298,9 +302,12 @@ async function answerFor(med: Med, question: string, advice: boolean, onStatus?:
     ddinter: async () => (await import("../data/ddinter_food.json")).default as unknown as DdinterFile,
     otherLabels: () => otherLabels(med, entry.label.meta.setId, tier === "phone" ? 8 : 20),
     medline: () => medlineLink(med),
+    web: state.settings.webSearch ? (ingr, q) => webSearch(ingr, q, import.meta.env.VITE_SEARCH_URL || "/api/search") : undefined,
   }, {
     opts: modelOk && !state.crash ? { ...base, sims: null, generate } : { ...base, sims: null },
     maxLabels: tier === "phone" ? 2 : 3,
+    maxWeb: tier === "phone" ? 2 : 3,
+    webOff: state.settings.webSearch ? undefined : "off",
     onStatus,
   }).catch((e) => {
     if (isFatalGpuError(e)) crashed(key || "model", "The model stopped working on this device (out of graphics memory). Showing label passages instead.");
