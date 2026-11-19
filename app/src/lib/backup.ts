@@ -14,7 +14,7 @@ import { concepts } from "./query.ts";
 import { dailyMedUrl, labelDate, toStored } from "./openfda.ts";
 import { ingredientList } from "./rxnorm.ts";
 import type { LabelMeta, Med, Passage } from "./types.ts";
-import { aboutDrug, IMPLIES_SAFE, pagePassages, rankResults, WEB_SKIP, type Site, type WebResponse } from "./web.ts";
+import { aboutDrug, IMPLIES_SAFE, otherDrugs, pagePassages, rankResults, support, WEB_SKIP, type Site, type WebResponse } from "./web.ts";
 
 export interface FdaPage {
   id: string; title: string; url: string; publisher: string; content_date: string; accessed: string;
@@ -146,8 +146,15 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
   const ingr = productIngredients(med);
   const checked: string[] = [];
   const named = new RegExp(`\\b(${ingr.map((x) => x.replace(/[^a-z0-9 ]/g, "")).join("|")})\\b`, "i");
-  const ask = async (passages: Passage[], label: LabelMeta, general = false) => {
+  const own = [meta.title, ...(meta.brandNames || []), ...(meta.genericNames || [])];
+  /** A source answers only if it mentions everything asked ("dragon fruit", not just "food"). */
+  const fits = (index: LabelIndex) => {
+    const c = coverage(index, question, own);
+    return !(c.any && c.missing.length);
+  };
+  const ask = async (passages: Passage[], label: LabelMeta, general = false): Promise<AnswerResult | null> => {
     const index = new LabelIndex(passages);
+    if (general && !fits(index)) return null;
     const prefer = general ? named : undefined;
     const r = await answerQuestion(index, label, question, { ...o.opts, sims: null, prefer });
     // Curated sources are about this drug and (after the relevance gate) this topic by construction,
@@ -181,9 +188,9 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
       if (!st.passages.length || seenText.has(sig)) continue;
       seenText.add(sig);
       const lab = coverage(new LabelIndex(st.passages), question, [st.meta.title, ...st.meta.brandNames, ...st.meta.genericNames]);
-      if (lab.any && !lab.covered.length) continue; // the gate needs no model; only real candidates count
+      if (lab.any && lab.missing.length) continue; // the gate needs no model; every asked topic must be there
       tried++;
-      const r = await ask(st.passages, { ...st.meta, title: meta.title });
+      const r = (await ask(st.passages, { ...st.meta, title: meta.title }))!;
       if (answered(r)) {
         const date = labelDate(st.meta.effective);
         const out = await found([{
@@ -206,7 +213,7 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
     const g = page.groups.find((x) => allNamed(ingr, x.ingredients));
     if (!g) continue;
     const r = await ask(g.passages, asLabel(meta), true);
-    if (answered(r)) {
+    if (r && answered(r)) {
       const out = await found([{ kind: "fda-page", badge: `Not on your label — from FDA: ${page.title} (page dated ${page.content_date})`, url: page.url },
         r, (t) => fragment(page.url, t)]);
       if (out) return out;
@@ -221,7 +228,7 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
   if (rows.length) {
     const passages: Passage[] = rows.map((x) => [`${titleCase(x.drug)} and ${x.food} (rated ${x.level})`, x.sentences]);
     const r = await ask(passages, asLabel(meta), true);
-    if (answered(r)) {
+    if (r && answered(r)) {
       const ids = rows[0].ddinter_id;
       const url = dd.detail_url.replace("{id}", ids);
       const out = await found([{
@@ -242,21 +249,23 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
       const res = await deps.web(ingr, question);
       o.onStatus?.("Reading web pages…");
       const pages = rankResults(res.results).filter((r) => aboutDrug(r, ingr, meta.brandNames || []));
-      const own = [meta.title, ...(meta.brandNames || []), ...(meta.genericNames || [])];
       let calls = 0;
       for (const page of pages) {
         if (calls >= (o.maxWeb ?? 3)) break;
         // A page whose title doesn't name the medicine (a list of many drugs) only counts for sentences that do.
+        // Sentences about another medicine ("… with cariprazine") or another release form ("extended-release
+        // tablets whole" for an ordinary tablet) are dropped.
         const titled = aboutDrug({ title: page.title, content: "", raw: "" }, ingr, meta.brandNames || []);
-        const passages = pagePassages(page)
-          .map(([h, ss]): Passage => [h, titled ? ss : ss.filter((x) => aboutDrug({ title: x, content: "", raw: "" }, ingr, meta.brandNames || []))])
-          .filter(([, ss]) => ss.length);
+        const mine = [...ingr, ...own];
+        const keep = (x: string) => (titled || aboutDrug({ title: x, content: "", raw: "" }, ingr, meta.brandNames || []))
+          && !otherDrugs(x, mine, o.opts.lexicon).length && (myRelease === "modified" || releaseKind(x) === "immediate");
+        const passages = pagePassages(page).map(([h, ss]): Passage => [h, ss.filter(keep)]).filter(([, ss]) => ss.length);
         if (!passages.length) continue;
         const index = new LabelIndex(passages);
         const cov = coverage(index, question, own);
-        if (cov.any && !cov.covered.length) continue; // the page never mentions what was asked
+        if (cov.any && cov.missing.length) continue; // the page doesn't mention everything that was asked
         calls++;
-        const r = webAnswer(await answerQuestion(index, asLabel(meta), question, { ...o.opts, sims: null, prefer: named }), cov.covered.length > 0);
+        const r = webAnswer(await answerQuestion(index, asLabel(meta), question, { ...o.opts, sims: null, prefer: named }), cov.covered.length > 0, question);
         if (r) {
           const { site } = page;
           return done({
@@ -283,15 +292,20 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
  * "Yes") becomes the site's own sentences only; sentences without a model answer count only
  * when the relevance gate found the asked topic on the page.
  */
-export function webAnswer(r: AnswerResult, onTopic: boolean): AnswerResult | null {
+export function webAnswer(r: AnswerResult, onTopic: boolean, question = ""): AnswerResult | null {
   const s = r.shown;
   if (s.kind === "answer") {
-    return IMPLIES_SAFE.test(s.restatement) || /^\s*yes\b/i.test(s.restatement) ? { ...r, shown: { kind: "quotes", quotes: s.quotes } } : r;
+    // Our restatement of a web page must say what the page says: mostly its own words.
+    const loose = support(s.restatement, s.quotes.map((q) => q.text), question) < WEB_SUPPORT;
+    return loose || IMPLIES_SAFE.test(s.restatement) || /^\s*yes\b/i.test(s.restatement) ? { ...r, shown: { kind: "quotes", quotes: s.quotes } } : r;
   }
   if (s.kind === "quotes") return s.quotes.length ? r : null;
   if (s.kind === "passages") return onTopic && s.quotes.length ? r : null;
   return null;
 }
+
+/** Least share of a web restatement's content words that must come from the quoted sentences or question. */
+export const WEB_SUPPORT = 0.6;
 
 /** Nothing answered: never let silence read as "safe". */
 export const noneMention = (topic: string[]) =>

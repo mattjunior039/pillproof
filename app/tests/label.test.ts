@@ -201,3 +201,19 @@ test("question topics: the drug's own name isn't a topic; milk isn't breast milk
   const c = concepts("Is it birth control?", []).find((x) => /control/.test(x.name))!;
   assert.deepEqual(nearMisses(c, ["Use controlled doses."]), []);
 });
+
+test("question topics: birth control; cutting in half; 'less effective' is not a topic", async () => {
+  const { concepts } = await import("../src/lib/query.ts");
+  const names = (q: string) => concepts(q, ["Amoxicillin", "Prednisone"]).map((c) => c.name);
+  assert.deepEqual(names("Does amoxicillin make birth control less effective?"), ["birth control"]);
+  const cut = concepts("Can I cut prednisone in half?", ["Prednisone"]);
+  assert.equal(cut.length, 1);
+  assert.ok(cut[0].covers("Tablets are scored and may be broken in half."));
+});
+
+test("'eat' with a named food asks about that food, not food in general", async () => {
+  const { concepts } = await import("../src/lib/query.ts");
+  assert.deepEqual(concepts("Can I eat dragon fruit?", []).map((c) => c.name), ["dragon fruit"]);
+  assert.deepEqual(concepts("Can I eat before taking it?", []).map((c) => c.name), ["food"]);
+  assert.deepEqual(concepts("Can I take it with food?", []).map((c) => c.name), ["food"]);
+});

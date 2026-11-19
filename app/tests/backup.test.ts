@@ -134,3 +134,9 @@ test("matching sentences without an answer don't stop the search: a later checke
   assert.equal(seen, 1);
   assert.notEqual(out2.hit?.source.kind, "label");
 });
+
+test("a backup source must mention everything asked: a potassium-food row doesn't answer 'dragon fruit'", async () => {
+  const { first, out } = await ask(med({ ingredient: "lisinopril" }), "Can I eat dragon fruit?");
+  assert.equal(out.hit, undefined);
+  assert.match(backupText(first, out), /None of the sources we checked mention “dragon fruit”/);
+});

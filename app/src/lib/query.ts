@@ -48,7 +48,8 @@ const TOPICS: Topic[] = [
   { q: /\bliver\b/, add: "liver hepatic", hit: /liver|hepat/, name: "the liver" },
   { q: /\b(stop\w*|quit\w*|come off)( taking( it)?)? (suddenly|abruptly|all at once|cold turkey|at once)\b|\bsudden(ly)? stop\w*/, add: "stop suddenly abruptly withdrawal gradual reduction taper discontinuation", hit: /abrupt|sudden|gradual|taper|withdraw/, name: "stopping suddenly", head: /withdraw|discontinu/ },
   { q: /\b(stop|stopping|quit)\b/, add: "stop taking discontinue", hit: /\bstop|discontinu/, name: "stopping" },
-  { q: /\b(crush\w*|chew\w*|split\w*|cut|break|swallow\w*)\b/, add: "crush chew split break swallow whole", hit: /crush|chew|\bsplit\b|\bbreak\b|\bcut\b|swallow(ed)? (it |them |the \w+ )?whole|whole (tablet|capsule|pill)/, name: "crushing, splitting or chewing", head: /how should i (take|use)|administration/ },
+  { q: /\b(crush\w*|chew\w*|split\w*|cut|break|swallow\w*|halves|halve)\b|\b(in|into) (half|halves)\b/, add: "crush chew split break swallow whole scored", hit: /crush|chew|\bsplit\b|\bbreak\b|\bcut\b|\bhalf\b|\bhalve|\bscored\b|swallow(ed)? (it |them |the \w+ )?whole|whole (tablet|capsule|pill)/, name: "crushing, splitting or chewing", head: /how should i (take|use)|administration/ },
+  { q: /\bbirth[- ]control\b|\bcontracepti\w*|\bthe pill\b/, add: "contraceptives birth control oral contraceptive", hit: /contracepti|birth control/, name: "birth control" },
   { q: /\b(sun|sunlight|sunburn|tanning)\b/, add: "sunlight sun photosensitivity", hit: /\bsun|photosensitiv|ultraviolet|tanning/, name: "sunlight" },
 ];
 
@@ -76,7 +77,7 @@ need needs want still also much many day days daily time times thing things some
 tell say says said mention mentioned label cause causes make makes feel like go going start starting
 prescribed doctor pharmacist little bit lot every ever usually now today risk risks problem problems worry
 question information yes way give gave right wrong long often while same put common most serious
-possible main usual typical any some kind type
+possible main usual typical any some kind type less more effective work works working affect affects
 `.split(/\s+/).filter(Boolean));
 
 export interface Concept {
@@ -162,5 +163,8 @@ export function concepts(question: string, ownNames: string[]): Concept[] {
     else run.push(w);
   }
   flush();
+  // "Can I eat dragon fruit?" asks about dragon fruit: "eat" alone doesn't make it a question about food in general.
+  const verbOnly = /\beat(ing)?\b/.test(question.toLowerCase()) && !/\b(food|meals?|empty stomach|breakfast|lunch|dinner|supper)\b/i.test(question);
+  if (verbOnly && out.some((c) => c.words)) return out.filter((c) => c.name !== "food");
   return out;
 }

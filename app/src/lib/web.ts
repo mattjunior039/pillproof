@@ -3,6 +3,7 @@
 // our proxy (app/server/search.js), which adds the Tavily key. Any site may answer, but consumer
 // health sites rank first, research papers last, and every answer names its site.
 import { splitSentences } from "../../../core/sentences.js";
+import { contentTokens } from "../../../core/text.js";
 import type { Passage } from "./types.ts";
 
 export interface WebResult { url: string; title: string; content: string; raw: string; tier: "consumer" | "open" }
@@ -51,11 +52,16 @@ const TECHNICAL: [string, string][] = [
   ["semanticscholar.org", "Semantic Scholar"], ["biorxiv.org", "bioRxiv"], ["medrxiv.org", "medRxiv"],
 ];
 
+const FORUM_HOST = ["connect.mayoclinic.org", "reddit.com", "quora.com", "healthunlocked.com", "inspire.com", "dailystrength.org", "patientslikeme.com", "healthboards.com", "medhelp.org", "askapatient.com"];
+const FORUM_PATH = /patient\.info\/forums|drugs\.com\/(answers|comments)|webmd\.com\/drugs\/drugreview|\/(community|forums?|discussions?|threads?)\//i;
+
 const ends = (host: string, d: string) => host === d || host.endsWith("." + d);
 
 export function siteOf(url: string): Site {
   let host = "";
   try { host = new URL(url).hostname.toLowerCase().replace(/^www\./, ""); } catch { /* keep "" */ }
+  // Patient forums: what other people wrote, not the site's own information ("Mayo Clinic Connect").
+  if (FORUM_HOST.some((d) => ends(host, d)) || FORUM_PATH.test(url)) return { host, name: `${host} (discussion forum)`, kind: "other", rank: 150 };
   const t = TECHNICAL.find(([d]) => ends(host, d));
   if (t) return { host, name: t[1], kind: "technical", rank: 200 };
   const i = CONSUMER.findIndex(([d]) => ends(host, d));
@@ -100,6 +106,25 @@ export function pagePassages(r: Pick<WebResult, "title" | "content" | "raw">, ma
     }
   }
   return out;
+}
+
+/** Endings of drug names (INN stems), for sentences about another medicine than the one asked about. */
+const DRUG_STEM = /\b[a-z]{3,}(?:azine|apine|oxetine|pril|sartan|olol|statin|dipine|prazole|tidine|azepam|zolam|triptan|afil|mycin|cillin|floxacin|cycline|azole|vir|mab|tinib|parin|xaban|gliptin|glitazone|lukast|tadine|profen|semide|thiazide|codone|morphone|caine|setron|barbital|amine)\b/gi;
+
+/** Drug names in a sentence (from the lexicon or by INN stem), other than the ones given. */
+export function otherDrugs(sentence: string, own: string[], lexicon: Set<string>): string[] {
+  const mine = new Set(own.flatMap((o) => o.toLowerCase().split(/[^a-z]+/)).filter((w) => w.length >= 4));
+  const words = sentence.toLowerCase().match(/[a-z]{4,}/g) || [];
+  const named = [...words.filter((w) => lexicon.has(w)), ...(sentence.match(DRUG_STEM) || []).map((w) => w.toLowerCase())];
+  return [...new Set(named)].filter((w) => !mine.has(w) && ![...mine].some((m) => w.startsWith(m) || m.startsWith(w)));
+}
+
+/** Share of the restatement's content words found in the quoted sentences or the question. */
+export function support(restatement: string, quotes: string[], question: string): number {
+  const pre = (t: string) => t.slice(0, 5);
+  const src = new Set([...contentTokens(quotes.join(" ")), ...contentTokens(question)].map(pre));
+  const toks = contentTokens(restatement).filter((t: string) => !/^\d/.test(t));
+  return toks.length ? toks.filter((t: string) => src.has(pre(t))).length / toks.length : 1;
 }
 
 /** The page is about this medicine: every ingredient (or a brand name) appears in its title or text. */

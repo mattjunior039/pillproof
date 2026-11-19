@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { LabelIndex } from "../../core/retrieval.js";
 import { answerQuestion } from "../src/lib/answer.ts";
-import { runBackups, webAnswer, type BackupDeps } from "../src/lib/backup.ts";
-import { pagePassages, rankResults, siteOf, type WebResult } from "../src/lib/web.ts";
+import { runBackups, WEB_SUPPORT, webAnswer, type BackupDeps } from "../src/lib/backup.ts";
+import { otherDrugs, pagePassages, rankResults, siteOf, support, type WebResult } from "../src/lib/web.ts";
 import { handleSearch, limiter } from "../server/search.js";
 import type { LabelMeta } from "../src/lib/types.ts";
 import { med } from "./helpers.ts";
@@ -84,13 +84,28 @@ test("grape juice: a web page that only mentions grapefruit is not an answer", a
 });
 
 test("web answers never restate 'safe' or an unqualified yes: the site's sentences are shown instead", () => {
-  const r = (restatement: string) => webAnswer({ shown: { kind: "answer", restatement, quotes: [{ text: "q", section: "s" }] }, label: meta("X"), ms: 0 }, true)!.shown.kind;
+  const q = "Take it at the same time each day, with or without food; grape juice is fine to drink.";
+  const r = (restatement: string) => webAnswer({ shown: { kind: "answer", restatement, quotes: [{ text: q, section: "s" }] }, label: meta("X"), ms: 0 }, true)!.shown.kind;
   assert.equal(r("Yes, you can drink grape juice."), "quotes");
   assert.equal(r("It is safe to take with food."), "quotes");
   assert.equal(r("There is no known interaction with grape juice."), "quotes");
   assert.equal(r("Take it at the same time each day."), "answer");
   assert.equal(webAnswer({ shown: { kind: "passages", why: "no-model", quotes: [{ text: "q", section: "s" }] }, label: meta("X"), ms: 0 }, false), null,
     "sentences without the asked topic are never shown");
+});
+
+test("web restatements must use the page's own words; forums, other drugs and other release forms are caught", () => {
+  const page = "Sertraline is used to treat premenstrual dysphoric disorder (PMDD).";
+  assert.ok(support("Sertraline treats premenstrual dysphoric disorder.", [page], "What is sertraline for?") >= WEB_SUPPORT);
+  assert.ok(support("It can be taken by mouth or by injection every day at the same time.", ["Ibuprofen may raise statin levels."], "Can I take ibuprofen with it?") < WEB_SUPPORT);
+  assert.equal(siteOf("https://connect.mayoclinic.org/discussion/prednisone/").kind, "other");
+  assert.match(siteOf("https://connect.mayoclinic.org/discussion/prednisone/").name, /forum/);
+  assert.equal(siteOf("https://www.drugs.com/answers/can-i-cut-prednisone.html").kind, "other");
+  assert.equal(siteOf("https://www.mayoclinic.org/drugs-supplements/prednisone/").kind, "consumer");
+  const lex = new Set(["cetirizine", "warfarin"]);
+  assert.deepEqual(otherDrugs("Grapefruit juice may increase cariprazine levels.", ["cetirizine", "Zyrtec"], lex), ["cariprazine"]);
+  assert.deepEqual(otherDrugs("Cetirizine (Zyrtec) can cause drowsiness.", ["cetirizine", "Zyrtec"], lex), []);
+  assert.deepEqual(otherDrugs("Do not take with warfarin.", ["cetirizine"], lex), ["warfarin"]);
 });
 
 test("web not available: the reason is listed, and the answer is still 'none of the sources'", async () => {
