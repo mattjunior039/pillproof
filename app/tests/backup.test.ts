@@ -133,6 +133,11 @@ test("matching sentences without an answer don't stop the search: a later checke
     deps({ otherLabels: async () => { seen++; return [er]; } }), opts);
   assert.equal(seen, 1);
   assert.notEqual(out2.hit?.source.kind, "label");
+  // A label for both kinds: its extended-release sentences are dropped for an ordinary tablet.
+  const both = label("Swallow extended-release fexofenadine tablets whole and never crush them. Fexofenadine tablets are taken with water.");
+  const out3 = await runBackups(m, meta("Fexofenadine"), "Can I crush the tablet?", await answerQuestion(plainLabel("fexofenadine"), meta("Fexofenadine"), "Can I crush the tablet?", opts.opts),
+    deps({ otherLabels: async () => [both] }), opts);
+  assert.notEqual(out3.hit?.source.kind, "label");
 });
 
 test("a backup source must mention everything asked: a potassium-food row doesn't answer 'dragon fruit'", async () => {

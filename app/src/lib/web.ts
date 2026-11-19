@@ -109,14 +109,40 @@ export function pagePassages(r: Pick<WebResult, "title" | "content" | "raw">, ma
 }
 
 /** Endings of drug names (INN stems), for sentences about another medicine than the one asked about. */
-const DRUG_STEM = /\b[a-z]{3,}(?:azine|apine|oxetine|pril|sartan|olol|statin|dipine|prazole|tidine|azepam|zolam|triptan|afil|mycin|cillin|floxacin|cycline|azole|vir|mab|tinib|parin|xaban|gliptin|glitazone|lukast|tadine|profen|semide|thiazide|codone|morphone|caine|setron|barbital|amine)\b/gi;
+const DRUG_STEM = /\b[a-z]{3,}(?:azine|apine|spirone|oxetine|pril|sartan|olol|statin|dipine|prazole|tidine|azepam|zolam|triptan|afil|mycin|cillin|floxacin|cycline|azole|vir|mab|tinib|parin|xaban|gliptin|glitazone|lukast|tadine|profen|semide|thiazide|codone|morphone|caine|setron|barbital|amine)\b/gi;
 
 /** Drug names in a sentence (from the lexicon or by INN stem), other than the ones given. */
 export function otherDrugs(sentence: string, own: string[], lexicon: Set<string>): string[] {
   const mine = new Set(own.flatMap((o) => o.toLowerCase().split(/[^a-z]+/)).filter((w) => w.length >= 4));
   const words = sentence.toLowerCase().match(/[a-z]{4,}/g) || [];
-  const named = [...words.filter((w) => lexicon.has(w)), ...(sentence.match(DRUG_STEM) || []).map((w) => w.toLowerCase())];
+  // Tall-man lettering ("busPIRone", "predniSONE") is only ever used for drug names.
+  const tall = (sentence.match(/\b[a-z]{2,}[A-Z]{2,}[a-zA-Z]*\b/g) || []).map((w) => w.toLowerCase());
+  const named = [...words.filter((w) => lexicon.has(w)), ...(sentence.match(DRUG_STEM) || []).map((w) => w.toLowerCase()), ...tall];
   return [...new Set(named)].filter((w) => !mine.has(w) && ![...mine].some((m) => w.startsWith(m) || m.startsWith(w)));
+}
+
+/**
+ * A page about this medicine together with another one ("Buspirone + Cetirizine: Can You Take Them
+ * Together?"): it is about that pair, so it only answers questions that name the other medicine.
+ */
+export function pairPageOffTopic(title: string, own: string[], question: string): boolean {
+  const m = title.split(/[:|–]/)[0].match(/^(.+?)\s+(?:\+|&|and|with)\s+(.+)$/i);
+  if (!m) return false;
+  const names = own.flatMap((o) => o.toLowerCase().split(/[^a-z]+/)).filter((w) => w.length >= 4);
+  const has = (x: string) => names.some((n) => x.toLowerCase().includes(n));
+  const other = has(m[1]) ? m[2] : has(m[2]) ? m[1] : null;
+  if (!other) return false;
+  const q = question.toLowerCase();
+  return !(other.toLowerCase().match(/[a-z]{4,}/g) || []).some((w) => q.includes(w));
+}
+
+/** Dosage forms: a sentence about the suspension or the injection is not about a tablet. */
+const FORMS = /\b(suspension|syrup|liquid|oral solution|injections?|injectable|infusion|intravenous|cream|ointment|gel|patch(es)?|eye drops|ear drops|inhaler|nasal spray|suppositor(y|ies)|chewable|orally disintegrating|powder for)\b/gi;
+/** Dosage forms named in a sentence that the user's form isn't ("by injection" for tablets). */
+export function otherForms(sentence: string, myForm: string): string[] {
+  const mine = myForm.toLowerCase();
+  return [...new Set((sentence.match(FORMS) || []).map((f) => f.toLowerCase()))]
+    .filter((f) => !mine.includes(f.replace(/s$|es$|ies$/, "")) && !(f.startsWith("suppositor") && mine.includes("suppositor")) && !(f === "liquid" && /solution|syrup|suspension|liquid/.test(mine)));
 }
 
 /** Share of the restatement's content words found in the quoted sentences or the question. */

@@ -14,7 +14,7 @@ import { concepts } from "./query.ts";
 import { dailyMedUrl, labelDate, toStored } from "./openfda.ts";
 import { ingredientList } from "./rxnorm.ts";
 import type { LabelMeta, Med, Passage } from "./types.ts";
-import { aboutDrug, IMPLIES_SAFE, otherDrugs, pagePassages, rankResults, support, WEB_SKIP, type Site, type WebResponse } from "./web.ts";
+import { aboutDrug, IMPLIES_SAFE, otherDrugs, otherForms, pagePassages, pairPageOffTopic, rankResults, support, WEB_SKIP, type Site, type WebResponse } from "./web.ts";
 
 export interface FdaPage {
   id: string; title: string; url: string; publisher: string; content_date: string; accessed: string;
@@ -183,7 +183,9 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
     for (const rec of recs) {
       if (tried >= o.maxLabels) break;
       if (releaseKind(recordForm(rec)) !== myRelease) continue;
-      const st = toStored(rec);
+      const st0 = toStored(rec);
+      // Labels covering both kinds ("Swallow … extended-release tablets whole") keep only what fits this tablet.
+      const st = myRelease === "modified" ? st0 : { ...st0, passages: st0.passages.map(([h, ss]): Passage => [h, ss.filter((x) => releaseKind(x) === "immediate")]).filter(([, ss]) => ss.length) };
       const sig = st.passages.map((p) => p[1].join(" ")).join("\n");
       if (!st.passages.length || seenText.has(sig)) continue;
       seenText.add(sig);
@@ -255,11 +257,18 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
         // A page whose title doesn't name the medicine (a list of many drugs) only counts for sentences that do.
         // Sentences about another medicine ("… with cariprazine") or another release form ("extended-release
         // tablets whole" for an ordinary tablet) are dropped.
-        const titled = aboutDrug({ title: page.title, content: "", raw: "" }, ingr, meta.brandNames || []);
+        // A page titled "Buspirone and cetirizine" isn't about this medicine as a whole; questions
+        // ("Which pain relievers can you take with …?") are headings, not answers; a paragraph that
+        // mentions extended-release is dropped whole for an ordinary tablet ("Do not crush it" follows).
         const mine = [...ingr, ...own];
+        if (myRelease === "immediate" && releaseKind(`${page.title} ${page.url.replace(/[-_]/g, " ")}`) === "modified") continue;
+        if (pairPageOffTopic(page.title, mine, question)) continue;
+        const titled = aboutDrug({ title: page.title, content: "", raw: "" }, ingr, meta.brandNames || []) && !otherDrugs(page.title, mine, o.opts.lexicon).length;
         const keep = (x: string) => (titled || aboutDrug({ title: x, content: "", raw: "" }, ingr, meta.brandNames || []))
-          && !otherDrugs(x, mine, o.opts.lexicon).length && (myRelease === "modified" || releaseKind(x) === "immediate");
-        const passages = pagePassages(page).map(([h, ss]): Passage => [h, ss.filter(keep)]).filter(([, ss]) => ss.length);
+          && !otherDrugs(x, mine, o.opts.lexicon).length && !otherForms(x, `${med.name} ${med.form}`).length && !/\?["”’)]?$/.test(x.trim());
+        const passages = pagePassages(page)
+          .filter(([, ss]) => myRelease === "modified" || ss.every((x) => releaseKind(x) === "immediate"))
+          .map(([h, ss]): Passage => [h, ss.filter(keep)]).filter(([, ss]) => ss.length);
         if (!passages.length) continue;
         const index = new LabelIndex(passages);
         const cov = coverage(index, question, own);

@@ -2,6 +2,7 @@
 // Pure apart from the injected `generate`, so it runs under node tests too.
 import { DESKTOP, PHONE, render, scores, select } from "../../../core/retrieval.js";
 import { checkReply } from "../../../core/checks.js";
+import { contentTokens } from "../../../core/text.js";
 import { sectionName } from "./chunk.ts";
 import { concepts, nearMisses, searchQuery } from "./query.ts";
 import type { LabelMeta } from "./types.ts";
@@ -137,6 +138,24 @@ export function topSentences(index: any, question: string, sims: number[] | null
   return best.map((i) => quoteAt(index, index.units[i][0], index.units[i][1]));
 }
 
+/**
+ * The answer spells out an abbreviation differently from the quoted sentences ("premature menstruation
+ * (PMDD)" where the label says "premenstrual dysphoric disorder (PMDD)"): the model made it up.
+ */
+export function wrongExpansion(restatement: string, quotes: string[]): string | null {
+  const pre = (t: string) => t.slice(0, 5);
+  const src = quotes.join(" ");
+  for (const m of restatement.matchAll(/((?:[A-Za-z'-]+\s+){1,7})\(([A-Z]{2,6})s?\)/g)) {
+    const acr = m[2];
+    const q = src.match(new RegExp(`((?:[A-Za-z'-]+[\\s,]+){1,9})\\(${acr}s?\\)`));
+    if (!q) continue;
+    const said = m[1].trim().split(/\s+/).slice(-acr.length).join(" ");
+    const theirs = new Set(contentTokens(q[1]).map(pre));
+    if (contentTokens(said).some((t: string) => !theirs.has(pre(t)))) return acr;
+  }
+  return null;
+}
+
 /** Most quotes shown under a model answer: highlighting only helps if it is selective. */
 export const MAX_QUOTES = 3;
 
@@ -184,7 +203,8 @@ export async function answerQuestion(index: any, label: LabelMeta, question: str
     shown = passages("invalid");
   }
   else if (chk.status === "answer" && chk.quotes.length) {
-    shown = chk.blocked ? { kind: "quotes", quotes: quotes() } : { kind: "answer", restatement: chk.restatement!, quotes: quotes() };
+    const qs = quotes();
+    shown = chk.blocked || wrongExpansion(chk.restatement || "", qs.map((x) => x.text)) ? { kind: "quotes", quotes: qs } : { kind: "answer", restatement: chk.restatement!, quotes: qs };
   } else shown = passages("invalid");
   return { ...base, shown, ms: Date.now() - t0 };
 }

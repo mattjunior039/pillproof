@@ -209,6 +209,7 @@ test("question topics: birth control; cutting in half; 'less effective' is not a
   const cut = concepts("Can I cut prednisone in half?", ["Prednisone"]);
   assert.equal(cut.length, 1);
   assert.ok(cut[0].covers("Tablets are scored and may be broken in half."));
+  assert.ok(!cut[0].covers("The half-life is prolonged in elderly subjects."));
 });
 
 test("'eat' with a named food asks about that food, not food in general", async () => {
@@ -216,4 +217,12 @@ test("'eat' with a named food asks about that food, not food in general", async 
   assert.deepEqual(concepts("Can I eat dragon fruit?", []).map((c) => c.name), ["dragon fruit"]);
   assert.deepEqual(concepts("Can I eat before taking it?", []).map((c) => c.name), ["food"]);
   assert.deepEqual(concepts("Can I take it with food?", []).map((c) => c.name), ["food"]);
+});
+
+test("an abbreviation spelled out differently from the label is caught", async () => {
+  const { wrongExpansion } = await import("../src/lib/answer.ts");
+  const q = ["It is used to treat social anxiety disorder (SAD) and premenstrual dysphoric disorder (PMDD)."];
+  assert.equal(wrongExpansion("It treats social anxiety disorder (SAD) and premature menstruation (PMDD).", q), "PMDD");
+  assert.equal(wrongExpansion("It treats social anxiety disorder (SAD) and premenstrual dysphoric disorder (PMDD).", q), null);
+  assert.equal(wrongExpansion("It is an ACE inhibitor (ACE).", q), null, "abbreviations the quotes don't define are not checked");
 });

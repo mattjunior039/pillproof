@@ -141,3 +141,20 @@ test("proxy: no key, bad requests, cache hits cost nothing, rate limit", async (
   assert.equal((await handleSearch({ ingredients: ["y"], question: "a" }, { key: "k", fetchFn, allow }))[0], 200);
   assert.deepEqual(await handleSearch({ ingredients: ["y"], question: "b" }, { key: "k", fetchFn, allow }), [429, { error: "rate-limit" }]);
 });
+
+test("web sentences: tall-man drug names and other dosage forms are recognised", async () => {
+  const { otherForms } = await import("../src/lib/web.ts");
+  assert.deepEqual(otherDrugs("Patients receiving busPIRone should avoid grapefruit.", ["cetirizine"], new Set()), ["buspirone"]);
+  assert.deepEqual(otherDrugs("Take predniSONE with food.", ["prednisone"], new Set()), []);
+  assert.deepEqual(otherForms("The suspension may be added to milk.", "amoxicillin capsule"), ["suspension"]);
+  assert.deepEqual(otherForms("It is given by mouth or by injection.", "atorvastatin tablet"), ["injection"]);
+  assert.deepEqual(otherForms("Shake the suspension well.", "amoxicillin for oral suspension"), []);
+});
+
+test("pages about this medicine with another one only answer questions naming that one", async () => {
+  const { pairPageOffTopic } = await import("../src/lib/web.ts");
+  const t = "Buspirone + Cetirizine: Can You Take Them Together?";
+  assert.equal(pairPageOffTopic(t, ["cetirizine"], "Can I take it with grapefruit juice?"), true);
+  assert.equal(pairPageOffTopic(t, ["cetirizine"], "Can I take it with buspirone?"), false);
+  assert.equal(pairPageOffTopic("Cetirizine: MedlinePlus Drug Information", ["cetirizine"], "Can I drink alcohol?"), false);
+});

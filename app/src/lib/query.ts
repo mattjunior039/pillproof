@@ -48,7 +48,7 @@ const TOPICS: Topic[] = [
   { q: /\bliver\b/, add: "liver hepatic", hit: /liver|hepat/, name: "the liver" },
   { q: /\b(stop\w*|quit\w*|come off)( taking( it)?)? (suddenly|abruptly|all at once|cold turkey|at once)\b|\bsudden(ly)? stop\w*/, add: "stop suddenly abruptly withdrawal gradual reduction taper discontinuation", hit: /abrupt|sudden|gradual|taper|withdraw/, name: "stopping suddenly", head: /withdraw|discontinu/ },
   { q: /\b(stop|stopping|quit)\b/, add: "stop taking discontinue", hit: /\bstop|discontinu/, name: "stopping" },
-  { q: /\b(crush\w*|chew\w*|split\w*|cut|break|swallow\w*|halves|halve)\b|\b(in|into) (half|halves)\b/, add: "crush chew split break swallow whole scored", hit: /crush|chew|\bsplit\b|\bbreak\b|\bcut\b|\bhalf\b|\bhalve|\bscored\b|swallow(ed)? (it |them |the \w+ )?whole|whole (tablet|capsule|pill)/, name: "crushing, splitting or chewing", head: /how should i (take|use)|administration/ },
+  { q: /\b(crush\w*|chew\w*|split\w*|cut|break|swallow\w*|halves|halve)\b|\b(in|into) (half|halves)\b/, add: "crush chew split break swallow whole scored", hit: /crush|chew|\bsplit\b|\bbreak\b|\bcut\b|\b(in|into) (half|halves)\b|\bhalve[sd]?\b|\bhalf (a |an |the |of (a|an|the) )?(tablet|pill|caplet)|\bscored\b|swallow(ed)? (it |them |the \w+ )?whole|whole (tablet|capsule|pill)/, name: "crushing, splitting or chewing", head: /how should i (take|use)|administration/ },
   { q: /\bbirth[- ]control\b|\bcontracepti\w*|\bthe pill\b/, add: "contraceptives birth control oral contraceptive", hit: /contracepti|birth control/, name: "birth control" },
   { q: /\b(sun|sunlight|sunburn|tanning)\b/, add: "sunlight sun photosensitivity", hit: /\bsun|photosensitiv|ultraviolet|tanning/, name: "sunlight" },
 ];
