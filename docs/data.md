@@ -16,9 +16,8 @@ uv run python -m medlabel_data.t3 snapshot         # T3: fix the label per drug,
 uv run python -m medlabel_data.t3 build            # T3: check hand-written items, write the draft sheet
 uv run python -m medlabel_data.t6 labels           # T6: OTC labels, numbered like T3
 uv run python -m medlabel_data.t6 build            # T6: check web-search test items, write the draft sheet
-uv run python -m medlabel_data.annotation.build    # one annotation workbook for all human review tasks
-uv run python -m medlabel_data.annotation.split --annotators "Ana,Ben,Cy"  # one workbook per person
-uv run python -m medlabel_data.annotation.merge ~/waicy-work/data/build/annotation/split  # marks -> original sheets
+uv run python -m medlabel_data.annotation.build    # one shared annotation file (markers, pharmacist, testers)
+uv run python -m medlabel_data.annotation.merge ~/Downloads/annotation_master.xlsx  # marks -> original sheets
 uv run pytest -q                                   # splitter/section/alignment tests
 ```
 
@@ -238,7 +237,7 @@ Method and grading scale: [t6.md](t6.md).
 
 ## Annotation workbook (all human review tasks)
 
-All human review tasks are in one workbook, `data/build/annotation/annotation_master.xlsx`, with one CSV per tab. The tasks are T5, T3, T6, the training audit, the decline check and the pharmacist sheet. `split` gives each annotator their own workbook. Part of T5, T3 and T6 is given to two people, so agreement can be measured. `merge` writes the marks back into the sheets above and reports Cohen's kappa.
+All human work is in one shared file for Google Sheets, `data/build/annotation/annotation_master.xlsx`, with one CSV per tab. It has a tab per role: five Markers tabs (T5, T3, T6, the training audit and the decline check), a Second check tab, a Pharmacist tab and a Testers – usability tab with the System Usability Scale. People type their first name on each row they mark; nobody is assigned rows. The Second check tab repeats about 20% of T5 and 15% of T3 and T6, so agreement can be measured. `merge` writes the marks back into the sheets above, plus `usability.csv`, and reports Cohen's kappa.
 
 Reviewers never see AI verdicts or notes, hidden keys, scores or model outputs. Details: [annotation.md](annotation.md).
 

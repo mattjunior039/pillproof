@@ -1,5 +1,7 @@
-"""Split the annotation work between people: one workbook each, balanced and drug-stratified,
-with a share of items double-assigned to measure agreement.
+"""Optional: split the annotation work between named people, one workbook each, balanced and
+drug-stratified, with a share of items double-assigned to measure agreement. The normal way is the
+single shared file from `build` (docs/annotation.md); its Second check tab uses the same seeded
+double-marked set as here (`double_set`).
 
     uv run python -m medlabel_data.annotation.split --annotators "Ana,Ben,Cy" [--pharmacist "Dr Lee"]
 
@@ -8,8 +10,10 @@ within each drug with random.Random(f"{seed}:{task}:{drug}"). Walking that order
 the least-loaded annotator (ties broken by a seeded per-task order), so every person gets a similar
 number of items and a similar mix of drugs. The double-marked set is a systematic sample of that
 order (k = share * N rounded half up, positions floor(i * N / k)), so doubles are spread over drugs;
-each double gets a second, different, least-loaded annotator. Each person sees the row only in
-their own file and never sees the other mark.
+each double gets a second, different, least-loaded annotator. Each person's file has the same layout
+as the shared file: their first-assigned rows (name filled in) on the task tabs and their
+second-assigned rows on Second check, so they never see the other mark. The pharmacist's file holds
+the Pharmacist tab only.
 """
 
 import argparse
@@ -20,16 +24,13 @@ from collections import defaultdict
 from pathlib import Path
 
 from . import workbook
-from .tasks import BY_KEY, OUT, TASKS, Task, decline_label_rows
+from .tasks import BY_KEY, OUT, TASKS, Task, ref_rows
 
 SEED = 2026
 
 
-def assign(items: list[dict], annotators: list[str], seed: int = SEED, double: float = 0.0,
-           key: str = "") -> dict[str, list[str]]:
-    """item_id -> annotators (one, or two for double-marked items)."""
-    if not annotators:
-        raise ValueError("no annotators")
+def stratified_order(items: list[dict], seed: int = SEED, key: str = "") -> list[str]:
+    """item ids grouped by drug (drugs sorted), shuffled within each drug with a seed per task and drug."""
     by_drug = defaultdict(list)
     for it in items:
         by_drug[it.get("drug", "")].append(it["item_id"])
@@ -38,9 +39,26 @@ def assign(items: list[dict], annotators: list[str], seed: int = SEED, double: f
         ids = sorted(by_drug[drug])
         random.Random(f"{seed}:{key}:{drug}").shuffle(ids)
         order += ids
+    return order
+
+
+def double_set(items: list[dict], seed: int = SEED, share: float = 0.0, key: str = "") -> list[str]:
+    """The double-marked item ids: a systematic sample of the stratified order, then shuffled."""
+    order = stratified_order(items, seed, key)
     n = len(order)
-    k = int(double * n + 0.5) if len(annotators) > 1 else 0
-    doubles = {order[i * n // k] for i in range(k)} if k else set()
+    k = int(share * n + 0.5)
+    out = [order[i * n // k] for i in range(k)] if k else []
+    random.Random(f"{seed}:{key}:second").shuffle(out)
+    return out
+
+
+def assign(items: list[dict], annotators: list[str], seed: int = SEED, double: float = 0.0,
+           key: str = "") -> dict[str, list[str]]:
+    """item_id -> annotators (one, or two for double-marked items)."""
+    if not annotators:
+        raise ValueError("no annotators")
+    order = stratified_order(items, seed, key)
+    doubles = set(double_set(items, seed, double, key)) if len(annotators) > 1 else set()
     tie = list(annotators)
     random.Random(f"{seed}:{key}:order").shuffle(tie)
     rank = {a: i for i, a in enumerate(tie)}
@@ -89,12 +107,22 @@ def summary(plan: list[dict], tasks: list[Task], who: str | None = None) -> list
 
 def write_person(path: Path, name: str, tasks: list[Task], items: dict[str, list[dict]], plan: list[dict],
                  due: str = workbook.DUE, with_labels: bool = True) -> int:
-    mine = {(p["task"], p["item_id"]) for p in plan if p["annotator"] == name}
-    rows = {t.key: [{**it, "annotator": name} for it in items.get(t.key, []) if (t.key, it["item_id"]) in mine]
+    # an item is someone's second copy if another annotator is listed before them for it
+    order = defaultdict(list)
+    for p in plan:
+        order[(p["task"], p["item_id"])].append(p["annotator"])
+    first = {k for k, who in order.items() if who[0] == name}
+    second = defaultdict(list)
+    for k, who in order.items():
+        if name in who[1:]:
+            second[k[0]].append(k[1])
+    rows = {t.key: [{**it, "name": name} for it in items.get(t.key, []) if (t.key, it["item_id"]) in first]
             for t in tasks}
-    ref = decline_label_rows(rows.get("decline", [])) if with_labels and rows.get("decline") else None
-    workbook.write(path, tasks, rows, [name], summary(plan, tasks, name), ref, due=due)
-    return len(mine)
+    sec = workbook.second_rows(tasks, {t.key: [{**it, "name": name} for it in items.get(t.key, [])] for t in tasks},
+                               dict(second))
+    ref = ref_rows([it for t in tasks for it in rows.get(t.key, [])]) if with_labels else None
+    workbook.write(path, tasks, rows, sec, 0, ref or None, due=due)
+    return sum(len(v) for v in rows.values()) + len(sec)
 
 
 def safe(name: str) -> str:
@@ -142,14 +170,11 @@ def main(argv=None) -> None:
         n = write_person(split_dir / f"annotation_{safe(name)}.xlsx", name, tasks, items, plan, a.due)
         print(f"{name}: {n} items -> {split_dir / f'annotation_{safe(name)}.xlsx'}")
 
-    all_items = {t.key: t.load() for t in TASKS}
-    workbook.write(a.out / "annotation_master.xlsx", TASKS, all_items, people,
-                   summary(plan, TASKS), decline_label_rows(all_items["decline"]), a.out / "csv", a.due)
     for t in tasks:
         if t.split:
             d = sum(p["double"] for p in plan if p["task"] == t.key) // 2
             print(f"{t.key}: {len(items[t.key])} items, {d} double-marked")
-    print(f"plan -> {split_dir / 'assignments.csv'}; master -> {a.out / 'annotation_master.xlsx'}")
+    print(f"plan -> {split_dir / 'assignments.csv'}")
 
 
 if __name__ == "__main__":

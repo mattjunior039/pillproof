@@ -4,9 +4,9 @@ from collections import Counter
 import pytest
 from openpyxl import load_workbook
 
-from medlabel_data.annotation import merge, workbook
-from medlabel_data.annotation.split import assign, make_plan, summary
-from medlabel_data.annotation.tasks import Mark, Task
+from medlabel_data.annotation import merge, usability, workbook
+from medlabel_data.annotation.split import assign, double_set, make_plan, write_person
+from medlabel_data.annotation.tasks import Mark, Task, read_csv
 
 
 def make_task(tmp_path, n=12, key="T5", double=0.25, rows=None):
@@ -18,24 +18,27 @@ def make_task(tmp_path, n=12, key="T5", double=0.25, rows=None):
         w.writeheader()
         w.writerows(rows)
     t = Task(key, f"{key} tab", src, lambda r: r["id"], [("drug", 10), ("text", 30)],
-             [Mark("mark", ["meaning changed", "reworded"]), Mark("notes")], "C9DAF8", "1 min", "Mark it.",
-             ("e1", "e2"), double=double)
+             [Mark("mark", ["meaning changed", "reworded"]), Mark("only_formatting", ["y", "n"]), Mark("notes")],
+             "markers", (1, 1), "Mark it.", ("e1", "e2"), double=double)
     return t, src
 
 
-def read(src):
-    with open(src, newline="") as f:
-        return {r["id"]: r for r in csv.DictReader(f)}
+def master(tmp_path, t, sessions=2):
+    items = {t.key: t.load()}
+    ids = {t.key: double_set(items[t.key], 1, t.double, t.key)}
+    path = tmp_path / "master.xlsx"
+    workbook.write(path, [t], items, workbook.second_rows([t], items, ids), sessions, csv_dir=tmp_path / "csv")
+    return path, ids[t.key]
 
 
-def fill(path, values):
-    """values: item_id -> mark, written into the person's workbook like a reviewer would."""
+def fill(path, tab, values, header_row=2):
+    """values: item_id -> {column: value}, typed in like a reviewer would."""
     wb = load_workbook(path)
-    ws = wb["T5 tab"]
-    hdr = [c.value for c in ws[1]]
-    for row in ws.iter_rows(min_row=2):
-        if row[0].value in values:
-            row[hdr.index("mark")].value = values[row[0].value]
+    ws = wb[tab]
+    hdr = [c.value for c in ws[header_row]]
+    for row in ws.iter_rows(min_row=header_row + 1):
+        for c, v in values.get(row[0].value, {}).items():
+            row[hdr.index(c)].value = v
     wb.save(path)
 
 
@@ -46,6 +49,7 @@ def test_assign_balanced_stratified_deterministic():
     assert out != assign(items, ["A", "B", "C"], seed=8, double=0.2, key="T5")
     doubles = [w for w in out.values() if len(w) == 2]
     assert len(doubles) == 30 and all(a != b for a, b in doubles)
+    assert {i for i, w in out.items() if len(w) == 2} == set(double_set(items, 7, 0.2, "T5"))
     load = Counter(a for w in out.values() for a in w)
     assert max(load.values()) - min(load.values()) <= 1
     drug = {it["item_id"]: it["drug"] for it in items}
@@ -55,78 +59,123 @@ def test_assign_balanced_stratified_deterministic():
     assert all(len(w) == 1 for w in assign(items, ["A"], double=0.2).values())
 
 
-def test_split_write_fill_merge_roundtrip(tmp_path):
+def test_shared_file_layout(tmp_path):
+    t, _ = make_task(tmp_path)
+    path, doubles = master(tmp_path, t)
+    wb = load_workbook(path)
+    assert wb.sheetnames == ["Start here", "Progress", "T5 tab", "Second check", "Testers – usability"]
+    ws = wb["T5 tab"]
+    hdr = [c.value for c in ws[2]]
+    assert ws["A1"].value.startswith("What to do") and ws.freeze_panes == "A3"
+    assert hdr == ["item_id", "drug", "text", "name", "mark", "only_formatting", "notes", "task"]
+    dvs = {str(dv.sqref): dv.formula1 for dv in ws.data_validations.dataValidation}
+    assert dvs == {"E3:E14": '"meaning changed,reworded"', "F3:F14": '"y,n"'}  # name is free text
+    sc = wb["Second check"]
+    assert [c.value for c in sc[2]][:5] == ["item_id", "drug", "item", "name", "answer"]
+    assert [sc.cell(row=r, column=1).value for r in range(3, 6)] == doubles and sc.max_row == 5
+    assert all(c.value is None for c in sc[3][3:7])
+    prog = wb["Progress"]
+    assert prog["C3"].value == "=COUNTA('T5 tab'!$E$3:$E$14)"
+    assert prog["A4"].value == "Second check" and "COUNTIFS" in prog["B9"].value
+    u = wb["Testers – usability"]
+    assert u.freeze_panes == "A4" and u["A4"].value == "U-01" and u.max_row == 5
+    assert sorted(p.name for p in (tmp_path / "csv").iterdir())[:3] == ["01_start_here.csv", "02_progress.csv",
+                                                                        "03_t5_tab.csv"]
+
+
+def test_fill_shared_file_and_merge_roundtrip(tmp_path):
     t, src = make_task(tmp_path)
-    items = {"T5": t.load()}
-    plan = make_plan(items, [t], ["A", "B"], None, seed=1)
-    for name in "AB":
-        mine = {p["item_id"] for p in plan if p["annotator"] == name}
-        rows = {"T5": [{**it, "annotator": name} for it in items["T5"] if it["item_id"] in mine]}
-        workbook.write(tmp_path / f"{name}.xlsx", [t], rows, [name], summary(plan, [t], name))
-        fill(tmp_path / f"{name}.xlsx", {i: "reworded" for i in mine})
-    res = merge.read_marks([tmp_path / "A.xlsx", tmp_path / "B.xlsx"], {"T5": t})
-    sheets = merge.apply(res, {"T5": t})
-    assert not res.errors
-    cols, rows = sheets[src]
-    assert {"annotator", "mark", "annotator_2", "mark_2"} <= set(cols)
-    doubled = [r for r in rows if r["annotator_2"]]
-    assert len(doubled) == 3 and all(r["annotator"] != r["annotator_2"] and r["mark_2"] == "reworded" for r in doubled)
-    assert all(r["mark"] == "reworded" and r["annotator"] in "AB" for r in rows)
-    agree = merge.agreement(sheets, {"T5": t})
-    assert agree[0]["n"] == 3 and agree[0]["agree"] == 1.0
+    path, doubles = master(tmp_path, t)
+    fill(path, "T5 tab", {f"X-{i:03d}": {"name": "Ana" if i < 7 else "Ben", "mark": "reworded"} for i in range(1, 12)})
+    fill(path, "Second check", {doubles[0]: {"name": "Cy", "answer": "Reworded"},
+                                doubles[1]: {"name": "Cy", "answer": "meaning changed", "notes": "dose"},
+                                doubles[2]: {"name": "Cy", "answer": "reworded", "only_formatting": "y"}})
+    sus = {f"sus_{i}": 5 if i % 2 else 1 for i in range(1, 11)}
+    fill(path, "Testers – usability", {"U-01": {"name": "Ana", "tester": "T1", "age_band": "70-79",
+                                                "voice_done": "with help", "voice_minutes": 2.0, **sus}}, 3)
+    out = tmp_path / "usability.csv"
+    res, text = merge.merge([path], {"T5": t}, out)
+    assert not res.errors, res.errors
+    rows = {r["id"]: r for r in read_csv(src)}
+    assert rows["X-001"]["annotator"] == "Ana" and rows["X-001"]["mark"] == "reworded"
+    assert rows[doubles[1]]["annotator_2"] == "Cy" and rows[doubles[1]]["notes_2"] == "dose"
+    assert rows[doubles[2]]["only_formatting_2"] == "y"
+    assert any("1 row(s) left blank" in w for w in res.warnings)  # X-012
+    (s,) = read_csv(out)
+    assert (s["item_id"], s["age_band"], s["voice_minutes"], s["sus_score"]) == ("U-01", "70-79", "2", "100")
+    assert "mean SUS 100.0" in text and "T5: first vs Second check" in text
+
+    # running it again is a no-op; a changed mark is refused and nothing is written
+    assert not merge.merge([path], {"T5": t}, out)[0].errors
+    fill(path, "T5 tab", {"X-001": {"mark": "meaning changed"}})
+    before = src.read_text()
+    res, _ = merge.merge([path], {"T5": t}, out)
+    assert any("refusing to overwrite" in e for e in res.errors) and src.read_text() == before
 
 
-def test_merge_refuses_to_overwrite_and_warns(tmp_path):
-    rows = [{"id": "X-001", "drug": "d", "text": "s", "mark": "reworded", "notes": "", "annotator": "A"},
-            {"id": "X-002", "drug": "d", "text": "s", "mark": "", "notes": "", "annotator": ""},
-            {"id": "X-003", "drug": "d", "text": "s", "mark": "", "notes": "", "annotator": ""}]
-    t, src = make_task(tmp_path, rows=rows)
+def test_merge_warnings_from_csv_with_what_to_do_row(tmp_path):
+    t, _ = make_task(tmp_path)
     sub = tmp_path / "in.csv"
-    sub.write_text("item_id,task,annotator,mark,notes\n"
-                   "X-001,T5,A,meaning changed,\n"   # A changed their mind: refuse
+    sub.write_text("What to do: mark it,,,,\n"
+                   "item_id,task,name,mark,notes\n"
                    "X-002,T5,A,Reworded,\n"          # case-insensitive choice
                    "X-003,T5,A,maybe,\n"             # invalid
-                   "X-009,T5,A,reworded,\n"          # unknown item
-                   "X-002,T5,,,\n")                  # blank row
-    before = src.read_text()
+                   "X-099,T5,A,reworded,\n"          # unknown item
+                   "X-004,T5,,reworded,\n"           # no name
+                   "X-005,T5,A,,a note\n")           # note without a mark
     res = merge.read_marks([sub], {"T5": t})
-    sheets = merge.apply(res, {"T5": t})
-    assert any("refusing to overwrite" in e for e in res.errors)
-    assert any("invalid mark 'maybe'" in w for w in res.warnings)
-    assert any("unknown item_id 'X-009'" in w for w in res.warnings)
-    assert any("left blank" in w for w in res.warnings)
-    assert sheets[src][1][1]["mark"] == "reworded"
-    assert src.read_text() == before  # apply works in memory; main writes nothing when there are errors
+    assert res.marks == {("T5", "X-002", 1): {"annotator": "A", "mark": "reworded"},
+                         ("T5", "X-005", 1): {"annotator": "A", "notes": "a note"}}
+    w = "\n".join(res.warnings)
+    assert "invalid mark 'maybe'" in w and "unknown item_id 'X-099'" in w and "no name" in w
+    assert "mark is blank but other columns are filled" in w
 
 
 def test_same_mark_from_two_files_is_fine_but_different_is_an_error(tmp_path):
     t, _ = make_task(tmp_path)
     a, b = tmp_path / "a.csv", tmp_path / "b.csv"
-    a.write_text("item_id,task,annotator,mark\nX-001,T5,A,reworded\n")
-    b.write_text("item_id,task,annotator,mark\nX-001,T5,A,reworded\n")
+    a.write_text("item_id,task,name,mark\nX-001,T5,A,reworded\n")
+    b.write_text("item_id,task,name,mark\nX-001,T5,A,reworded\n")
     assert not merge.read_marks([a, b], {"T5": t}).errors
-    b.write_text("item_id,task,annotator,mark\nX-001,T5,A,meaning changed\n")
+    b.write_text("item_id,task,name,mark\nX-001,T5,A,meaning changed\n")
     assert merge.read_marks([a, b], {"T5": t}).errors
 
 
-def test_kappa_known_value():
+def test_kappa_known_value_and_same_person_pairs_left_out(tmp_path):
     k, po, n = merge.kappa([("a", "a"), ("a", "a"), ("b", "b"), ("a", "b")])
     assert (round(k, 3), po, n) == (0.5, 0.75, 4)
     assert merge.kappa([("a", "a")])[0] is None
+    t, src = make_task(tmp_path)
+    rows = [{"annotator": "A", "mark": "reworded", "annotator_2": a2, "mark_2": "reworded", "id": i}
+            for i, a2 in (("X-1", "B"), ("X-2", "a"))]
+    warn = []
+    (a,) = merge.agreement({src: ([], rows)}, {"T5": t}, warn)
+    assert a["n"] == 1 and "X-2" in warn[0]
+
+
+def test_sus_score():
+    assert usability.sus_score({f"sus_{i}": "3" for i in range(1, 11)}) == "50"
+    assert usability.sus_score({f"sus_{i}": "5" if i % 2 else "1" for i in range(1, 11)}) == "100"
+    assert usability.sus_score({"sus_1": "3"}) == ""
+
+
+def test_split_person_file_hides_other_mark(tmp_path):
+    t, _ = make_task(tmp_path)
+    items = {"T5": t.load()}
+    plan = make_plan(items, [t], ["A", "B"], None, seed=1)
+    write_person(tmp_path / "A.xlsx", "A", [t], items, plan)
+    wb = load_workbook(tmp_path / "A.xlsx")
+    main_ids = {r[0] for r in wb["T5 tab"].iter_rows(min_row=3, values_only=True)}
+    second_ids = {r[0] for r in wb["Second check"].iter_rows(min_row=3, values_only=True)} \
+        if "Second check" in wb.sheetnames else set()
+    assert not main_ids & second_ids
+    first = {p["item_id"] for p in plan if p["annotator"] == "A"}
+    assert main_ids | second_ids == first
+    assert all(r[3] == "A" for r in wb["T5 tab"].iter_rows(min_row=3, values_only=True))
 
 
 def test_workbook_blocks_hidden_columns(tmp_path):
     t, _ = make_task(tmp_path)
     t.show = t.show + [("ai_verdict", 10)]
     with pytest.raises(ValueError, match="ai_verdict"):
-        workbook.write(tmp_path / "x.xlsx", [t], {"T5": t.load()}, ["A"])
-
-
-def test_workbook_has_dropdowns_and_frozen_header(tmp_path):
-    t, _ = make_task(tmp_path)
-    workbook.write(tmp_path / "m.xlsx", [t], {"T5": t.load()}, ["A", "B"], csv_dir=tmp_path / "csv")
-    ws = load_workbook(tmp_path / "m.xlsx")["T5 tab"]
-    assert ws.freeze_panes == "B2"
-    assert {dv.formula1 for dv in ws.data_validations.dataValidation} == {'"A,B"', '"meaning changed,reworded"'}
-    assert sorted(p.name for p in (tmp_path / "csv").iterdir()) == ["01_start_here.csv", "02_assignments.csv",
-                                                                     "03_t5_tab.csv"]
+        workbook.write(tmp_path / "x.xlsx", [t], {"T5": t.load()})

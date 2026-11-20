@@ -1,62 +1,76 @@
-"""Merge completed annotation files back into the original sheets.
+"""Merge the completed annotation workbook back into the original sheets.
 
-    uv run python -m medlabel_data.annotation.merge ~/waicy-work/data/build/annotation/split [--dry-run]
+    uv run python -m medlabel_data.annotation.merge annotation_master_done.xlsx [--dry-run]
 
-Reads per-person workbooks, the master downloaded back from Google Sheets (.xlsx), or its tab CSVs
-(files or folders; folders are not searched recursively). Every tab whose header has item_id and
-task is read. Marks go into the source sheet of each task (t5_sheet.csv, t3_draft.csv, ...) with
-an `annotator` column; a second annotator of a double-marked item goes into `annotator_2` and
-`<mark>_2`. Existing marks are never overwritten: any disagreement with a filled cell aborts the
-whole merge with nothing written. Blank and invalid marks are reported. Agreement (Cohen's kappa)
-is computed over double-marked items, and pharmacist vs T5.
+Reads the shared file downloaded back from Google Sheets (.xlsx), its tab CSVs, or per-person files
+from `split` (files or folders; folders are not searched recursively). Every table whose header
+(found in the first 10 rows) has item_id and task is read. Marks on the task tabs go into each
+task's source sheet (t5_sheet.csv, t3_draft.csv, pharmacist_sheet.csv, ...) as `annotator` plus the
+mark columns; marks on the Second check tab go into `annotator_2` and `<mark>_2`. Tester sessions go
+to usability.csv. Existing marks are never overwritten: any disagreement with a filled cell aborts
+the whole merge with nothing written. Blank rows and invalid values are reported. Agreement (Cohen's
+kappa) is computed for first vs second marks, and pharmacist vs T5.
 """
 
 import argparse
 import csv
+import datetime as dt
 import sys
-from collections import Counter, defaultdict
+from collections import Counter
 from dataclasses import dataclass, field
 from functools import partial
 from pathlib import Path
 
 from openpyxl import load_workbook
 
+from . import usability as U
 from .tasks import BY_KEY, OUT, Task, read_csv
+
+USABILITY_COLS = ["item_id"] + U.INPUTS + ["sus_score"]
 
 
 @dataclass
 class Result:
-    marks: dict = field(default_factory=dict)       # (task, item_id, annotator) -> {mark: value}
+    marks: dict = field(default_factory=dict)        # (task, item_id, slot) -> {"annotator": name, mark: value}
+    sessions: dict = field(default_factory=dict)     # usability item_id -> {column: value}
     warnings: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
-    blanks: Counter = field(default_factory=Counter)  # (task, annotator) -> rows with no marks
+    blanks: Counter = field(default_factory=Counter)  # (task, slot) -> rows with no marks
 
 
 def _norm(s) -> str:
     return " ".join(str(s).replace("_", " ").split()).casefold()
 
 
+def _value(v) -> str:
+    if v is None:
+        return ""
+    if isinstance(v, dt.datetime):
+        return v.date().isoformat() if v.time() == dt.time() else v.isoformat(sep=" ")
+    if isinstance(v, dt.date):
+        return v.isoformat()
+    if isinstance(v, float) and v.is_integer():
+        return str(int(v))
+    return str(v).strip()
+
+
 def _tables(path: Path):
-    """Yields (source name, header, rows) for every table in a file."""
+    """Yields (source name, header, first data row number, rows) for every table with item_id and task."""
     if path.suffix.lower() == ".xlsx":
         wb = load_workbook(path, read_only=True, data_only=True)
-        for ws in wb.worksheets:
-            it = ws.iter_rows(values_only=True)
-            header = next(it, None)
-            if header:
-                header = ["" if h is None else str(h).strip() for h in header]
-                yield f"{path.name}:{ws.title}", header, [["" if v is None else v for v in r] for r in it]
+        sheets = [(f"{path.name}:{ws.title}", [[_value(v) for v in r] for r in ws.iter_rows(values_only=True)])
+                  for ws in wb.worksheets]
         wb.close()
     elif path.suffix.lower() == ".csv":
         with open(path, newline="", encoding="utf-8-sig") as f:
-            rows = list(csv.reader(f))
-        if rows:
-            yield path.name, [h.strip() for h in rows[0]], rows[1:]
-
-
-def _cell(row: list, col: dict[str, int], c: str) -> str:
-    i = col.get(c)
-    return "" if i is None or i >= len(row) or row[i] is None else str(row[i]).strip()
+            sheets = [(path.name, [[v.strip() for v in r] for r in csv.reader(f)])]
+    else:
+        return
+    for src, rows in sheets:
+        for i, r in enumerate(rows[:10]):
+            if "item_id" in r and "task" in r:
+                yield src, r, i + 2, rows[i + 1:]
+                break
 
 
 def _files(inputs: list[Path]) -> list[Path]:
@@ -64,7 +78,8 @@ def _files(inputs: list[Path]) -> list[Path]:
     for p in inputs:
         p = p.expanduser()
         if p.is_dir():
-            out += sorted(q for q in p.iterdir() if q.suffix.lower() in (".xlsx", ".csv") and not q.name.startswith(("~", ".")))
+            out += sorted(q for q in p.iterdir()
+                          if q.suffix.lower() in (".xlsx", ".csv") and not q.name.startswith(("~", ".")))
         elif p.exists():
             out.append(p)
         else:
@@ -72,121 +87,151 @@ def _files(inputs: list[Path]) -> list[Path]:
     return out
 
 
+def _cell(row: list[str], col: dict[str, int], c: str) -> str:
+    i = col.get(c)
+    return "" if i is None or i >= len(row) else row[i]
+
+
+def _choice(v: str, choices: list[str]) -> str | None:
+    return next((c for c in choices if _norm(c) == _norm(v)), None)
+
+
 def read_marks(inputs: list[Path], tasks: dict[str, Task] = BY_KEY, default_annotator: str = "") -> Result:
     res = Result()
     known = {k: {t.id_fn(r) for r in read_csv(t.source)} for k, t in tasks.items()}
     seen_from = {}
     for path in _files(inputs):
-        for src, header, rows in _tables(path):
-            if "item_id" not in header or "task" not in header:
-                continue
-            col = {h: i for i, h in enumerate(header)}
-            for n, row in enumerate(rows, 2):
+        for src, header, first, rows in _tables(path):
+            col = {h: i for i, h in enumerate(header) if h}
+            second = "answer" in col
+            for n, row in enumerate(rows, first):
                 get = partial(_cell, row, col)
                 key, iid = get("task"), get("item_id")
                 if not key and not iid:
                     continue
-                t = tasks.get(key)
                 where = f"{src} row {n}"
+                if key == "usability":
+                    _session(res, iid, {c: get(c) for c in U.INPUTS}, where, seen_from)
+                    continue
+                t = tasks.get(key)
                 if t is None:
                     res.warnings.append(f"{where}: unknown task '{key}', skipped")
                     continue
                 if iid not in known[key]:
                     res.warnings.append(f"{where}: unknown item_id '{iid}' for {key}, skipped")
                     continue
+                slot = 2 if second else 1
+                fields = t.second_map() if second else {m.name: m.name for m in t.marks}
                 vals = {}
-                for m in t.marks:
-                    v = get(m.name)
+                for c, mark in fields.items():
+                    v, m = get(c), t.mark(mark)
                     if v and m.choices:
-                        match = [c for c in m.choices if _norm(c) == _norm(v)]
-                        if not match:
-                            res.warnings.append(f"{where} {iid}: invalid {m.name} '{v}' (allowed: "
-                                                f"{', '.join(m.choices)}), ignored")
+                        ok = _choice(v, m.choices)
+                        if ok is None:
+                            res.warnings.append(f"{where} {iid}: invalid {c} '{v}' (allowed: {', '.join(m.choices)}),"
+                                                " ignored")
                             continue
-                        v = match[0]
+                        v = ok
                     if v:
-                        vals[m.name] = v
-                who = get("annotator") or default_annotator
+                        vals[mark] = v
                 if not vals:
-                    res.blanks[(key, who or "?")] += 1
+                    res.blanks[(key, slot)] += 1
                     continue
+                who = get("name") or get("annotator") or default_annotator
                 if not who:
-                    res.warnings.append(f"{where} {iid}: marks but no annotator name, skipped "
-                                        "(fill 'annotator' or pass --default-annotator)")
+                    res.warnings.append(f"{where} {iid}: marks but no name, skipped (type a name in the 'name' "
+                                        "column or pass --default-annotator)")
                     continue
                 if t.primary not in vals:
-                    res.warnings.append(f"{where} {iid}: {t.primary} is blank but other columns are filled")
-                k = (key, iid, who)
+                    res.warnings.append(f"{where} {iid}: {'answer' if second else t.primary} is blank but other "
+                                        "columns are filled")
+                vals = {"annotator": who, **vals}
+                k = (key, iid, slot)
                 if k in res.marks and res.marks[k] != vals:
-                    res.errors.append(f"{iid} ({key}, {who}): different marks in {seen_from[k]} and {where}")
+                    res.errors.append(f"{iid} ({key}, {'second' if second else 'first'} mark): different marks in "
+                                      f"{seen_from[k]} and {where}")
                     continue
                 res.marks[k] = vals
                 seen_from[k] = where
-    for (key, who), n in sorted(res.blanks.items()):
-        res.warnings.append(f"{key}, {who}: {n} row(s) left blank")
+    for (key, slot), n in sorted(res.blanks.items()):
+        res.warnings.append(f"{key}{' (Second check)' if slot == 2 else ''}: {n} row(s) left blank")
     return res
 
 
-def _slot_cols(t: Task, s: int) -> tuple[str, list[str]]:
-    suf = "" if s == 1 else f"_{s}"
-    return "annotator" + suf, [m.name + suf for m in t.marks]
+def _session(res: Result, iid: str, vals: dict, where: str, seen_from: dict) -> None:
+    if not any(v for c, v in vals.items() if c != "name"):
+        return
+    if iid not in U.IDS:
+        res.warnings.append(f"{where}: unknown usability row '{iid}', skipped")
+        return
+    for c, choices in U.CHOICES.items():
+        if vals[c]:
+            ok = _choice(vals[c], choices)
+            if ok is None:
+                res.warnings.append(f"{where} {iid}: invalid {c} '{vals[c]}' (allowed: {', '.join(choices)}), ignored")
+            vals[c] = ok or ""
+    if not vals["tester"]:
+        res.warnings.append(f"{where} {iid}: session has answers but no tester name or code")
+    missing = [f"sus_{i}" for i in range(1, 11) if not vals[f"sus_{i}"]]
+    if 0 < len(missing) < 10:
+        res.warnings.append(f"{where} {iid}: SUS incomplete ({', '.join(missing)} blank), no score")
+    vals["sus_score"] = U.sus_score(vals)
+    k = ("usability", iid)
+    if iid in res.sessions and res.sessions[iid] != vals:
+        res.errors.append(f"{iid} (usability): different answers in {seen_from[k]} and {where}")
+        return
+    res.sessions[iid] = vals
+    seen_from[k] = where
 
 
-def apply(res: Result, tasks: dict[str, Task] = BY_KEY) -> dict[Path, tuple[list[str], list[dict]]]:
-    """Places marks into the source sheets (in memory). Adds errors for any conflict."""
+def _same(c: str, a: str, b: str) -> bool:
+    return a.casefold() == b.casefold() if c.startswith("annotator") else a == b
+
+
+def _put(row: dict, cols: list[str], rows: list[dict], vals: dict, label: str, res: Result) -> None:
+    """Fill empty cells; refuse (error) where a filled cell differs."""
+    for c, new in vals.items():
+        if c not in cols:
+            cols.append(c)
+            for r in rows:
+                r.setdefault(c, "")
+        old = row.get(c) or ""
+        if new and old and not _same(c, old, new):
+            res.errors.append(f"{label}: {c} is already '{old}', refusing to overwrite with '{new}'")
+        elif new and not old:
+            row[c] = new
+
+
+def apply(res: Result, tasks: dict[str, Task] = BY_KEY,
+          usability_csv: Path = U.CSV) -> dict[Path, tuple[list[str], list[dict]]]:
+    """Places marks into the source sheets and usability.csv (in memory). Adds errors for any conflict."""
     out = {}
-    by_task = defaultdict(list)
-    for (key, iid, who), vals in sorted(res.marks.items()):
-        by_task[key].append((iid, who, vals))
-    for key, marks in by_task.items():
+    for key in dict.fromkeys(k for k, _, _ in sorted(res.marks)):
         t = tasks[key]
         with open(t.source, newline="", encoding="utf-8") as f:
             r = csv.DictReader(f)
             cols, rows = list(r.fieldnames), list(r)
         by_id = {t.id_fn(row): row for row in rows}
-        for iid, who, vals in marks:
-            row = by_id[iid]
-            slot = None
-            for s in (1, 2):
-                a, _ = _slot_cols(t, s)
-                if row.get(a, "") == who:
-                    slot = s
-                    break
-            if slot is None:
-                for s in (1, 2):
-                    a, ms = _slot_cols(t, s)
-                    filled = any(row.get(c, "") for c in ms)
-                    if not row.get(a, "") and not filled:
-                        slot = s
-                        break
-                    if not row.get(a, "") and all(row.get(c, "") in ("", vals.get(m.name, ""))
-                                                  for m, c in zip(t.marks, ms)):
-                        res.warnings.append(f"{iid} ({key}): existing unattributed marks match {who}'s; "
-                                            f"attributed to {who}")
-                        slot = s
-                        break
-                    if not row.get(a, ""):
-                        res.warnings.append(f"{iid} ({key}): has unattributed marks that differ from {who}'s; "
-                                            "they are kept as a separate mark")
-            if slot is None:
-                res.errors.append(f"{iid} ({key}): no free slot for {who} (already marked by "
-                                  f"{row.get('annotator') or '?'} and {row.get('annotator_2') or '?'})")
+        for (k, iid, slot), vals in sorted(res.marks.items()):
+            if k != key:
                 continue
-            a, ms = _slot_cols(t, slot)
-            for c in [a] + ms:
-                if c not in cols:
-                    cols.append(c)
-                    for rr in rows:
-                        rr.setdefault(c, "")
-            for m, c in zip(t.marks, ms):
-                new, old = vals.get(m.name, ""), row.get(c, "")
-                if new and old and new != old:
-                    res.errors.append(f"{iid} ({key}, {who}): {c} is already '{old}' in {t.source.name}, "
-                                      f"refusing to overwrite with '{new}'")
-                elif new:
-                    row[c] = new
-            row[a] = who
+            suf = "" if slot == 1 else "_2"
+            _put(by_id[iid], cols, rows, {c + suf: v for c, v in vals.items()}, f"{iid} ({key}) in {t.source.name}",
+                 res)
         out[t.source] = (cols, rows)
+    if res.sessions:
+        rows = read_csv(usability_csv) if usability_csv.exists() else []
+        cols = list(rows[0]) if rows else list(USABILITY_COLS)
+        by_id = {r["item_id"]: r for r in rows}
+        for iid, vals in sorted(res.sessions.items()):
+            if iid not in by_id:
+                by_id[iid] = {"item_id": iid}
+                rows.append(by_id[iid])
+            _put(by_id[iid], cols, rows, vals, f"{iid} in {usability_csv.name}", res)
+        for r in rows:
+            for c in cols:
+                r.setdefault(c, "")
+        out[usability_csv] = (cols, sorted(rows, key=lambda r: r["item_id"]))
     return out
 
 
@@ -201,17 +246,27 @@ def kappa(pairs: list[tuple[str, str]]) -> tuple[float | None, float | None, int
     return (None if pe == 1 else (po - pe) / (1 - pe)), po, n
 
 
-def agreement(sheets: dict[Path, tuple[list[str], list[dict]]], tasks: dict[str, Task] = BY_KEY) -> list[dict]:
+def agreement(sheets: dict[Path, tuple[list[str], list[dict]]], tasks: dict[str, Task] = BY_KEY,
+              warnings: list[str] | None = None) -> list[dict]:
     def rows_of(t):
         if t.source in sheets:
             return sheets[t.source][1]
         return read_csv(t.source) if t.source.exists() else []
     out = []
     for key, t in tasks.items():
-        p2 = t.primary + "_2"
-        pairs = [(r[t.primary], r[p2]) for r in rows_of(t) if r.get(t.primary) and r.get(p2)]
+        p, p2 = t.primary, t.primary + "_2"
+        pairs = []
+        for r in rows_of(t):
+            if not (r.get(p) and r.get(p2)):
+                continue
+            if (r.get("annotator") or "").casefold() == (r.get("annotator_2") or "").casefold():
+                if warnings is not None:
+                    warnings.append(f"{t.id_fn(r)} ({key}): first and second mark are both by "
+                                    f"{r.get('annotator')}; left out of kappa")
+                continue
+            pairs.append((r[p], r[p2]))
         if pairs:
-            out.append({"what": f"{key}: double-marked", "pairs": pairs})
+            out.append({"what": f"{key}: first vs Second check", "pairs": pairs})
     if "pharmacist" in tasks and "T5" in tasks:
         t5 = {r["t5_id"]: r.get("mark", "") for r in rows_of(tasks["T5"])}
         pairs = [(r["mark"], t5[r["t5_id"]]) for r in rows_of(tasks["pharmacist"])
@@ -225,46 +280,54 @@ def agreement(sheets: dict[Path, tuple[list[str], list[dict]]], tasks: dict[str,
 
 def report(res: Result, agree: list[dict], wrote: list[Path], dry: bool) -> str:
     f = lambda x: "n/a" if x is None else f"{x:.2f}"
-    per = Counter((k, w) for k, _, w in res.marks)
+    per = Counter((k, s, v["annotator"]) for (k, _, s), v in res.marks.items())
     lines = ["# Annotation merge report", "", ("DRY RUN, nothing written." if dry else
              "ABORTED, nothing written." if res.errors else "Written: " + ", ".join(str(p) for p in wrote)), "",
-             "## Marks read", "", "| task | annotator | marked | blank |", "|---|---|---|---|"]
-    for k, w in sorted(set(per) | set(res.blanks)):
-        lines.append(f"| {k} | {w} | {per[(k, w)]} | {res.blanks[(k, w)]} |")
+             "## Marks read", "", "| task | mark | name | rows marked |", "|---|---|---|---|"]
+    for k, s, w in sorted(per):
+        lines.append(f"| {k} | {'first' if s == 1 else 'second check'} | {w} | {per[(k, s, w)]} |")
+    for (k, s), n in sorted(res.blanks.items()):
+        lines.append(f"| {k} | {'first' if s == 1 else 'second check'} | (blank) | {n} |")
     lines += ["", "## Agreement", "", "| comparison | n | % agree | Cohen's kappa |", "|---|---|---|---|"]
     lines += [f"| {a['what']} | {a['n']} | {f(a['agree'] * 100 if a['agree'] is not None else None)} | "
               f"{f(a['kappa'])} |" for a in agree] or ["| (no double-marked items yet) | | | |"]
-    lines += ["", "Kappa pools all pairs of a task (first vs second mark), whoever the two annotators were.", ""]
+    lines += ["", ("Kappa pools all pairs of a task (first vs second mark), whoever the two people were; pairs "
+              "marked twice by the same person are left out."), ""]
+    scores = [float(v["sus_score"]) for v in res.sessions.values() if v.get("sus_score")]
+    lines += ["## Usability sessions", "", f"{len(res.sessions)} session(s) read; "
+              + (f"mean SUS {sum(scores) / len(scores):.1f} (n = {len(scores)})." if scores else "no complete SUS."), ""]
     for title, xs in (("Errors", res.errors), ("Warnings", res.warnings)):
         if xs:
             lines += [f"## {title} ({len(xs)})", ""] + [f"- {x}" for x in xs] + [""]
     return "\n".join(lines)
 
 
-def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("inputs", nargs="+", type=Path, help="completed .xlsx/.csv files or folders")
-    ap.add_argument("--dry-run", action="store_true", help="check and report, write nothing")
-    ap.add_argument("--default-annotator", default="", help="name for rows whose annotator cell is empty")
-    ap.add_argument("--report", type=Path, default=OUT / "merge_report.md")
-    a = ap.parse_args(argv)
-    res = read_marks(a.inputs, default_annotator=a.default_annotator)
-    sheets = apply(res)
-    plan = OUT / "split" / "assignments.csv"
-    if plan.exists():
-        planned = {(r["task"], r["item_id"], r["annotator"]) for r in read_csv(plan)}
-        for k in res.marks:
-            if k not in planned:
-                res.warnings.append(f"{k[1]} ({k[0]}): marked by {k[2]}, who was not assigned it")
+def merge(inputs: list[Path], tasks: dict[str, Task] = BY_KEY, usability_csv: Path = U.CSV,
+          default_annotator: str = "", dry_run: bool = False) -> tuple[Result, str]:
+    res = read_marks(inputs, tasks, default_annotator)
+    sheets = apply(res, tasks, usability_csv)
+    agree = agreement(sheets, tasks, res.warnings)
     wrote = []
-    if not res.errors and not a.dry_run:
+    if not res.errors and not dry_run:
         for path, (cols, rows) in sheets.items():
+            path.parent.mkdir(parents=True, exist_ok=True)
             with open(path, "w", newline="", encoding="utf-8") as f:
                 w = csv.DictWriter(f, cols)
                 w.writeheader()
                 w.writerows(rows)
             wrote.append(path)
-    text = report(res, agreement(sheets), wrote, a.dry_run)
+    return res, report(res, agree, wrote, dry_run)
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("inputs", nargs="+", type=Path, help="completed .xlsx/.csv files or folders")
+    ap.add_argument("--dry-run", action="store_true", help="check and report, write nothing")
+    ap.add_argument("--default-annotator", default="", help="name for marked rows whose name cell is empty")
+    ap.add_argument("--usability", type=Path, default=U.CSV, help="where tester sessions go")
+    ap.add_argument("--report", type=Path, default=OUT / "merge_report.md")
+    a = ap.parse_args(argv)
+    res, text = merge(a.inputs, BY_KEY, a.usability, a.default_annotator, a.dry_run)
     a.report.parent.mkdir(parents=True, exist_ok=True)
     a.report.write_text(text)
     print(text)

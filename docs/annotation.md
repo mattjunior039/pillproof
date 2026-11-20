@@ -1,31 +1,51 @@
 # Annotation workbook
 
-All human review work is in one workbook that opens in Google Sheets. It can be split into one file per person, and the marks are merged back into the original sheets. The code is in `datapipe/src/medlabel_data/annotation/`. The outputs are in `data/build/annotation/` and are not in git.
+All human work is in **one shared file** that the markers, the pharmacist and the testers all use in Google Sheets: `data/build/annotation/annotation_master.xlsx`, with one CSV per tab in `csv/`. Nobody is assigned rows by name. Each person picks the tab for their role and types their first name in the `name` column of every row they mark. The marks are merged back into the original sheets afterwards. The code is in `datapipe/src/medlabel_data/annotation/`. The outputs are in `data/build/annotation/` and are not in git.
 
 ## Tabs
 
-| tab | items | source sheet (marks are merged back here) | reviewer fills in |
-|---|---|---|---|
-| Start here | – | – | read: the rule, then for each task what to do, 2 worked examples and the time per item |
-| Assignments | – | – | nothing; `done` and `remaining` are formulas that count filled marks |
-| T5 label changes | 150 | `changes/t5/t5_sheet.csv` | `mark` (meaning changed / reworded), `only_formatting` (y / n), `notes` |
-| T3 questions | 143 | `t3/t3_draft.csv` | `user_status` (keep / edit / drop), `user_notes` |
-| T6 questions | 30 | `t6/t6_draft.csv` | `user_status` (keep / edit / drop), `user_notes` |
-| Training audit | 23 | `fdarx/audit/audit_review_20.csv` | `user_verdict` (ok / wrong_sentences / wrong_answer / should_decline / should_answer / bad_question), `user_notes` |
-| Decline check | 20 | `fdarx/audit/decline_review_20.csv` | `user_verdict` (not_in_label / answerable_elsewhere / partly / bad_question), `user_where_found`, `user_notes` |
-| Pharmacist | 30 | `changes/t5/pharmacist_sheet.csv` | same as T5; expert only |
-| Decline labels | 8,639 lines | `fdarx/audit/decline_check_labels/` | nothing; the label text for the decline check, one row per line (filter on `item_id`) |
+| tab | who | rows | source sheet (marks are merged back here) | fill in |
+|---|---|---|---|---|
+| Start here | everyone | – | – | read: pick the tab for your role; type your first name in every row you mark; humans only, no AI tools; what to do, 2 worked examples and the time for each tab |
+| Progress | everyone | – | – | nothing; formulas count rows done / total per tab and rows marked per name |
+| Markers – T5 label changes | markers | 150 | `changes/t5/t5_sheet.csv` | `name`, `mark` (meaning changed / reworded), `only_formatting` (y / n), `notes` |
+| Markers – T3 questions | markers | 143 | `t3/t3_draft.csv` | `name`, `user_status` (keep / edit / drop), `user_notes` |
+| Markers – T6 questions | markers | 30 | `t6/t6_draft.csv` | `name`, `user_status` (keep / edit / drop), `user_notes` |
+| Markers – Training audit | markers | 23 | `fdarx/audit/audit_review_20.csv` | `name`, `user_verdict` (ok / wrong_sentences / wrong_answer / should_decline / should_answer / bad_question), `user_notes` |
+| Markers – Decline check | markers | 20 | `fdarx/audit/decline_review_20.csv` | `name`, `user_verdict` (not_in_label / answerable_elsewhere / partly / bad_question), `user_where_found`, `user_notes` |
+| Second check | markers | 56 (T5 30, T3 21, T6 5) | the same sheets, as a second mark (`*_2`) | `name`, `answer`, `only_formatting` (T5 only), `notes` |
+| Pharmacist | pharmacist | 30 | `changes/t5/pharmacist_sheet.csv` | `name`, `mark`, `only_formatting`, `clinically_important` (y / n), `notes` |
+| Testers – usability | session runner | 20 empty sessions | `usability.csv` (new) | one row per test session, see below |
+| Reference – label text | markers | 9,094 lines | – | nothing; the full label text for the audit and decline rows, one line per row (filter on `item_id`) |
 
-Every task row has:
-- a stable `item_id`: `T5-001`, `T3-001`, `T6-01`, `AUD-001`, `DEC-02`, and `PH-T5-004` for pharmacist rows;
-- `task`;
-- an `annotator` dropdown;
-- the fields the reviewer needs;
-- the mark columns, which are shaded and darker in the header.
+Layout of every tab:
+- Row 1 is a one-line "What to do" (merged, bold). The header is on row 2 (row 3 on the testers tab, under the session script) and is frozen.
+- Each row has a stable `item_id` (`T5-001`, `T3-001`, `T6-01`, `AUD-001`, `DEC-02`, `PH-T5-004`, `U-01`) and, as the last column, `task`. Merging needs both.
+- The grey columns are the item; the coloured columns are filled in. Choice columns have dropdowns; `name` is free text.
+- One colour per role: markers blue, pharmacist purple, testers orange, info grey.
+- Long label text is kept out of the task tabs: the audit and decline rows point to the Reference tab.
 
-Each task has its own colour. The header is frozen, text wraps, and choice columns have dropdowns (list data validation). These survive an `.xlsx` import into Google Sheets.
+Only things the reviewer needs are shown. T3 shows the question, topic, whether it is answerable, the reference answer, the gold sentences or the decline evidence, and a DailyMed link. T6 shows the question, category, reference note, `dangerous_if`, the sources and the label text. Author notes, label versions, sentence numbers and similar fields stay in the source sheets.
 
-The Pharmacist tab holds a subset of T5: the 30 rows have the same `t5_id` as their T5 rows. A pharmacist marks them independently, and they are compared with the T5 marks. The `plain_language_*` columns of `pharmacist_sheet.csv` are left out because they would show model output. Checking the plain-language rewrites is a separate, later step.
+### Second check
+
+To measure agreement, about 20% of T5 and 15% of T3 and T6 appear a second time on the Second check tab. They have the same `item_id`, no first mark visible, and the item text in one cell. The note says: *Do these only if you did NOT mark the same item on another tab.* Rows are grouped by task (T5, then T3, then T6) and shuffled within each block. The set is a seeded, drug-stratified systematic sample (seed 2026, `split.double_set`):
+1. Items are grouped by drug, with drugs in sorted order, and shuffled within each drug with `random.Random(f"{seed}:{task}:{drug}")`.
+2. k = share × N, rounded half up. The items at positions ⌊i·N/k⌋ of that order are taken, so they are spread over the drugs.
+
+### Pharmacist
+
+The Pharmacist tab holds a subset of T5: the 30 rows have the same `t5_id` as their T5 rows (`PH-T5-004` is `T5-004`). The instructions use expert wording. A pharmacist marks them independently, and they are compared with the T5 marks. `clinically_important` is a new column. The `plain_language_*` columns of `pharmacist_sheet.csv` are left out because they would show model output. Checking the plain-language rewrites is a separate, later step.
+
+### Testers – usability
+
+One row per test session, filled in by the person running it. Above the header is a short script: it's the app being tested, not you; think aloud; stop any time; use the demo medicines; how to give each task and when to help; the 10 SUS statements; and the last 3 questions.
+
+Columns:
+- `name` (the session runner), `tester` (first name or a code only), `age_band` (under 18 / 18-39 / 40-59 / 60-69 / 70-79 / 80+), `phone`, `date`. No other personal data.
+- For each of the 5 tasks (pick or scan a medicine, ask a dose question, ask a food or drink question, read a label-change alert, use voice): `<task>_done` (yes / no / with help), `<task>_minutes`, `<task>_comment`.
+- `sus_1` … `sus_10` (1–5): the System Usability Scale (Brooke 1996), with "system" replaced by "app". The statements are in the script and in a note on each header cell. `sus_score` is a formula: odd items score − 1, even items 5 − score, sum × 2.5, blank until all 10 are filled.
+- `would_use` (1–5), `what_confused_you`, `anything_unsafe_or_wrong`.
 
 ## Kept blind
 
@@ -39,102 +59,61 @@ The workbook never shows:
 - support-check coverage numbers inside the T3/T6 evidence notes;
 - any score, prediction or model output.
 
-`tasks.BLOCKED` is checked on every header that is written, and writing fails if a blocked column would be shown. AI notes are joined back only after merging, from the original sheets.
+`tasks.BLOCKED` is checked on every header that is written, and writing fails if a blocked column would be shown. The only exception is the testers' own `sus_score`. AI notes are joined back only after merging, from the original sheets.
 
-The training-audit rows show what the model was trained on: the `sentences_shown`, the `target`, and the original line from the benchmark. They are training data, not model outputs.
+The training-audit rows show what the model was trained on: the cited sentences, the `target`, the original line from the benchmark, and (on the Reference tab) all sentences shown. They are training data, not model outputs.
 
 ## Commands
 
 Run from `datapipe/`:
 
 ```bash
-uv run python -m medlabel_data.annotation.build                      # master only
-uv run python -m medlabel_data.annotation.split --annotators "Ana,Ben,Cy" --pharmacist "Dr Lee"
-uv run python -m medlabel_data.annotation.merge ~/waicy-work/data/build/annotation/split --dry-run
-uv run python -m medlabel_data.annotation.merge ~/waicy-work/data/build/annotation/split
+uv run python -m medlabel_data.annotation.build                                  # the shared file + CSVs
+uv run python -m medlabel_data.annotation.merge ~/Downloads/annotation_master.xlsx --dry-run
+uv run python -m medlabel_data.annotation.merge ~/Downloads/annotation_master.xlsx
 ```
 
-### build
-
-`build` writes `annotation_master.xlsx` and `csv/NN_<tab>.csv`, one file per tab. The Assignments tab then has one `all` row per task.
-
-### split
-
-`split` writes the following to `split/`:
-- `annotation_<name>.xlsx` for each person. Each file has only that person's rows, with `annotator` filled in, their Assignments rows with live counts, the Start here rows for their tasks, and the decline-label lines for their decline items.
-- `annotation_<pharmacist>.xlsx` with the Pharmacist tab only.
-- `assignments.csv` (item_id, task, annotator, double) and `plan.json` (seed and settings).
-
-It also rebuilds the master with the plan. In the master, the `annotator` column stays empty; people pick their name if they work there. The live counts are in each person's file.
-
-Options:
-- `--tasks T5,T3`: split only some tasks.
-- `--double T5=0.3`: change the double-marked shares.
-- `--seed` and `--due`.
-
-### merge
-
-`merge` reads the completed files. These can be:
-- per-person workbooks;
-- the master downloaded from Google Sheets as `.xlsx`;
-- tab CSVs.
-
-It accepts files or folders; folders are not searched recursively. It writes `merge_report.md`.
-
-## How the work is split
-
-The seed is fixed: `2026` by default. The split is deterministic for the same names, seed and sheets.
-
-For each task:
-1. Items are grouped by drug, with drugs in sorted order.
-2. Within each drug, items are shuffled with `random.Random(f"{seed}:{task}:{drug}")`.
-3. Walking that order, each item goes to the least-loaded annotator. Ties are broken by a seeded per-task order of names. So everyone gets about the same number of items and the same mix of drugs.
-
-**Double-marked items:**
-- The shares are T5 20%, T3 15% and T6 15%. The audit and decline check have none, because the student reviews them.
-- k = share × N, rounded half up. The double-marked items are a systematic sample of the walking order, at positions ⌊i·N/k⌋, so they are spread over the drugs.
-- Each double gets a second, different annotator: the least-loaded one.
-- The two people each have the row in their own file and never see each other's mark.
-- With one annotator, nothing is double-marked.
-
-With Ana, Ben and Cy, the split gives:
-- T5: 60 items each, 30 double-marked;
-- T3: 54–55 each, 21 double-marked;
-- T6: 11–12 each, 5 double-marked;
-- audit: 7–8 each;
-- decline: 6–7 each.
-
-## How marks are merged back
-
-**Reading:**
-- Every tab whose header has `item_id` and `task` is read.
-- Choice values are matched ignoring case, spaces and underscores. Invalid values are reported and ignored.
-- These are reported as warnings:
-  - rows left blank, per task and annotator;
-  - rows with notes but no main mark;
-  - unknown item ids;
-  - marks by someone who was not assigned that item, if `split/assignments.csv` exists.
-- Rows with marks but no annotator are skipped with a warning, unless `--default-annotator NAME` is given.
-- The same person giving different marks for the same item in two files is an error.
-
-**Writing:**
-- Marks go into the task's source sheet. The sheet gets an `annotator` column. For a second annotator of a double-marked item, it gets `annotator_2` and `<mark>_2` (for example `mark_2`, `user_status_2`).
-- A person always goes back to the same slot.
-- Existing marks are never overwritten. Every conflict is listed, and then the whole merge is aborted with nothing written.
-- Equal values are fine, so merging the same files twice is safe.
-- If a sheet already has marks with no annotator name (filled in by hand):
-  - if they match the incoming marks, they are attributed to that person;
-  - if not, they are kept as a separate mark, with a warning.
-
-**Agreement:**
-- For each task, Cohen's kappa and percent agreement are computed over the double-marked items, on the main mark.
-- Pairs are pooled per task (first vs second mark), whoever the two annotators were.
-- The pharmacist's `mark` is compared with the first T5 mark for the same `t5_id`.
-
-The T3 and T6 builders keep extra columns such as `annotator` and `*_2` when they rebuild their sheets (`t3.write_sheet`). The T5 sheet generator is on another branch and does not yet keep them. Rebuilding `t5_sheet.csv` after a merge would drop the merged marks, so merge only after T5 is final, or back the sheet up first.
+`build` options: `--seed` (Second check sample), `--due` (shown on Start here, default 2026-11-23), `--out`.
 
 ## Google Sheets
 
-1. Upload the `.xlsx` (master or a person's file) to Drive and open it with Google Sheets. Alternatively, use File → Import → Upload.
-2. Share each person's file only with that person.
-3. When everyone is done, download each file as `.xlsx` (File → Download → Microsoft Excel) into a folder, then run `merge` on that folder. Start with `--dry-run`.
+1. Upload `annotation_master.xlsx` to Drive and open it with Google Sheets (or File → Import → Upload). Share it with the markers, the pharmacist and the testers.
+2. Dropdowns, frozen headers, colours, the header notes and the formulas carry over. The formulas use only classic functions (COUNTA, COUNTIF(S), INDEX, MATCH, IFERROR, ROWS, SUM), so nothing is Excel-only. The Progress tab's name list uses two hidden helper columns (X and Y) that collect every name typed.
+3. When everyone is done, download it with File → Download → Microsoft Excel (.xlsx) and run `merge` on it, starting with `--dry-run`.
+
+Rebuilding the master replaces it with empty marks, so don't rebuild once people have started; download the shared copy instead.
+
+## How marks are merged back
+
+`merge` reads the shared file downloaded back as `.xlsx`, its tab CSVs, or per-person files from `split`. It accepts files or folders; folders are not searched recursively. It writes `merge_report.md`.
+
+**Reading:**
+- The header row is found in the first 10 rows of each tab: any table with `item_id` and `task` is read. Start here, Progress and the Reference tab are skipped.
+- The task tabs are the first mark. The Second check tab (the table with an `answer` column) is the second mark: `answer` goes to the task's main mark, `notes` to its notes column, and `only_formatting` to `only_formatting`.
+- The annotator is the `name` cell. Rows with marks but no name are skipped with a warning, unless `--default-annotator NAME` is given.
+- Choice values are matched ignoring case, spaces and underscores. Invalid values are reported and ignored.
+- Warnings: rows left blank (counted per task), rows with notes but no main mark, unknown item ids, and incomplete usability rows (no tester code, or SUS partly filled).
+- Different values for the same item and slot in two input files are an error.
+
+**Writing:**
+- First marks go into the source sheet as `annotator` plus the mark columns. Second marks go into `annotator_2` and `<mark>_2` (for example `mark_2`, `user_status_2`). The pharmacist's marks go into `pharmacist_sheet.csv`, which gets `annotator` and `clinically_important`.
+- Tester sessions go into `data/build/annotation/usability.csv` (option `--usability`), one row per `U-NN`, with `sus_score` recomputed in Python.
+- Existing marks are never overwritten. A filled cell may only receive the same value (names compared ignoring case). Every conflict is listed, and then the whole merge is aborted with nothing written. So merging the same file twice is safe, and changing a mark after a merge needs a deliberate edit of the source sheet.
+
+**Agreement:**
+- For each of T5, T3 and T6, Cohen's kappa and percent agreement are computed between the first mark and the Second check mark, on the main mark.
+- Pairs where the same name gave both marks are left out of kappa, with a warning.
+- The pharmacist's `mark` is compared with the first T5 mark for the same `t5_id`.
+- The report also gives the number of usability sessions and the mean SUS.
+
+The T3 and T6 builders keep extra columns such as `annotator` and `*_2` when they rebuild their sheets (`t3.write_sheet`). The T5 sheet generator is on another branch and does not yet keep them. Rebuilding `t5_sheet.csv` after a merge would drop the merged marks, so merge only after T5 is final, or back the sheet up first.
+
+## Optional: one file per person (`split`)
+
+Not the main way any more, but kept for when separate files are wanted:
+
+```bash
+uv run python -m medlabel_data.annotation.split --annotators "Ana,Ben,Cy" --pharmacist "Dr Lee"
+```
+
+It writes `split/annotation_<name>.xlsx` in the same layout as the shared file, plus `split/assignments.csv` and `split/plan.json`. Each person's task tabs hold the rows they mark first, with `name` filled in. Their Second check tab holds the double-marked rows they mark second, so the two people never see each other's mark. The double-marked set is the same `double_set` as in the shared file. Rows are spread so everyone gets about the same number and the same mix of drugs: walking the drug-stratified order, each item goes to the least-loaded person, with ties broken by a seeded order of names. The pharmacist's file holds the Pharmacist tab only, and there is no testers tab. Options: `--tasks`, `--double T5=0.3`, `--seed`, `--due`. `merge` reads these files the same way.
