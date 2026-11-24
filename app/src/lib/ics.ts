@@ -26,7 +26,7 @@ function fold(line: string): string {
 export function buildIcs(meds: Med[], opts: { includeNames: boolean; now: Date }): string {
   const { now } = opts;
   const day = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
-  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//MedLabel//WAICY 2026//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH"];
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//PillProof//WAICY 2026//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH"];
   // One event per time; with names off, medicines at the same time share one event.
   const byTime = new Map<string, Med[]>();
   for (const m of meds) for (const t of m.times) byTime.set(t, [...(byTime.get(t) || []), m]);

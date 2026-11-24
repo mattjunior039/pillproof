@@ -5,5 +5,5 @@ import "./styles.css";
 
 render(<App />, document.getElementById("app")!);
 init().catch((e) => {
-  document.getElementById("app")!.textContent = `MedLabel could not start: ${e?.message || e}`;
+  document.getElementById("app")!.textContent = `PillProof could not start: ${e?.message || e}`;
 });

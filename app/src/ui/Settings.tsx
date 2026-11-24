@@ -102,7 +102,7 @@ export function Settings() {
       <button class="btn" disabled={!s.meds.length} onClick={() => downloadIcs(s.meds, st.calendarNames)}>Download calendar file (.ics)</button>
 
       <h2>About</h2>
-      <p>MedLabel answers questions from the FDA label of each medicine on your list. It is reference information, not medical advice. It never tells you to change a dose or stop a medicine.</p>
+      <p>PillProof answers questions from the FDA label of each medicine on your list. It is reference information, not medical advice. It never tells you to change a dose or stop a medicine.</p>
       <p>Emergency: Poison Help <a href={`tel:${POISON_HELP.replace(/-/g, "")}`}>{POISON_HELP}</a> (24 hours, free), or call <a href="tel:911">911</a>.</p>
       <p class="small">Everything stays in this browser: no accounts, no server, no analytics. Labels come from openFDA, names from RxNorm, label history from DailyMed.</p>
     </section>

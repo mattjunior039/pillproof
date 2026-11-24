@@ -1,4 +1,4 @@
-# waicy-medlabel (working title)
+# PillProof
 
 Label-grounded medication assistant with label-change alerts. WAICY 2026 AI Showcase, High School, solo.
 

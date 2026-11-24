@@ -21,7 +21,7 @@ export function App() {
   return (
     <>
       <header class="top">
-        <span class="brand">MedLabel</span>
+        <span class="brand">PillProof</span>
         <button class={`gear ${s.tab === "settings" ? "on" : ""}`} aria-label="Settings" aria-current={s.tab === "settings" ? "page" : undefined} onClick={() => go("settings")}>⚙︎ Settings</button>
       </header>
       <main class="screen" id="main"><Screen /></main>

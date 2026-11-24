@@ -1,4 +1,4 @@
-# MedLabel web app
+# PillProof web app
 
 The app from plan §4 ("Must have"). It is a static PWA in `app/` built with Vite, Preact and TypeScript. There are no accounts, no server and no analytics: medicines, labels, settings and chat stay in the browser (IndexedDB and localStorage). It works offline after the first load.
 

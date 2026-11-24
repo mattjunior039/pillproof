@@ -130,8 +130,8 @@ export default defineConfig({
       registerType: "autoUpdate",
       injectRegister: "auto",
       manifest: {
-        name: "MedLabel: your medicine labels, explained",
-        short_name: "MedLabel",
+        name: "PillProof: your medicine labels, explained",
+        short_name: "PillProof",
         description: "Answers questions about your medicines from their FDA labels, on your device.",
         start_url: "./",
         display: "standalone",
