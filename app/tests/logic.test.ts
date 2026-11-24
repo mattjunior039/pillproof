@@ -88,3 +88,21 @@ test("label-change history matches medicines by ingredient or brand", async () =
   assert.deepEqual(historyKeys({ ingredient: "xyz", brand: "Lipitor" }, data), ["atorvastatin"]);
   assert.deepEqual(historyKeys({ ingredient: "ibuprofen" }, data), []);
 });
+
+test("model source: Hugging Face URLs from models.json when present, else the local MLC build", async () => {
+  const { modelSource } = await import("../src/lib/modelsrc.ts");
+  const local = { key: "lite-r1-ft", size: "0.8B" as const, mlc_dir: "Qwen3.5-0.8B-medlabel-r1-q4f16_1-MLC" };
+  const baseLib = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_80/Qwen3.5-0.8B-q4f16_1_cs1k-webgpu.wasm";
+  assert.deepEqual(modelSource(local, "https://h:4443/models/", "https://h:4443/libs/", baseLib), {
+    model: "https://h:4443/models/Qwen3.5-0.8B-medlabel-r1-q4f16_1-MLC",
+    modelLib: "https://h:4443/libs/Qwen3.5-0.8B-q4f16_1_cs1k-webgpu.wasm", remote: false,
+  });
+  const hf = { ...local, hf_repo: "u/pillproof-0.8b", model_url: "https://huggingface.co/u/pillproof-0.8b/",
+    model_lib_url: "https://huggingface.co/u/pillproof-0.8b/resolve/main/Qwen3.5-0.8B-q4f16_1_cs1k-webgpu.wasm" };
+  assert.deepEqual(modelSource(hf, "https://h:4443/models/", "https://h:4443/libs/", baseLib), {
+    model: "https://huggingface.co/u/pillproof-0.8b",
+    modelLib: "https://huggingface.co/u/pillproof-0.8b/resolve/main/Qwen3.5-0.8B-q4f16_1_cs1k-webgpu.wasm", remote: true,
+  });
+  // Only one of the two fields: stay local rather than mix sources.
+  assert.equal(modelSource({ ...local, model_url: hf.model_url }, "/m/", "/l/", baseLib).remote, false);
+});

@@ -4,6 +4,7 @@ import type * as webllm from "@mlc-ai/web-llm";
 // Loaded on demand so the 6 MB library stays out of the first-paint bundle.
 const lib = () => import("@mlc-ai/web-llm");
 import { BASE, type ModelEntry, type Tier } from "./device.ts";
+import { modelSource } from "./modelsrc.ts";
 
 // Same system prompt as training (datapipe/src/medlabel_data/fdarx/build.py SYSTEM).
 export const SYSTEM =
@@ -22,9 +23,10 @@ export async function appConfigFor(m: ModelEntry, tier: Tier) {
   const base = webllm.prebuiltAppConfig.model_list.find((r) => r.model_id === BASE[m.size]);
   if (!base) throw new Error(`WebLLM has no prebuilt record for ${BASE[m.size]}`);
   const rec = structuredClone(base);
-  rec.model = MODEL_BASE + m.mlc_dir; // WebLLM appends resolve/main/
-  rec.model_lib = LIB_BASE + base.model_lib.split("/").pop();
-  rec.model_id = `${m.key}-${BASE[m.size]}`;
+  const src = modelSource(m, MODEL_BASE, LIB_BASE, base.model_lib);
+  rec.model = src.model; // WebLLM appends resolve/main/
+  rec.model_lib = src.modelLib;
+  rec.model_id = `${m.key}-${BASE[m.size]}${src.remote ? "-hf" : ""}`;
   if (tier === "phone") rec.overrides = { ...rec.overrides, context_window_size: 2048 };
   return { appConfig: { ...webllm.prebuiltAppConfig, model_list: [rec] }, modelId: rec.model_id };
 }

@@ -4,7 +4,11 @@ import config from "../../models.json";
 export type Size = "2B" | "0.8B";
 export type Tier = "desktop" | "phone";
 
-export interface ModelEntry { key: string; size: Size; mlc_dir: string; dev?: Record<string, unknown> }
+export interface ModelEntry {
+  key: string; size: Size; mlc_dir: string; dev?: Record<string, unknown>;
+  /** Hugging Face release (train/scripts/app_models.py --hf-user); WebLLM appends resolve/main/ to model_url. */
+  hf_repo?: string; model_url?: string; model_lib_url?: string;
+}
 
 export const BASE: Record<Size, string> = { "2B": "Qwen3.5-2B-q4f16_1-MLC", "0.8B": "Qwen3.5-0.8B-q4f16_1-MLC" };
 export const SIZE_MB: Record<Size, number> = { "2B": 1000, "0.8B": 426 };
