@@ -112,8 +112,21 @@ The output format for the model is in [output-format.md](output-format.md).
   - **Student review sheets** (fill in `user_verdict`, `user_notes`; seed 2026). The AI note is folded in the `.md` so the student can decide first.
     - `audit/audit_review_20.{md,csv}`: all 20 non-ok items still in the r3 training data, plus 3 random AI-`ok` items (23 rows). There were more non-ok items than fit in 20, so the 7 already removed from training are left out.
     - `audit/decline_review_20.{md,csv}`: all 18 non-ok items plus 2 random AI-`ok` items.
-  - **Agreement (student vs AI):** _to be filled in after the student completes the review sheets._ Audit: __ / 23 agree (non-ok: __ / 20; ok: __ / 3). Decline: __ / 20 agree (non-ok: __ / 18; ok: __ / 2).
-  - **Fixing training items** that the student confirms as wrong is a separate step and has not been done.
+  - **Human review (2026-11-24).** Both review sheets were marked by hand on the shared annotation workbook ([annotation.md](annotation.md)) by **Advait**, a friend of the student. He used no AI tools and did not see the AI notes. Agreement is computed on ok vs not ok: for the audit, `ok` vs any other verdict; for the decline check, `not_in_label` vs any other.
+    - **Audit: 7 / 23 agree, κ = −0.14** (non-ok: 6 / 20; ok: 1 / 3). The two disagree in both directions:
+      - The human accepted 14 of the AI's 20 flags as ok. Most were answers drawing on an uncited neighbouring sentence, or a small added gloss.
+      - The human flagged 2 of the 3 AI-ok items. Both are declines he judged answerable.
+    - **Decline check: 19 / 20 agree, κ = 0.64** (non-ok: 18 / 18; ok: 1 / 2). The exact verdict matched on 18 of 20. Every disagreement is one where the human found part of the answer still in the label.
+  - **Humans call 8 of the 23 reviewed training items wrong** (34.8%, 95% Wilson interval 18.8% to 55.1%). They are 6 of the 20 AI-flagged items and 2 of the 3 AI-ok ones:
+    - **5 declines that the human says should be answered.** That is every decline item in the sample: audit n 12, 20, 27, 33 and 89.
+    - **2 answerable items whose answer is incomplete** (n 80, 83).
+    - **1 with the wrong cited sentences** (n 74).
+
+    The audit sample was drawn before the decline fix, so these are items as the round-1 build (and the shipped r1 adapters) trained on them. Of the 8, one (n 89) was later removed by the decline fix, and four (n 12, 20, 27, 33) had their prompt changed by it; these were not rechecked against the r3 prompt.
+
+    **The sample is enriched for AI flags**, so 34.8% is **not** a training-set error rate. Weighting it back to the 100 audited items needs the error rate among the 73 AI-ok items, and that rests on only 3 items (2 / 3, interval 21% to 94%). It is too uncertain to report. The firm statement is a floor: **at least 8 of the 100 audited training items (8%) are wrong by human judgment.**
+  - **Decline check: humans call 19 of the 20 reviewed decline items not cleanly unanswerable.** 18 are `partly` (part of the answer is still in the label) and 1 is `bad_question`; only 1 is `not_in_label`. So **at least 19 of the 50 spot-checked decline items (38%; interval 26% to 52%) are not clean declines**: 17 train and 2 valid. The true share is probably higher, since the 1 of 2 AI-ok items reviewed was also `partly`.
+  - **Not fixed (stated limitation).** The training data was frozen on 2026-11-24 and **r1 is the shipped model**, so none of these items was corrected and nothing was retrained. The main consequence: some decline training examples teach the model to decline questions that the label partly answers. That is a conservative failure (an unnecessary "ask your pharmacist"), not an unsafe one, but it costs helpfulness. A few answerable examples also have incomplete or loosely cited answers. The T1–T3 tests measure this behaviour directly.
 
 ### Plain-language ANSWER lines (train and valid only; disclosed AI assistance)
 
@@ -237,7 +250,7 @@ Method and grading scale: [t6.md](t6.md).
 
 ## Annotation workbook (all human review tasks)
 
-All human work is in one shared file for Google Sheets, `data/build/annotation/annotation_master.xlsx`, with one CSV per tab. It has a tab per role: five Markers tabs (T5, T3, T6, the training audit and the decline check), a Second check tab, a Pharmacist tab and a Testers – usability tab with the System Usability Scale. People type their first name on each row they mark; nobody is assigned rows. The Second check tab repeats about 20% of T5 and 15% of T3 and T6, so agreement can be measured. `merge` writes the marks back into the sheets above, plus `usability.csv`, and reports Cohen's kappa.
+All human work is in one shared file for Google Sheets, `data/build/annotation/annotation_master.xlsx`, with one CSV per tab. It has a tab per role: five Markers tabs (T5, T3, T6, the training audit and the decline check), a Second check tab, a Pharmacist tab and a Testers – usability tab with the System Usability Scale. People type their first name on each row they mark; nobody is assigned rows. The Second check tab repeats about 20% of T5 and 15% of T3 and T6, so agreement can be measured. `merge` writes the marks back into the sheets above, plus `usability.csv`, and reports Cohen's kappa. The completed file came back on 2026-11-24; who marked what and the results are in [annotation.md](annotation.md#returned-file-2026-11-24).
 
 Reviewers never see AI verdicts or notes, hidden keys, scores or model outputs. Details: [annotation.md](annotation.md).
 

@@ -10,11 +10,16 @@ mark columns; marks on the Second check tab go into `annotator_2` and `<mark>_2`
 to usability.csv. Existing marks are never overwritten: any disagreement with a filled cell aborts
 the whole merge with nothing written. Blank rows and invalid values are reported. Agreement (Cohen's
 kappa) is computed for first vs second marks, and pharmacist vs T5.
+
+Names are cleaned (spaces collapsed) and can be fixed with `--alias Albet=Albert`. A tab where
+nobody typed a name can get one with `--default-annotator pharmacist="pharmacist (licensed)"`
+(a bare `--default-annotator NAME` applies to every task).
 """
 
 import argparse
 import csv
 import datetime as dt
+import re
 import sys
 from collections import Counter
 from dataclasses import dataclass, field
@@ -27,6 +32,7 @@ from . import usability as U
 from .tasks import BY_KEY, OUT, Task, read_csv
 
 USABILITY_COLS = ["item_id"] + U.INPUTS + ["sus_score"]
+MIN_KAPPA_N = 20  # below this, the report says the sample is too small instead of leaning on kappa
 
 
 @dataclass
@@ -96,8 +102,25 @@ def _choice(v: str, choices: list[str]) -> str | None:
     return next((c for c in choices if _norm(c) == _norm(v)), None)
 
 
-def read_marks(inputs: list[Path], tasks: dict[str, Task] = BY_KEY, default_annotator: str = "") -> Result:
+def _defaults(default_annotator: str | dict[str, str]) -> dict[str, str]:
+    """'' -> {}; 'Name' -> {'*': 'Name'}; {'pharmacist': 'X'} as is."""
+    if isinstance(default_annotator, dict):
+        return default_annotator
+    return {"*": default_annotator} if default_annotator else {}
+
+
+def clean_name(name: str, aliases: dict[str, str] | None = None) -> str:
+    name = re.sub(r"\s+", " ", name).strip()
+    for old, new in (aliases or {}).items():
+        if name.casefold() == old.strip().casefold():
+            return new
+    return name
+
+
+def read_marks(inputs: list[Path], tasks: dict[str, Task] = BY_KEY, default_annotator: str | dict[str, str] = "",
+               aliases: dict[str, str] | None = None) -> Result:
     res = Result()
+    defaults = _defaults(default_annotator)
     known = {k: {t.id_fn(r) for r in read_csv(t.source)} for k, t in tasks.items()}
     seen_from = {}
     for path in _files(inputs):
@@ -137,7 +160,7 @@ def read_marks(inputs: list[Path], tasks: dict[str, Task] = BY_KEY, default_anno
                 if not vals:
                     res.blanks[(key, slot)] += 1
                     continue
-                who = get("name") or get("annotator") or default_annotator
+                who = clean_name(get("name") or get("annotator"), aliases) or defaults.get(key, defaults.get("*", ""))
                 if not who:
                     res.warnings.append(f"{where} {iid}: marks but no name, skipped (type a name in the 'name' "
                                         "column or pass --default-annotator)")
@@ -255,7 +278,7 @@ def agreement(sheets: dict[Path, tuple[list[str], list[dict]]], tasks: dict[str,
     out = []
     for key, t in tasks.items():
         p, p2 = t.primary, t.primary + "_2"
-        pairs = []
+        pairs, same = [], 0
         for r in rows_of(t):
             if not (r.get(p) and r.get(p2)):
                 continue
@@ -263,10 +286,11 @@ def agreement(sheets: dict[Path, tuple[list[str], list[dict]]], tasks: dict[str,
                 if warnings is not None:
                     warnings.append(f"{t.id_fn(r)} ({key}): first and second mark are both by "
                                     f"{r.get('annotator')}; left out of kappa")
+                same += 1
                 continue
             pairs.append((r[p], r[p2]))
-        if pairs:
-            out.append({"what": f"{key}: first vs Second check", "pairs": pairs})
+        if pairs or same:
+            out.append({"what": f"{key}: first vs Second check", "pairs": pairs, "same_person": same})
     if "pharmacist" in tasks and "T5" in tasks:
         t5 = {r["t5_id"]: r.get("mark", "") for r in rows_of(tasks["T5"])}
         pairs = [(r["mark"], t5[r["t5_id"]]) for r in rows_of(tasks["pharmacist"])
@@ -288,11 +312,15 @@ def report(res: Result, agree: list[dict], wrote: list[Path], dry: bool) -> str:
         lines.append(f"| {k} | {'first' if s == 1 else 'second check'} | {w} | {per[(k, s, w)]} |")
     for (k, s), n in sorted(res.blanks.items()):
         lines.append(f"| {k} | {'first' if s == 1 else 'second check'} | (blank) | {n} |")
-    lines += ["", "## Agreement", "", "| comparison | n | % agree | Cohen's kappa |", "|---|---|---|---|"]
+    lines += ["", "## Agreement", "",
+              "| comparison | n (different people) | % agree | Cohen's kappa | same person, left out |",
+              "|---|---|---|---|---|"]
     lines += [f"| {a['what']} | {a['n']} | {f(a['agree'] * 100 if a['agree'] is not None else None)} | "
-              f"{f(a['kappa'])} |" for a in agree] or ["| (no double-marked items yet) | | | |"]
+              f"{f(a['kappa']) if a['n'] >= MIN_KAPPA_N else f'too few (n < {MIN_KAPPA_N}); ' + f(a['kappa'])} | "
+              f"{a.get('same_person', 0)} |" for a in agree] or ["| (no double-marked items yet) | | | | |"]
     lines += ["", ("Kappa pools all pairs of a task (first vs second mark), whoever the two people were; pairs "
-              "marked twice by the same person are left out."), ""]
+              "marked twice by the same person are left out and counted in the last column. With fewer than "
+              f"{MIN_KAPPA_N} pairs kappa is shown for reference only."), ""]
     scores = [float(v["sus_score"]) for v in res.sessions.values() if v.get("sus_score")]
     lines += ["## Usability sessions", "", f"{len(res.sessions)} session(s) read; "
               + (f"mean SUS {sum(scores) / len(scores):.1f} (n = {len(scores)})." if scores else "no complete SUS."), ""]
@@ -303,8 +331,9 @@ def report(res: Result, agree: list[dict], wrote: list[Path], dry: bool) -> str:
 
 
 def merge(inputs: list[Path], tasks: dict[str, Task] = BY_KEY, usability_csv: Path = U.CSV,
-          default_annotator: str = "", dry_run: bool = False) -> tuple[Result, str]:
-    res = read_marks(inputs, tasks, default_annotator)
+          default_annotator: str | dict[str, str] = "", dry_run: bool = False,
+          aliases: dict[str, str] | None = None) -> tuple[Result, str]:
+    res = read_marks(inputs, tasks, default_annotator, aliases)
     sheets = apply(res, tasks, usability_csv)
     agree = agreement(sheets, tasks, res.warnings)
     wrote = []
@@ -323,11 +352,26 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("inputs", nargs="+", type=Path, help="completed .xlsx/.csv files or folders")
     ap.add_argument("--dry-run", action="store_true", help="check and report, write nothing")
-    ap.add_argument("--default-annotator", default="", help="name for marked rows whose name cell is empty")
+    ap.add_argument("--default-annotator", action="append", default=[], metavar="[TASK=]NAME",
+                    help="name for marked rows whose name cell is empty, for one task (TASK=NAME) or all (NAME)")
+    ap.add_argument("--alias", action="append", default=[], metavar="TYPED=NAME",
+                    help="fix a mistyped name, e.g. Albet=Albert (case-insensitive, repeatable)")
     ap.add_argument("--usability", type=Path, default=U.CSV, help="where tester sessions go")
     ap.add_argument("--report", type=Path, default=OUT / "merge_report.md")
     a = ap.parse_args(argv)
-    res, text = merge(a.inputs, BY_KEY, a.usability, a.default_annotator, a.dry_run)
+    defaults, aliases = {}, {}
+    for d in a.default_annotator:
+        k, _, v = d.partition("=")
+        if v and k in BY_KEY:
+            defaults[k] = v
+        else:
+            defaults["*"] = d
+    for x in a.alias:
+        old, sep, new = x.partition("=")
+        if not sep or not old.strip() or not new.strip():
+            ap.error(f"--alias needs TYPED=NAME, got '{x}'")
+        aliases[old.strip()] = new.strip()
+    res, text = merge(a.inputs, BY_KEY, a.usability, defaults, a.dry_run, aliases)
     a.report.parent.mkdir(parents=True, exist_ok=True)
     a.report.write_text(text)
     print(text)
