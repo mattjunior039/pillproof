@@ -173,3 +173,13 @@ def test_restatement_problems():
     assert text.restatement_problems("Take 20 mg of Lipitor with warfarin for 2 hours.", src, lex) == [
         "number 2", "number 20", "unit hour", "drug warfarin"]
     assert text.drug_terms("ethinyl estradiol", lex) == {"ethinyl estradiol", "estradiol"}
+
+
+def test_verifier_parses_replies_cut_off_inside_fix():
+    from medlabel_data.fdarx import verify
+
+    cut = '```json\n{"verdict":"error","category":"incomplete","reason":"Omits \\"sentence\\" 5.","fix":{"sentences":[3,4],"answer":"Take it'
+    assert verify.parse_answerable(cut)["category"] == "incomplete"
+    d = verify.parse_decline('{"shown": "no", "elsewhere": "partly", "bad_question": false, "reason": "E3.", "fix": {"answer": "OPS')
+    assert (d["shown"], d["elsewhere"], d["flag"]) == ("no", "partly", True)
+    assert verify.parse_decline("")["unparsed"]
