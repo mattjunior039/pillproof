@@ -325,7 +325,7 @@ def write_md(rows: list[dict], spec: dict) -> None:
           f"{len(rows)} questions on {len({r['drug'] for r in rows})} drugs; {n_no} ({n_no / len(rows):.0%}) are "
           "**not answerable** from the drug's label.", "",
           "Drafted by an AI assistant (Claude Opus 5.5) without access to any system outputs. "
-          "To be reviewed, edited and locked by the student; reference answers to be checked by a pharmacist. "
+          "To be reviewed, edited and locked by the team; reference answers to be checked by a pharmacist. "
           "Method: `docs/t3.md`. Fill in `user_status` (keep / edit / drop) and `user_notes` in `t3_draft.csv`.", "",
           "Gold sentences: `S<section>` is the section index in the parsed label and the numbers are sentences "
           "within that section, numbered by `datapipe/src/medlabel_data/sentences.py` from 1. `L<n>` is the running "

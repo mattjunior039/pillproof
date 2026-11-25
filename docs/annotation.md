@@ -91,7 +91,7 @@ Rebuilding the master replaces it with empty marks, so don't rebuild once people
 - The header row is found in the first 10 rows of each tab: any table with `item_id` and `task` is read. Start here, Progress and the Reference tab are skipped.
 - The task tabs are the first mark. The Second check tab (the table with an `answer` column) is the second mark: `answer` goes to the task's main mark, `notes` to its notes column, and `only_formatting` to `only_formatting`.
 - The annotator is the `name` cell, with spaces trimmed. Rows with marks but no name are skipped with a warning, unless a default is given. `--default-annotator NAME` sets a default for every task; `--default-annotator pharmacist=NAME` sets it for one task only. Both can be repeated.
-- `--alias TYPED=NAME` (repeatable, case-insensitive) maps a misspelt name to the right one, for example `--alias Albet=Albert`.
+- `--alias TYPED=NAME` (repeatable, case-insensitive) maps a misspelt name to the right one, for example `--alias Jhon=John`.
 - Choice values are matched ignoring case, spaces and underscores. Invalid values are reported and ignored.
 - Warnings: rows left blank (counted per task), rows with notes but no main mark, unknown item ids, and incomplete usability rows (no tester code, or SUS partly filled).
 - Different values for the same item and slot in two input files are an error.
@@ -117,35 +117,37 @@ The completed shared file came back on 2026-11-24. It is saved as `data/build/an
 ```bash
 uv run python -m medlabel_data.annotation.merge \
   ~/waicy-work/data/build/annotation/returned/annotation_returned_2026-11-24.xlsx \
-  --alias Albet=Albert --default-annotator 'pharmacist=pharmacist (licensed)' \
+  --alias <typo>=<name> --default-annotator 'pharmacist=pharmacist (licensed)' \
   --report ~/waicy-work/data/build/annotation/returned/merge_report.md
 ```
+
+(One misspelt marker name was mapped with `--alias`; names are not published.)
 
 A `--dry-run` came first. It found no invalid values and no conflicts. Running the merge again changes nothing.
 
 Apart from the marks, Google Sheets changed two cells that merge doesn't read: a source URL on T6-03 became a link chip, and one `target` cell on the Training audit tab was blanked. The source sheets are unaffected.
 
-**Who marked what.** All markers are friends of the student, plus a licensed pharmacist. Nobody used AI tools, and nobody saw system outputs.
+**Who marked what.** The markers were members of the team, shown here as reviewers A, B and C, plus a licensed pharmacist. Nobody used AI tools, and nobody saw system outputs.
 
 | Tab | Marked by | Rows marked |
 |---|---|---|
-| Markers – T5 | Albert | 149 / 150 (T5-085 blank) |
-| Markers – T3 | Tiyaan | 143 / 143 |
-| Markers – T6 | Advait | 30 / 30 |
-| Markers – Training audit | Advait | 23 / 23 |
-| Markers – Decline check | Advait | 20 / 20 |
-| Second check | Advait | 24 / 56 (all T5). The 21 T3, 5 T6 and 6 T5 rows were left blank. |
+| Markers – T5 | Reviewer A | 149 / 150 (T5-085 blank) |
+| Markers – T3 | Reviewer C | 143 / 143 |
+| Markers – T6 | Reviewer B | 30 / 30 |
+| Markers – Training audit | Reviewer B | 23 / 23 |
+| Markers – Decline check | Reviewer B | 20 / 20 |
+| Second check | Reviewer B | 24 / 56 (all T5). The 21 T3, 5 T6 and 6 T5 rows were left blank. |
 | Pharmacist | a licensed pharmacist (name cell left blank; recorded as `pharmacist (licensed)`) | 30 / 30 |
 | Testers – usability | none yet | 0 sessions |
 
 **Agreement:**
-- **T5, first mark vs Second check** (Albert vs Advait): n = 24, 70.8% agreement, κ = 0.42. Both marked 11 as reworded and 6 as meaning changed. Advait called 6 of Albert's "meaning changed" items reworded; 1 went the other way. No pair was marked by the same person.
-- **Pharmacist vs T5 first mark** (Albert): n = 30, 86.7% agreement, κ = 0.68.
+- **T5, first mark vs Second check** (reviewer A vs reviewer B): n = 24, 70.8% agreement, κ = 0.42. Both marked 11 as reworded and 6 as meaning changed. Reviewer B called 6 of reviewer A's "meaning changed" items reworded; 1 went the other way. No pair was marked by the same person.
+- **Pharmacist vs T5 first mark** (reviewer A): n = 30, 86.7% agreement, κ = 0.68.
 - **T3, T6:** none, because the Second check rows for them are blank.
 
 **Caveats:**
-- Albert left `only_formatting` blank on every T5 row, so his marks give no formatting-only estimate.
-- On the Second check, Advait answered `only_formatting` on 11 of 24 rows (8 y, 3 n).
+- Reviewer A left `only_formatting` blank on every T5 row, so those marks give no formatting-only estimate.
+- On the Second check, reviewer B answered `only_formatting` on 11 of 24 rows (8 y, 3 n).
 
 The results per task are in [t3.md](t3.md), [t6.md](t6.md), [label-changes.md](label-changes.md) (Gate 3) and [data.md](data.md) (training audit and decline check).
 

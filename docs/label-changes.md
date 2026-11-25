@@ -141,8 +141,8 @@ The 26 rewordings are mostly edits like "should be discontinued" → "Discontinu
 ### Second estimate: human marks on T5 (2026-11-24)
 
 T5 was marked by hand on the shared annotation workbook ([annotation.md](annotation.md#returned-file-2026-11-24)).
-- **Albert** (a friend of the student) gave the first mark on 149 of 150 items. T5-085 is blank.
-- **Advait** marked 24 items again on the Second check tab.
+- **Reviewer A** (a team member) gave the first mark on 149 of 150 items. T5-085 is blank.
+- **Reviewer B** (another team member) marked 24 items again on the Second check tab.
 - **A licensed pharmacist** marked the 30-item pharmacist subset.
 
 No one used AI tools or saw the hidden key, scores or model outputs.
@@ -152,24 +152,24 @@ The workbook asked for `only_formatting` = y "if only punctuation, bullets, numb
 | Marker | Formatting only | 95% interval (Wilson) |
 |---|---|---|
 | Pharmacist (30-item subset) | 3/30 = **10.0%** | 3.5% to 25.6% |
-| Albert (149) | 0 y; he left the column blank on every row and never typed "n" | 0/149 = 0% [0%, 2.5%] only if blank means "no" |
-| Advait (24, Second check) | 8/24 = 33.3% if blank means "no"; he answered 11 (8 y, 3 n) | 18.0% to 53.3% (8/11: 43% to 90%) |
+| Reviewer A (149) | 0 y; left the column blank on every row and never typed "n" | 0/149 = 0% [0%, 2.5%] only if blank means "no" |
+| Reviewer B (24, Second check) | 8/24 = 33.3% if blank means "no"; answered 11 (8 y, 3 n) | 18.0% to 53.3% (8/11: 43% to 90%) |
 
 **Gate 3 status: still passes on the point estimate, and still not conclusively.**
 - **The pharmacist's figure is the one to use.** At 10.0% it agrees with the dev sample's 13.8% [7.9%, 23.0%], but its upper end is also above 20%.
-- **Albert's blank column is read as "not answered", not as 0%.**
-- **Advait's rate is much higher.** All 8 of his "y" items are ones he marked "reworded", which suggests he used "y" for "trivial rewording" rather than "formatting only". The pharmacist's 3 "y" items are not in the Second check set, so the two can't be compared item by item.
+- **Reviewer A's blank column is read as "not answered", not as 0%.**
+- **Reviewer B's rate is much higher.** All 8 of reviewer B's "y" items were also marked "reworded", which suggests "y" was used "y" for "trivial rewording" rather than "formatting only". The pharmacist's 3 "y" items are not in the Second check set, so the two can't be compared item by item.
 - **The shares are unweighted.** T5 is stratified by drug and change type, and the sampling weights are in `t5_key_hidden.jsonl`. That file stays closed until the final evaluation, so these shares are not weighted back to the 2,908 candidates.
 
 **The T5 marks:**
-- **Albert:** 89 meaning changed and 60 reworded of 149 (59.7% vs 40.3%).
+- **Reviewer A:** 89 meaning changed and 60 reworded of 149 (59.7% vs 40.3%).
   - By change type: added sentences were 42 meaning changed vs 3 reworded; removed, 24 vs 4; changed, 23 vs 53.
-  - He wrote notes on 8 rows.
-- **Albert vs Advait** (Second check, n = 24): 70.8% agreement, κ = 0.42.
-  - 6 of Albert's "meaning changed" items were "reworded" to Advait; 1 went the other way.
-- **Pharmacist vs Albert** (n = 30): 86.7% agreement, κ = 0.68.
+  - Notes were written on 8 rows.
+- **Reviewer A vs reviewer B** (Second check, n = 24): 70.8% agreement, κ = 0.42.
+  - 6 of reviewer A's "meaning changed" items were "reworded" to reviewer B; 1 went the other way.
+- **Pharmacist vs reviewer A** (n = 30): 86.7% agreement, κ = 0.68.
   - The pharmacist called 22 items "meaning changed" and 8 "reworded".
-  - In 3 of the 4 disagreements the pharmacist said "meaning changed" where Albert said "reworded".
+  - In 3 of the 4 disagreements the pharmacist said "meaning changed" where reviewer A said "reworded".
   - **17 of 30 were marked clinically important**, all of them "meaning changed" items (17 of the pharmacist's 22).
 - `plain_language_accurate` is still blank. The plain-language lines come after T5 is scored.
 

@@ -179,7 +179,7 @@ def write_md(rows: list[dict], spec: dict) -> None:
           f"({sum(r['otc'] == 'yes' for r in rows) // 3} OTC). Categories: "
           + ", ".join(f"{cats[c]} {CATEGORIES[c]}" for c in CATEGORIES) + ".", "",
           "Drafted by an AI assistant (Claude Opus 5.5) without access to any model, app or web-search output. "
-          "To be reviewed, edited and locked by the student. Method: `docs/t6.md`. Fill in `user_status` "
+          "To be reviewed, edited and locked by the team. Method: `docs/t6.md`. Fill in `user_status` "
           "(keep / edit / drop) and `user_notes` in `t6_draft.csv`.", "",
           f"Sources were opened and checked on {spec['checked']}. Reference notes are in the drafter's own words; "
           "MedlinePlus is never quoted.", "", "## Grading scale (one grade per answer)", ""]

@@ -11,7 +11,7 @@ to usability.csv. Existing marks are never overwritten: any disagreement with a 
 the whole merge with nothing written. Blank rows and invalid values are reported. Agreement (Cohen's
 kappa) is computed for first vs second marks, and pharmacist vs T5.
 
-Names are cleaned (spaces collapsed) and can be fixed with `--alias Albet=Albert`. A tab where
+Names are cleaned (spaces collapsed) and can be fixed with `--alias Jhon=John`. A tab where
 nobody typed a name can get one with `--default-annotator pharmacist="pharmacist (licensed)"`
 (a bare `--default-annotator NAME` applies to every task).
 """
@@ -355,7 +355,7 @@ def main(argv=None) -> int:
     ap.add_argument("--default-annotator", action="append", default=[], metavar="[TASK=]NAME",
                     help="name for marked rows whose name cell is empty, for one task (TASK=NAME) or all (NAME)")
     ap.add_argument("--alias", action="append", default=[], metavar="TYPED=NAME",
-                    help="fix a mistyped name, e.g. Albet=Albert (case-insensitive, repeatable)")
+                    help="fix a mistyped name, e.g. Jhon=John (case-insensitive, repeatable)")
     ap.add_argument("--usability", type=Path, default=U.CSV, help="where tester sessions go")
     ap.add_argument("--report", type=Path, default=OUT / "merge_report.md")
     a = ap.parse_args(argv)

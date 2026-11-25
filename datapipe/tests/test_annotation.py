@@ -158,14 +158,14 @@ def test_name_aliases_and_per_task_default(tmp_path):
     p, _ = make_task(tmp_path, key="pharmacist")
     sub = tmp_path / "in.csv"
     sub.write_text("item_id,task,name,mark\n"
-                   "X-001,T5,albet ,reworded\n"
-                   "X-002,T5,Al  bert,reworded\n"
+                   "X-001,T5,jhon ,reworded\n"
+                   "X-002,T5,Jo  hn,reworded\n"
                    "X-003,T5,,reworded\n"
                    "X-001,pharmacist,,reworded\n")
     res = merge.read_marks([sub], {"T5": t, "pharmacist": p}, {"pharmacist": "pharmacist (licensed)"},
-                           {"Albet": "Albert"})
+                           {"Jhon": "John"})
     who = {(k, i): v["annotator"] for (k, i, _), v in res.marks.items()}
-    assert who == {("T5", "X-001"): "Albert", ("T5", "X-002"): "Al bert",
+    assert who == {("T5", "X-001"): "John", ("T5", "X-002"): "Jo hn",
                    ("pharmacist", "X-001"): "pharmacist (licensed)"}
     assert any("X-003: marks but no name" in w for w in res.warnings)
 
