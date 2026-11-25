@@ -13,6 +13,12 @@ uv run python -m medlabel_data.fdarx.decline_audit # 50-item decline spot-check 
 uv run python -m medlabel_data.medqa               # T2 (MedicationQA)
 uv run python -m medlabel_data.labelfetch          # T3/T5 label versions (needs confirmed drug list)
 uv run python -m medlabel_data.changes.build       # label changes between versions (see label-changes.md)
+uv run python -m medlabel_data.t3 snapshot         # T3: fix the label per drug, number sentences
+uv run python -m medlabel_data.t3 build            # T3: check hand-written items, write the draft sheet
+uv run python -m medlabel_data.t6 labels           # T6: OTC labels, numbered like T3
+uv run python -m medlabel_data.t6 build            # T6: check web-search test items, write the draft sheet
+uv run python -m medlabel_data.annotation.build    # one shared annotation file (markers, pharmacist, testers)
+uv run python -m medlabel_data.annotation.merge ~/Downloads/annotation_master.xlsx  # marks -> original sheets
 uv run pytest -q                                   # splitter/section/alignment tests
 ```
 
@@ -93,6 +99,35 @@ The output format for the model is in [output-format.md](output-format.md).
   - Each item shows the question, the answer that was removed, the removed section headings, and the closest remaining sentences the check found.
   - `decline_check_labels/NN_<qid>.txt` is the full label text with the removed passages marked, so it can be searched with Ctrl-F.
   - Verdicts: `not_in_label`, `answerable_elsewhere` (fill in `where_found`), `partly`, or `bad_question`.
+- **AI first pass on both sheets (disclosed).** The first pass on the 100-item audit and the 50-item decline spot-check was done by an AI assistant: Claude sub-agents launched by Anthropic Claude Opus 5.5 (`claude-opus-5.5`) in the GitHub Copilot app, 2026-11. The student then verifies a sample.
+  - **What was added.** The agents read each item and searched the full label where needed. They filled in new columns `ai_verdict` (`ok` / `error` / `unclear`), `ai_category` (in the sheet's verdict vocabulary) and `ai_notes`, plus `ai_where_found` for the decline sheet and `r3_status` for the audit sheet. The student's own `verdict` / `notes` / `where_found` columns are untouched. The sheets as they were before this pass are in `audit/backup_before_ai/`.
+  - **Not fully independent.** The plain-language ANSWER lines being audited were also written by an AI model (Claude Sonnet 5.5, below), so an AI checking AI output is not a fully independent audit. That is why the student checks a sample by hand.
+  - **AI results, audit (100).** 73 ok, 24 error, 3 unclear:
+    - 9 `wrong_sentences` (cited sentences miss part of the answer or a fact comes from an uncited sentence)
+    - 6 `wrong_answer` (adds a fact not in the shown sentences)
+    - 2 `rewrite_changes_meaning` (an inaccurate gloss added by the rewrite)
+    - 7 `should_answer` (decline items whose shown sentences do answer it)
+
+    7 of the 27 non-ok items were already removed from training by the decline fix.
+  - **AI results, decline check (50).** 32 `not_in_label`, 15 errors (13 `partly`, 1 `answerable_elsewhere`, 1 `bad_question`) and 3 unclear (all leaning `partly`).
+  - **Student review sheets** (fill in `user_verdict`, `user_notes`; seed 2026). The AI note is folded in the `.md` so the student can decide first.
+    - `audit/audit_review_20.{md,csv}`: all 20 non-ok items still in the r3 training data, plus 3 random AI-`ok` items (23 rows). There were more non-ok items than fit in 20, so the 7 already removed from training are left out.
+    - `audit/decline_review_20.{md,csv}`: all 18 non-ok items plus 2 random AI-`ok` items.
+  - **Human review (2026-11-24).** Both review sheets were marked by hand on the shared annotation workbook ([annotation.md](annotation.md)) by **Advait**, a friend of the student. He used no AI tools and did not see the AI notes. Agreement is computed on ok vs not ok: for the audit, `ok` vs any other verdict; for the decline check, `not_in_label` vs any other.
+    - **Audit: 7 / 23 agree, κ = −0.14** (non-ok: 6 / 20; ok: 1 / 3). The two disagree in both directions:
+      - The human accepted 14 of the AI's 20 flags as ok. Most were answers drawing on an uncited neighbouring sentence, or a small added gloss.
+      - The human flagged 2 of the 3 AI-ok items. Both are declines he judged answerable.
+    - **Decline check: 19 / 20 agree, κ = 0.64** (non-ok: 18 / 18; ok: 1 / 2). The exact verdict matched on 18 of 20. Every disagreement is one where the human found part of the answer still in the label.
+  - **Humans call 8 of the 23 reviewed training items wrong** (34.8%, 95% Wilson interval 18.8% to 55.1%). They are 6 of the 20 AI-flagged items and 2 of the 3 AI-ok ones:
+    - **5 declines that the human says should be answered.** That is every decline item in the sample: audit n 12, 20, 27, 33 and 89.
+    - **2 answerable items whose answer is incomplete** (n 80, 83).
+    - **1 with the wrong cited sentences** (n 74).
+
+    The audit sample was drawn before the decline fix, so these are items as the round-1 build (and the shipped r1 adapters) trained on them. Of the 8, one (n 89) was later removed by the decline fix, and four (n 12, 20, 27, 33) had their prompt changed by it; these were not rechecked against the r3 prompt.
+
+    **The sample is enriched for AI flags**, so 34.8% is **not** a training-set error rate. Weighting it back to the 100 audited items needs the error rate among the 73 AI-ok items, and that rests on only 3 items (2 / 3, interval 21% to 94%). It is too uncertain to report. The firm statement is a floor: **at least 8 of the 100 audited training items (8%) are wrong by human judgment.**
+  - **Decline check: humans call 19 of the 20 reviewed decline items not cleanly unanswerable.** 18 are `partly` (part of the answer is still in the label) and 1 is `bad_question`; only 1 is `not_in_label`. So **at least 19 of the 50 spot-checked decline items (38%; interval 26% to 52%) are not clean declines**: 17 train and 2 valid. The true share is probably higher, since the 1 of 2 AI-ok items reviewed was also `partly`.
+  - **Not fixed (stated limitation).** The training data was frozen on 2026-11-24 and **r1 is the shipped model**, so none of these items was corrected and nothing was retrained. The main consequence: some decline training examples teach the model to decline questions that the label partly answers. That is a conservative failure (an unnecessary "ask your pharmacist"), not an unsafe one, but it costs helpfulness. A few answerable examples also have incomplete or loosely cited answers. The T1–T3 tests measure this behaviour directly.
 
 ### Plain-language ANSWER lines (train and valid only; disclosed AI assistance)
 
@@ -245,7 +280,30 @@ The list was confirmed by the project owner on 2026-11-15 and is in `config/t3_d
 - DailyMed history only includes versions it has archived. Some labels restarted their history, for example Zestril has only 2 versions.
 - To pin a different label, set `set_id` for that drug in the config.
 - Changes between versions, the T5 sheet and Gate 3 are described in [label-changes.md](label-changes.md).
-- T3 questions are **not** written here. The project owner writes and locks them before seeing any model output.
+- **T3 questions** (143 items, 30% not answerable, DRAFT) are in `data/build/t3/`. They were drafted by an AI assistant (Claude Opus 5.5) with no access to any system outputs, and are reviewed, edited and locked by the student before any model is run on them. Method, label choice and disclosure: [t3.md](t3.md). T5 is marked by the student separately.
+
+## T6: web-search mode questions (DRAFT)
+
+There are 30 everyday questions on 10 products:
+- 7 T3 drugs;
+- Excedrin (acetaminophen/aspirin/caffeine), Advil and Benadryl.
+
+They split into three groups of 10:
+- answered by the label;
+- not on the label but covered by reputable public sources;
+- ask a pharmacist or doctor, or mixed evidence.
+
+Each item has a reference note in the drafter's own words, 1–2 checked source URLs and a `dangerous_if` note. The files are in `data/build/t6/`.
+
+The items were drafted by an AI assistant (Claude Opus 5.5) with no access to any model, app or web-search output. The student reviews, edits and locks them.
+
+Method and grading scale: [t6.md](t6.md).
+
+## Annotation workbook (all human review tasks)
+
+All human work is in one shared file for Google Sheets, `data/build/annotation/annotation_master.xlsx`, with one CSV per tab. It has a tab per role: five Markers tabs (T5, T3, T6, the training audit and the decline check), a Second check tab, a Pharmacist tab and a Testers – usability tab with the System Usability Scale. People type their first name on each row they mark; nobody is assigned rows. The Second check tab repeats about 20% of T5 and 15% of T3 and T6, so agreement can be measured. `merge` writes the marks back into the sheets above, plus `usability.csv`, and reports Cohen's kappa. The completed file came back on 2026-11-24; who marked what and the results are in [annotation.md](annotation.md#returned-file-2026-11-24).
+
+Reviewers never see AI verdicts or notes, hidden keys, scores or model outputs. Details: [annotation.md](annotation.md).
 
 ## Licenses
 
