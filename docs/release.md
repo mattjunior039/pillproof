@@ -55,4 +55,13 @@ $PY train/scripts/app_models.py --hf-user <user>      # adds hf_repo / model_url
 
 ## Status
 
-- Staged; upload pending. Waiting for the user to log in to Hugging Face with the release account. The current login is `jmamitha`, which is not to be used.
+- Uploaded 2026-11-25 as public repos under `mattjunior`:
+  - https://huggingface.co/mattjunior/PillProof-Qwen3.5-2B-r1-q4f16_1-MLC (42 files)
+  - https://huggingface.co/mattjunior/PillProof-Qwen3.5-0.8B-r1-q4f16_1-MLC (22 files)
+- app/models.json has `hf_repo`, `model_url` and `model_lib_url` on `r1-ft` and `lite-r1-ft`.
+- Browser check, Chrome on the M5 Pro with a fresh profile (empty cache), gate1 page `?models=hf-r1-ft,hf-lite-r1-ft&prompts=label&ctx=2048`. Both models downloaded weights and wasm from Hugging Face and ran, and their replies to the two label prompts match the earlier local runs of the same builds exactly:
+
+  | Model | Load from HF, cold | Decode |
+  |---|---|---|
+  | 2B | 98 s | 47 tok/s |
+  | 0.8B | 40 s | 41 tok/s |
