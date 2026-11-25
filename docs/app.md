@@ -8,7 +8,7 @@ The app from plan §4 ("Must have"). It is a static PWA in `app/` built with Vit
 cd app
 npm install
 npm run dev                  # http://localhost:5173
-npm test                     # node --test tests/ (app logic, answer pipeline, backup sources)
+npm test                     # node --test "tests/*.test.ts" (app logic, answer pipeline, backup sources)
 npm run build                # tsc + vite build -> dist/ (service worker precaches everything)
 npm run build:pages          # the public GitHub Pages build (base /pillproof/, web search off, HF models only)
 HTTPS=1 CERTS_DIR=~/waicy-work/certs/app npx vite preview --host --port 4443   # phone testing on the LAN
