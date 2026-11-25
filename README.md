@@ -36,7 +36,7 @@ More: [docs/app.md](docs/app.md) (the app), [docs/plan.md](docs/plan.md) (projec
 
 ## Results
 
-Final test-set results: [docs/final-eval.md](docs/final-eval.md).
+Final test-set results will be added in `docs/final-eval.md` when the final evaluation is finished.
 
 On the development set, the fine-tuned 2B model with checks gave about a third as many wrong answers as the same base model given the same label passages (14.0% vs 40.6% wrong on phone-size prompts; [docs/gate2.md](docs/gate2.md)). Label-change detection is described in [docs/label-changes.md](docs/label-changes.md).
 

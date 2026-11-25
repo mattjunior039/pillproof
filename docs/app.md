@@ -174,6 +174,15 @@ What runs on the public site (everything else is client-side):
 
 openFDA allows about 1,000 requests a day per IP without a key; each new medicine and each "other labels" step uses one or two.
 
+Checked on 2026-11-25 with Playwright on the live site in a fresh Chrome profile (Chrome 158, M5 Pro Mac, home internet):
+
+- Added atorvastatin 10 mg and lisinopril 2.5 mg (Accord labels). r1-ft loaded in 89 s and lite-r1-ft in 35 s. Both models answered "Can I drink grapefruit juice with atorvastatin?" with the 1.2-litre label sentence and a DailyMed link; "Can I drink alcohol with lisinopril?" fell back to DDInter (marked "Not on your label"), with "the web (not checked: web search is available in the local version)".
+- Settings shows the disabled web-search box with the local-version note. The browser contacted only github.io, rxnav.nlm.nih.gov, api.fda.gov, connect.medlineplus.gov and Hugging Face; nothing went to `/api/search`.
+- Voice: the speech model downloaded in 75 s and transcribed a recorded question (fake microphone input).
+- A 390 px phone viewport has no sideways scrolling. With an iPhone user agent, Settings offers only lite-r1-ft.
+- The only console error is a 404 from openFDA when a medicine has no patient-leaflet label version (openFDA returns 404 for "no results"); the app then uses the main label. The local version logs the same 404.
+- "How should I take lisinopril?" got "The label does not cover this" from both models, although the label has a Dosage and Administration section. This is the frozen model's behaviour, not a public-build difference.
+
 ## Answer quality on everyday questions (dev only)
 
 We wrote 41 everyday questions of our own (none from T1 to T5) over 9 medicines: atorvastatin (Accord), ibuprofen, amoxicillin, prednisone, cetirizine, metformin, lisinopril, sertraline and Tylenol PM. They cover what it's for, how to take it, missed dose, dose, side effects, alcohol, grapefruit vs grape juice, an unusual food, splitting/crushing, pregnancy, use with another common drug, a combination OTC product, and questions with no good answer. Each answer was hand-graded as useful and correct / correct but unhelpful / wrong / dangerous. Harness: Playwright on the real app in Chrome, with backup sources and web search on.
