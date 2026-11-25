@@ -614,6 +614,20 @@ What this shows:
 - **The 0.8B r2 reply is the worst one:** a "yes" that drops the limit. The checks pass it (verified with `core/checks.js`): "1.2 liters" is in the cited sentence, and "yes" has no number or unit to check. This is the restatement risk that the quotes shown under every answer are meant to cover. The checks block made-up numbers and names, not wrong meaning.
 - **Follow-up.** The qualifier check (rule 5 under [Checks](#checks)) now blocks both 0.8B r2 replies, and the app shows the cited sentence instead.
 
+## Round 4: AI-verified training data (not built; r1 stays)
+
+- **Plan.** Round 4 would fix the training rows that the human audit found wrong:
+  - mostly false declines: 5 of the 8 wrong rows in the training audit, and 19 of 20 reviewed declines not clean;
+  - false declines would become answerable rows, with the decline share held at r1's 30%;
+  - training would use r1's settings.
+- **Ship rule, set beforehand.** r4 had to beat r1 on the dev phone wrong-answer rate, with a CI that excludes 0, without adding more than about 1 point of "declined, should answer".
+- **What happened.** The Claude verifier that would make the fixes had to validate against the human verdicts first. It did not. Details are in [data.md](data.md#round-4-not-built-ai-verifier-for-training-rows-failed-its-validation-gate):
+  - Training audit: κ 0.02, against −0.14 for the old first pass. This is still chance level.
+  - Decline check: κ 0.35, against 0.64 for the old first pass.
+- **Result.** No r4 data was built and nothing was trained. This is recorded as a negative result.
+- **Defaults unchanged:** `r1-ft` (2B) and `lite-r1-ft` (0.8B), which are also the models released.
+- **Lesson.** Round 2 (removing declines) and round 3 (refilling them with a code check) were not better than r1. A model-based check could not be validated either. The noisy declines remain the main known weakness of the training data. The human audit is the only reliable signal, and it covers 43 items.
+
 ## Data hygiene
 
 - Training read only `mlx_plain/train.jsonl`, through a data directory of symlinks to train and valid. Choices (learning rate, checkpoint, retrieval weights and budgets) used the dev split only.
@@ -628,7 +642,7 @@ What this shows:
 - **Automatic grading.**
   - select_ok is a word-coverage proxy for "the right sentences". The lenient rows show how much the extra-sentence limit matters.
   - Restatements are checked only for numbers, units and drug names, not for meaning.
-  - The decline audits (round 1 and round 2) were each done by a single, unblinded grader, who knew which system wrote each reply. The plan's blind human and pharmacist grading on T3 is the real test.
+  - The decline audits (round 1 and round 2) and the human training audit and decline check behind round 4 were each done by a single grader; the round 1 and 2 audits were unblinded, who knew which system wrote each reply. The plan's blind human and pharmacist grading on T3 is the real test.
 - **Decline items are built by removing the passage that holds the answer.** Labels repeat facts (Medication Guide, counseling, warnings), so some "decline" items are still answerable from what remains.
   - In round 1 this penalised answering in general, and B more than C.
   - Round 2 drops items whose answer is still supported, using a loose code check. The audit shows about 30% of answered r2 decline items are still supported, so the r2 rates still overstate errors on decline items.

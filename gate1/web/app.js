@@ -25,6 +25,15 @@ const MODELS = {
   "r3-ft": { base: B2, label: "2B Gate 2 fine-tune medlabel-r3 (this server)", url: `${origin}/models/Qwen3.5-2B-medlabel-r3-q4f16_1-MLC` },
   "lite-r3-ft": { base: B08, label: "0.8B lite: Gate 2 fine-tune medlabel-r3 (this server)", url: `${origin}/models/Qwen3.5-0.8B-medlabel-r3-q4f16_1-MLC` },
 };
+// Released builds (docs/release.md): hf-<key> loads weights and wasm from Hugging Face, using the
+// model_url / model_lib_url fields that app_models.py --hf-user writes into app/models.json.
+try {
+  const released = (await (await fetch("/app/models.json")).json()).models;
+  for (const [key, m] of Object.entries(released)) {
+    if (m.model_url) MODELS[`hf-${key}`] = { base: m.size === "2B" ? B2 : B08, url: m.model_url, lib: m.model_lib_url,
+                                             label: `${m.size} released build ${m.hf_repo} (Hugging Face)` };
+  }
+} catch (e) { console.warn("no app/models.json", e); }
 
 const SHORT_PROMPTS = [
   "Who are you?",
@@ -63,6 +72,7 @@ function appConfigFor(key) {
   rec.model = MODELS[key].url;
   rec.model_id = `${key}-${baseId}`;
   if ($("localLib").checked) rec.model_lib = `${origin}/libs/${base.model_lib.split("/").pop()}`;
+  if (MODELS[key].lib) rec.model_lib = MODELS[key].lib;
   // ?ctx=N shrinks the KV cache / scratch memory for phones (iOS kills tabs that use too much).
   if (params.get("ctx")) rec.overrides = { ...rec.overrides, context_window_size: Number(params.get("ctx")) };
   const cacheBackend = $("cacheBackend").value;

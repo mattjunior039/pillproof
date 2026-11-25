@@ -5,6 +5,7 @@ Routes
   /models/<name>/resolve/main/<f>   $WAICY_WORK/models/mlc/<name>/<f>  (WebLLM expects HF-style URLs)
   /libs/<f>                         $WAICY_WORK/models/libs/<f>         (cached WebLLM model libraries)
   /dev/<f>                          $WAICY_WORK/eval/web/<f>            (dev prompts for ?prompts=dev, not in git)
+  /app/models.json                  app/models.json                     (hf-<key> entries for released builds)
   /ca.crt                           local CA certificate, for installing on a phone
   POST /log                         append a JSON result line to $WAICY_WORK/logs/gate1-results.jsonl
 
@@ -51,6 +52,8 @@ class Handler(SimpleHTTPRequestHandler):
             return _safe_join(WORK / "eval" / "web", parts[1])
         if path == "/ca.crt":
             return str(CERTS / "ca.crt")
+        if path == "/app/models.json":
+            return str(WEB.parent.parent / "app" / "models.json")
         return _safe_join(WEB, "/".join(parts))
 
     def end_headers(self):

@@ -154,6 +154,55 @@ FDARxBench reference answers are written in clinical language. The ANSWER lines 
 
 - **Disclosure.** Write-ups should say that the training targets' restatement lines were simplified by Claude Sonnet 5.5 under automatic number, unit and drug checks, and that no evaluation data was rewritten.
 
+### Round 4 (not built): AI verifier for training rows, failed its validation gate
+
+- **Plan.** r4 was to be r1's training data with errors fixed rather than removed:
+  - Claude turns confirmed false declines into answerable rows using the supporting sentences.
+  - New declines that Claude marks clean bring the decline share back to exactly r1's 30%.
+  - Answerable rows are checked too, if the budget allows.
+  - Hard budget cap: $20.
+  - The verifier could be used only if it agreed with the human audit verdicts.
+- **Code.** `medlabel_data.fdarx.verify`.
+  - It reads r1's rows, regenerated under `~/waicy-work/r4/data_r1/` with r1's builder. All 1,260 regenerated valid prompts are byte-identical to r1's dev prompts.
+  - Claude Sonnet 5.5, prompt v1, sees each row exactly as the small model does.
+  - For a decline it also gets the FDARxBench reference answer and the 12 closest other label sentences.
+  - It never reads T1 test.
+- **Validation against the humans.** One annotator, from `~/waicy-work/data/build/fdarx/audit/`:
+  - the training audit: 23 rows, verdicts on r1 targets;
+  - the decline check: 20 r3 decline rows (18 train, 2 valid), judged against the full label.
+
+  "Flag" means human or verifier says the row is wrong or the decline is not clean.
+
+  | Set | n | Human flagged | Verifier flagged | Agree | κ | Old AI first pass: agree, κ |
+  |---|---|---|---|---|---|---|
+  | Training audit | 23 | 8 | 14 | 11 | 0.02 | 7, −0.14 |
+  | … answerable rows | 18 | 3 | 11 | 8 | 0.03 | 4, 0.02 |
+  | … decline rows | 5 | 5 | 3 | 3 | — | 3, — |
+  | Decline check | 20 | 19 | 16 | 17 | 0.35 | 19, 0.64 |
+  | All | 43 | 27 | 30 | 28 | 0.22 | 26, 0.02 |
+
+  Other checks:
+  - It caught 30/30 synthetic errors (wrong sentence numbers, swapped answers).
+  - It flagged 5/30 random answerable rows.
+  - 15 of the 19 declines it flagged could be converted with fixes that pass the app's checks.
+- **Decision: not used, so r4 was not built and r1 stays.**
+  - On the training audit, agreement is at chance (κ 0.02). It flags 8 of the 15 answerable rows the human called OK.
+  - On the decline check it does worse than the old first pass (κ 0.35 against 0.64).
+  - Keeping 30% requires trusting its "clean decline" calls. The human data holds only one clean decline, so those calls can't be validated.
+  - The decision followed the rule set before the run: use the verifier only if it clearly beats the old first pass on both sets.
+  - The prompt was not tuned on the 43 human items. The only change after the first run was parsing, so that replies cut off by the token limit could still be read.
+- **Cost.** $0.60 of the $20 cap: 104 cached API calls, validation only. The full sweep was never sent.
+- **Caveats.**
+  - The human verdicts come from a single grader. Some verifier flags on "OK" rows may be real errors the grader missed, for example an answer citing a strength that appears only in an uncited sentence.
+  - With 43 items, the κ values have wide uncertainty.
+- **AI disclosure.** No training data was changed by the verifier. If this is revived, write-ups must say that Claude Sonnet 5.5 checked and corrected training rows.
+- **Command:**
+
+  ```bash
+  cd datapipe && WAICY_DATA=~/waicy-work/r4/data_r1 uv run python -m medlabel_data.fdarx.verify validate
+  # -> data_r1/build/fdarx/verify/validate_report.json, validate_results.jsonl (cached; re-run is free)
+  ```
+
 ## T2: MedicationQA (CC BY 4.0), test only
 
 `data/build/medqa/t2_all.jsonl` (690 consumer questions) and `t2_dailymed.jsonl` (290 whose reference answer came from DailyMed; 287 have a set_id and 268 of those set_ids are still current in openFDA). Each record has the question, focus drug, question type, reference answer, source URL, set_id, and the reference answer's section category. Never used for training.
