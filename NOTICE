@@ -1,0 +1,66 @@
+PillProof
+Copyright (c) 2026 The PillProof team: Matthew Flowerhill, Albert Toy, Tiyaan Kini, Advait Gowda, Neil Gupta
+
+The PillProof source code is released under the MIT License (see LICENSE).
+The data files listed below are NOT covered by the MIT License. Each keeps the
+licence or status of its source.
+
+-------------------------------------------------------------------------------
+1. DDInter 2.0 drug-food interactions
+   File: app/data/ddinter_food.json
+   Source: DDInter 2.0, https://ddinter2.scbdd.com/ (accessed 2026-11-16)
+   Licence: Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+            International (CC BY-NC-SA 4.0),
+            https://creativecommons.org/licenses/by-nc-sa/4.0/
+            Terms: https://ddinter2.scbdd.com/terms/
+   Citation: Xiong G, et al. DDInter 2.0: an enhanced drug interaction resource
+            with expanded data coverage, new interaction types, and improved
+            user interface. Nucleic Acids Research. 2025;53(D1):D1356-D1364.
+   Changes: drug-food rows only; text split into sentences; references and
+            mechanism tags dropped.
+   This adapted file is shared under the same CC BY-NC-SA 4.0 licence. It may
+   not be used commercially. PillProof is a free, non-commercial project; anyone
+   who wants to use PillProof commercially must remove this file and the DDInter
+   backup step. The app shows the DDInter credit under every answer
+   that uses it.
+
+-------------------------------------------------------------------------------
+2. FDA drug labels and FDA web pages (public domain)
+   Files: app/data/label_changes.json (sentences from DailyMed SPL label
+          versions), app/data/fda_food.json (sentences from FDA consumer pages:
+          "Grapefruit Juice and Some Drugs Don't Mix" and "Drug Interactions:
+          What You Should Know"), app/tests/fixtures/*_openfda.json,
+          core/fixtures/*.json, datapipe/tests/fixtures/*.json
+   Source: U.S. Food and Drug Administration, via openFDA (https://open.fda.gov)
+           and DailyMed (https://dailymed.nlm.nih.gov). Works of the U.S.
+           federal government are in the public domain in the United States.
+           Source URLs and dates are kept in each file.
+   PillProof is not endorsed by the FDA or the NLM.
+
+-------------------------------------------------------------------------------
+3. RxNorm / RxNav
+   Files: app/tests/fixtures/rxnav_*.json (saved API responses used in tests)
+   Source: National Library of Medicine RxNav API, https://lhncbc.nlm.nih.gov/RxNav/
+   Terms: https://lhncbc.nlm.nih.gov/RxNav/TermsofService.html
+   This product uses publicly available data from the U.S. National Library of
+   Medicine (NLM), National Institutes of Health, Department of Health and Human
+   Services; NLM is not responsible for the product and does not endorse or
+   recommend this or any other product.
+
+-------------------------------------------------------------------------------
+4. FDARxBench
+   Used for training and evaluation (the dataset itself is not in this
+   repository; datapipe/ downloads it). Some identifiers and audit marks in
+   docs/*.csv and datapipe/eval/*.csv refer to its items.
+   Source: https://github.com/xiongbetty/FDARxBench (commit 019785d);
+           Xiong et al., arXiv:2603.19539; Zenodo DOI 10.5281/zenodo.22073747
+   Licence: Apache License 2.0
+
+-------------------------------------------------------------------------------
+5. Models and libraries loaded at run time (not in this repository)
+   - Qwen3.5-2B / Qwen3.5-0.8B base models (Apache-2.0); PillProof fine-tunes
+     are published at https://huggingface.co/mattjunior under Apache-2.0.
+   - WebLLM and its WebGPU model libraries (Apache-2.0).
+   - transformers.js (Apache-2.0), ONNX Runtime Web (MIT).
+   - bge-small-en-v1.5 embeddings (MIT); Moonshine speech recognition (MIT).
+   - npm dependencies keep their own licences (see app/package-lock.json).

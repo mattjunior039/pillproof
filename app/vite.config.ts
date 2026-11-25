@@ -116,6 +116,8 @@ const https = process.env.HTTPS
   : undefined;
 
 export default defineConfig({
+  // GitHub Pages serves the app under /pillproof/ (npm run build:pages sets BASE_PATH).
+  base: process.env.BASE_PATH || "/",
   resolve: { alias: { "@core": path.resolve(root, "../core") } },
   server: { host: true, port: 5173, https, fs: { allow: [path.resolve(root, "..")] } },
   preview: { host: true, port: Number(process.env.PORT || 4173), https },

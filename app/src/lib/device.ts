@@ -1,5 +1,6 @@
 // Device tier and phone guards (docs/gate1.md "Guards the app should have on phones").
 import config from "../../models.json";
+import { loadable } from "./build.ts";
 
 export type Size = "2B" | "0.8B";
 export type Tier = "desktop" | "phone";
@@ -16,7 +17,7 @@ export const SIZE_MB: Record<Size, number> = { "2B": 1000, "0.8B": 426 };
 const cfg = config as unknown as { default: Record<Size, string>; models: Record<string, Omit<ModelEntry, "key">> };
 
 export function modelList(): ModelEntry[] {
-  return Object.entries(cfg.models).map(([key, m]) => ({ key, ...m }));
+  return loadable(Object.entries(cfg.models).map(([key, m]) => ({ key, ...m })));
 }
 
 /** Models this device may use: phones never get the 2B (it crashed the iPhone 17e tab). */

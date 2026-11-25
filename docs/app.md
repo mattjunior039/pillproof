@@ -10,6 +10,7 @@ npm install
 npm run dev                  # http://localhost:5173
 npm test                     # node --test tests/ (app logic, answer pipeline, backup sources)
 npm run build                # tsc + vite build -> dist/ (service worker precaches everything)
+npm run build:pages          # the public GitHub Pages build (base /pillproof/, web search off, HF models only)
 HTTPS=1 CERTS_DIR=~/waicy-work/certs/app npx vite preview --host --port 4443   # phone testing on the LAN
 ```
 
@@ -141,12 +142,37 @@ A separate, optional step, on by default in the app (Settings → "If those don'
 
 **Cache and limits.** Results are cached on disk per (ingredients, question) in `~/waicy-work/cache/web-search.json`, so repeat questions cost nothing. The rate limit is 12 searches per client per minute and 300 a day; the free plan has 1,000 credits a month.
 
-**Public deployment (not done yet).** `app/worker/` is a Cloudflare Worker version of the same proxy, using the Cache API for 30 days. To deploy: `npx wrangler secret put TAVILY_API_KEY`, set `ALLOWED_ORIGIN` in `wrangler.toml`, run `npx wrangler deploy`, and build the app with `VITE_SEARCH_URL=https://<worker>/api/search`. Without it, the static site has no web step.
+**Public deployment.** The GitHub Pages site has web search **off** (see [Public site](#public-site-github-pages)). `app/worker/` is a Cloudflare Worker version of the same proxy, using the Cache API for 30 days; it is not deployed. To deploy it: `npx wrangler secret put TAVILY_API_KEY`, set `ALLOWED_ORIGIN` in `wrangler.toml`, run `npx wrangler deploy`, and build the app with `VITE_SEARCH_URL=https://<worker>/api/search` (and without `VITE_WEB_SEARCH=off`).
 
 **Limits:**
 - Web pages can be wrong or out of date, and the badge says so. Attributed quotes may themselves say "generally considered safe" (for example Medical News Today on atorvastatin + ibuprofen). That is the site's wording, shown as a quote, never ours.
 - Results depend on what the search returns that day; the cache keeps repeats stable.
 - It needs the internet; offline, the step is listed as "not checked: no internet".
+
+## Public site (GitHub Pages)
+
+The public build is at **https://mattjunior039.github.io/pillproof/**. `.github/workflows/pages.yml` runs the app tests and `npm run build:pages` on every push to `main` and deploys `app/dist`. `build:pages` sets:
+
+- `BASE_PATH=/pillproof/`, the Vite `base` (assets, service worker scope, manifest);
+- `VITE_MODELS=hf`, so only models with a Hugging Face `model_url` and `model_lib_url` in `models.json` are offered (r1-ft and lite-r1-ft); a static site has no `/models/` server;
+- `VITE_WEB_SEARCH=off`, so the web-search step never runs: there is no search proxy or API key on a static site. Settings shows a disabled box with "Web search is available in the local version.", and the "sources checked" list says "the web (not checked: web search is available in the local version)".
+
+The flags are read in `app/src/lib/build.ts` and tested in `app/tests/build.test.ts`. A plain `npm run build` or `npm run dev` keeps the local behaviour (web search through `/api/search`, local or Hugging Face models).
+
+What runs on the public site (everything else is client-side):
+
+| Feature | Public site | Why |
+|---|---|---|
+| Answer model (WebGPU) | works | weights and wasm from Hugging Face |
+| RxNorm autocomplete, openFDA label download | works | browser calls rxnav.nlm.nih.gov and api.fda.gov directly |
+| Backup: other FDA labels | works | openFDA from the browser |
+| Backup: FDA food pages, DDInter | works | bundled JSON |
+| MedlinePlus link | works | MedlinePlus Connect from the browser |
+| Smart search, voice (bge-small, Moonshine) | works | models from Hugging Face via transformers.js |
+| Label changes, calendar file | works | bundled / generated in the browser |
+| Web search | **off** | needs the Tavily proxy; local version only |
+
+openFDA allows about 1,000 requests a day per IP without a key; each new medicine and each "other labels" step uses one or two.
 
 ## Answer quality on everyday questions (dev only)
 

@@ -17,6 +17,7 @@ import { route } from "./lib/router.ts";
 import { answerSchedule, shortName } from "./lib/schedule.ts";
 import type { Med } from "./lib/types.ts";
 import { webSearch } from "./lib/web.ts";
+import { FLAGS, webStep } from "./lib/build.ts";
 
 export const lexicon = new Set<string>(lexiconList as string[]);
 
@@ -296,18 +297,19 @@ async function answerFor(med: Med, question: string, advice: boolean, onStatus?:
     }
   }
   if (!state.settings.backupSources || !unanswered(result)) return { kind: "label", med, advice, result };
+  const web = webStep(state.settings.webSearch);
   // Backup sources, one at a time, with the same phone limits as the label itself.
   const backup = await runBackups(med, entry.label.meta, question, result, {
     fda: async () => (await import("../data/fda_food.json")).default as unknown as FdaFile,
     ddinter: async () => (await import("../data/ddinter_food.json")).default as unknown as DdinterFile,
     otherLabels: () => otherLabels(med, entry.label.meta.setId, tier === "phone" ? 8 : 20),
     medline: () => medlineLink(med),
-    web: state.settings.webSearch ? (ingr, q) => webSearch(ingr, q, import.meta.env.VITE_SEARCH_URL || "/api/search") : undefined,
+    web: web.run ? (ingr, q) => webSearch(ingr, q, FLAGS.searchUrl) : undefined,
   }, {
     opts: modelOk && !state.crash ? { ...base, sims: null, generate } : { ...base, sims: null },
     maxLabels: tier === "phone" ? 2 : 3,
     maxWeb: tier === "phone" ? 2 : 3,
-    webOff: state.settings.webSearch ? undefined : "off",
+    webOff: web.off,
     onStatus,
   }).catch((e) => {
     if (isFatalGpuError(e)) crashed(key || "model", "The model stopped working on this device (out of graphics memory). Showing label passages instead.");

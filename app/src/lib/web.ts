@@ -193,4 +193,5 @@ export const WEB_SKIP: Record<string, string> = {
   quota: "the search service's monthly limit was reached",
   failed: "the search service did not respond",
   off: "turned off in Settings",
+  "local-only": "web search is available in the local version",
 };
