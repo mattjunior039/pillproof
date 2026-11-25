@@ -41,7 +41,10 @@
      "n": 1190,
      "n_wrong": 216
     }
-   }
+   },
+   "hf_repo": "mattjunior/PillProof-Qwen3.5-2B-r1-q4f16_1-MLC",
+   "model_url": "https://huggingface.co/mattjunior/PillProof-Qwen3.5-2B-r1-q4f16_1-MLC",
+   "model_lib_url": "https://huggingface.co/mattjunior/PillProof-Qwen3.5-2B-r1-q4f16_1-MLC/resolve/main/Qwen3.5-2B-q4f16_1_cs1k-webgpu.wasm"
   },
   "r2-ft": {
    "size": "2B",
@@ -147,7 +150,10 @@
      "n": 1193,
      "n_wrong": 170
     }
-   }
+   },
+   "hf_repo": "mattjunior/PillProof-Qwen3.5-0.8B-r1-q4f16_1-MLC",
+   "model_url": "https://huggingface.co/mattjunior/PillProof-Qwen3.5-0.8B-r1-q4f16_1-MLC",
+   "model_lib_url": "https://huggingface.co/mattjunior/PillProof-Qwen3.5-0.8B-r1-q4f16_1-MLC/resolve/main/Qwen3.5-0.8B-q4f16_1_cs1k-webgpu.wasm"
   },
   "lite-r2-ft": {
    "size": "0.8B",
