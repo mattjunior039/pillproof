@@ -61,7 +61,7 @@
 | T1 | 2,638 primary + 549 refusal items | FDARxBench held-out test questions over full labels | Benchmark test split; Gate 2 prompt construction (`t1_prep.py`) |
 | T1 sample | 500 | Drug-stratified sample of T1 primary, for A, E and the AI grader | `gen_plain.py sample` |
 | T2 | 268 | MedicationQA consumer questions with a DailyMed source label | 22 excluded because their set id is no longer current in openFDA (`t2_fetch.py`) |
-| T3 | 143 (100 answerable, 43 label-silent) | Consumer-phrased questions about 20 common medicines, with gold label sentences and reference answers | `~/waicy-work/data/build/t3/t3_draft.csv`, final status, edits applied |
+| T3 | 143 (100 answerable, 43 label-silent) | Consumer-phrased questions about 25 common medicines, with gold label sentences and reference answers | `~/waicy-work/data/build/t3/t3_draft.csv`, final status, edits applied |
 | T4 | — | Voice | **Not recorded; not done** |
 | T5 | 149 | Old/new label sentence pairs marked by hand | `t5_sheet.csv` (the team's marks); pharmacist subset (30); a second team member's check (24) |
 | T6 | 29 | Questions the label does not answer (food, alcohol, coffee, supplements) | `~/waicy-work/data/build/t6/t6_draft.csv`, final status `keep` |
@@ -205,7 +205,7 @@ On 500 drug-stratified T1 items:
 
 ## T3: consumer questions
 
-143 questions (100 answerable, 43 where the label is silent) about 20 common medicines, run through the real app pipeline.
+143 questions (100 answerable, 43 where the label is silent) about 25 common medicines, run through the real app pipeline.
 
 ### AI grader (primary)
 

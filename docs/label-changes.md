@@ -7,7 +7,7 @@ Code is in `datapipe/src/medlabel_data/changes/`. Large outputs go in `~/waicy-w
 cd datapipe
 uv run python -m medlabel_data.changes.build      # all version pairs -> candidates.jsonl, pairs.jsonl, drugs.json
 uv run python -m medlabel_data.changes.sample dev # 80-item development sample (eval/changes_dev_marks.csv)
-uv run python -m medlabel_data.changes.sample t5  # T5 sheet (150) + pharmacist subset (30); never overwrites
+uv run python -m medlabel_data.changes.sample t5  # T5 sheet (150 sampled; 149 marked) + pharmacist subset (30); never overwrites
 uv run python -m medlabel_data.changes.appdata    # app/data/label_changes.json
 # after T5 is fully marked, and only when the GPU is free:
 PYTHONPATH=src ~/waicy-work/envs/mlx/bin/python -m medlabel_data.changes.judge \
@@ -176,11 +176,11 @@ The workbook asked for `only_formatting` = y "if only punctuation, bullets, numb
 ## T5 marking sheet (marked by hand; no model has seen it)
 
 - `~/waicy-work/data/build/changes/t5/t5_sheet.csv`: fill in `mark` ("meaning changed" or "reworded"), plus `only_formatting` (y/blank) and `notes`.
-- `~/waicy-work/data/build/changes/t5/t5_sheet.md`: the same 150 items, easier to read.
+- `~/waicy-work/data/build/changes/t5/t5_sheet.md`: the same 150 sampled items (149 marked), easier to read.
 - `~/waicy-work/data/build/changes/t5/t5_key_hidden.jsonl`: links each T5 id to its candidate, stratum and sampling weight. Do not open it while marking.
 
 How the sample was drawn (`sample.py`, seed 5):
-- 150 items from the 2,908 non-conversion sentence candidates, excluding the dev sample.
+- 150 items sampled from the 2,908 non-conversion sentence candidates, excluding the dev sample.
 - Round-robin over drugs, then over four change types:
   - altered with similarity ≥ 0.85 (43 items);
   - altered with lower similarity (34);

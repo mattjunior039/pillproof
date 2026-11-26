@@ -8,7 +8,7 @@ All human work is in **one shared file** that the markers, the pharmacist and th
 |---|---|---|---|---|
 | Start here | everyone | – | – | read: pick the tab for your role; type your first name in every row you mark; humans only, no AI tools; what to do, 2 worked examples and the time for each tab |
 | Progress | everyone | – | – | nothing; formulas count rows done / total per tab and rows marked per name |
-| Markers – T5 label changes | markers | 150 | `changes/t5/t5_sheet.csv` | `name`, `mark` (meaning changed / reworded), `only_formatting` (y / n), `notes` |
+| Markers – T5 label changes | markers | 150 sampled (149 marked) | `changes/t5/t5_sheet.csv` | `name`, `mark` (meaning changed / reworded), `only_formatting` (y / n), `notes` |
 | Markers – T3 questions | markers | 143 | `t3/t3_draft.csv` | `name`, `user_status` (keep / edit / drop), `user_notes` |
 | Markers – T6 questions | markers | 30 | `t6/t6_draft.csv` | `name`, `user_status` (keep / edit / drop), `user_notes` |
 | Markers – Training audit | markers | 23 | `fdarx/audit/audit_review_20.csv` | `name`, `user_verdict` (ok / wrong_sentences / wrong_answer / should_decline / should_answer / bad_question), `user_notes` |
