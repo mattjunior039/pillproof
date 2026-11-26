@@ -5,7 +5,7 @@
     python3 train/scripts/final/t5_run.py --score       # needs both runs; writes final/t5/summary.json
 judge.load_t5() refuses while any row is unmarked; T5-085 has no mark, so this wrapper builds the same items
 for the 149 marked rows (judge._item + norm_mark + the hidden key) and uses judge.run/score as they are.
-Primary labels: Albert's marks (mark). Checks: the pharmacist's 30 and Advait's 24 second marks.
+Primary labels: Reviewer A's marks (mark). Checks: the pharmacist's 30 and Reviewer B's 24 second marks (mark_2).
 """
 import argparse
 import csv
@@ -45,9 +45,9 @@ def gen(a):
 
 def score():
     res = {}
-    checks = {"albert": {r["item_id"]: r["gold"] for r in items()},
+    checks = {"reviewer_a": {r["item_id"]: r["gold"] for r in items()},
               "pharmacist": {r["item_id"]: r["gold"] for r in items(sheet=J.T5_DIR / "pharmacist_sheet.csv")},
-              "advait": {r["item_id"]: r["gold"] for r in items(col="mark_2")}}
+              "reviewer_b": {r["item_id"]: r["gold"] for r in items(col="mark_2")}}
     runs = {n: [json.loads(l) for l in open(OUT / f"{n}.jsonl")] for n in ("base-2b", "tuned-2b")}
     methods = {"similarity_rule": (runs["base-2b"], "baseline"), "base-2b": (runs["base-2b"], "label"),
                "tuned-2b": (runs["tuned-2b"], "label")}
@@ -63,19 +63,19 @@ def score():
                            **{k: v for k, v in J.rates(cm).items() if k != "n"},
                            "recall_ci": drug_boot(pos, lambda s: 100 * sum(map(flag, s)) / max(1, len(s))),
                            "false_flag_ci": drug_boot(neg, lambda s: 100 * sum(map(flag, s)) / max(1, len(s)))}
-    # human agreement on the overlaps (Albert vs the checks)
+    # human agreement on the overlaps (Reviewer A vs the checks)
     agree = {}
-    for ref in ("pharmacist", "advait"):
-        ids = [i for i in checks[ref] if i in checks["albert"]]
-        agree[ref] = {"n": len(ids), "agree": sum(checks[ref][i] == checks["albert"][i] for i in ids)}
+    for ref in ("pharmacist", "reviewer_b"):
+        ids = [i for i in checks[ref] if i in checks["reviewer_a"]]
+        agree[ref] = {"n": len(ids), "agree": sum(checks[ref][i] == checks["reviewer_a"][i] for i in ids)}
     t = runs["tuned-2b"]
-    res["human_agreement_with_albert"] = agree
+    res["human_agreement_with_reviewer_a"] = agree
     res["tuned_explanations"] = {"kept": sum(r["explanation"] is not None for r in t), "n": len(t),
                                  "parse_failures": sum(not r["parsed"] for r in t)}
     res["base_explanations"] = {"kept": sum(r["explanation"] is not None for r in runs["base-2b"]), "n": len(t)}
     (OUT / "summary.json").write_text(json.dumps(res, indent=1))
     for m in methods:
-        a = res["albert"][m]
+        a = res["reviewer_a"][m]
         print(f"{m:16s} recall {100*a['catch_rate']:.1f} {a['recall_ci']}  false-flag {100*a['false_flag_rate']:.1f} {a['false_flag_ci']}"
               f"  | pharm recall {res['pharmacist'][m]['catch_rate']} ff {res['pharmacist'][m]['false_flag_rate']}")
     print(agree, res["tuned_explanations"])
