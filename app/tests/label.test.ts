@@ -91,6 +91,36 @@ test("answer pipeline: checked answer, blocked restatement, decline, invalid, pa
   assert.ok(po.shown.kind === "passages" && po.shown.why === "no-model" && po.shown.quotes.some((x) => /grapefruit/i.test(x.text)));
 });
 
+test("v1.1 quoteOnDecline: a decline or withheld reply quotes the covered topic and names the missing one", async () => {
+  const { answerQuestion, plainText } = await import("../src/lib/answer.ts");
+  const idx = new LabelIndex(chunkLabel(rec));
+  const label: any = { title: "Atorvastatin calcium", brandNames: [], genericNames: ["ATORVASTATIN CALCIUM"], effective: "" };
+  const lexicon = new Set(["atorvastatin"]);
+  const run = (q: string, reply: string, quoteOnDecline: boolean) =>
+    answerQuestion(idx, label, q, { tier: "phone", lexicon, generate: async () => reply, quoteOnDecline });
+  const q = "Can I drink grapefruit juice or kombucha?";
+  // v1.0: a decline on a partly covered question stays a decline (so backup sources run).
+  assert.equal((await run(q, "NOT IN LABEL", false)).shown.kind, "decline");
+  for (const reply of ["NOT IN LABEL", "SENTENCES: 999\nANSWER: whatever", "gibberish"]) {
+    const r = await run(q, reply, true);
+    assert.ok(r.shown.kind === "passages" && r.shown.why === "declined" && r.shown.quotes.length >= 1 && r.shown.quotes.length <= 3, reply);
+    if (r.shown.kind === "passages") for (const x of r.shown.quotes) assert.match(x.text, /grapefruit/i);
+    assert.deepEqual(r.missing, ["kombucha"]);
+    assert.match(plainText(r, false, "", "", "NOT COVERED"), /does not mention “kombucha”\. That does not mean it is safe or unsafe\. Your label says: .*grapefruit/i);
+  }
+  // v1.0 for a withheld reply: up to 2 "closest sentences".
+  const old = await run("Can I drink grapefruit juice?", "SENTENCES: 999\nANSWER: whatever", false);
+  assert.ok(old.shown.kind === "passages" && old.shown.why === "invalid");
+  // Gate fails: no topic words, or a topic the label never mentions -> unchanged decline / not found.
+  assert.equal((await run("Is it any good?", "NOT IN LABEL", true)).shown.kind, "decline");
+  assert.equal((await run("Is it any good?", "SENTENCES: 999\nANSWER: whatever", true)).shown.kind, "passages");
+  assert.deepEqual((await run("Can I drink kombucha?", "NOT IN LABEL", true)).shown, { kind: "not-found", missing: ["kombucha"] });
+  // A checked answer is unchanged.
+  const r = retrieve(idx, label.title, "Can I drink grapefruit juice?", null, PHONE);
+  const n = Number(Object.entries(r.sentences).find(([, s]: any) => /grapefruit/i.test(s))![0]);
+  assert.equal((await run("Can I drink grapefruit juice?", `SENTENCES: ${n}\nANSWER: Avoid large amounts of grapefruit juice.`, true)).shown.kind, "answer");
+});
+
 test("OTC Drug Facts: run-together list items are split; Rx chunking is unchanged", () => {
   const otc = fx("goodys_otc_openfda.json");
   const sents = chunkLabel(otc).flatMap(([, s]) => s);

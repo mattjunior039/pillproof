@@ -156,11 +156,11 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
     const index = new LabelIndex(passages);
     if (general && !fits(index)) return null;
     const prefer = general ? named : undefined;
-    const r = await answerQuestion(index, label, question, { ...o.opts, sims: null, prefer });
+    const r = await answerQuestion(index, label, question, { ...o.opts, sims: null, prefer, quoteOnDecline: false });
     // Curated sources are about this drug and (after the relevance gate) this topic by construction,
     // so a model that only knows labels declining them still leaves the sentences worth showing.
     if (!general || r.shown.kind !== "decline") return r;
-    const quoted = await answerQuestion(index, label, question, { ...o.opts, sims: null, prefer, generate: undefined });
+    const quoted = await answerQuestion(index, label, question, { ...o.opts, sims: null, prefer, generate: undefined, quoteOnDecline: false });
     return { ...quoted, raw: r.raw, modelKey: r.modelKey };
   };
   const done = async (source: Source, result: AnswerResult, url: (t: string) => string): Promise<BackupOutcome> =>
@@ -274,7 +274,7 @@ export async function runBackups(med: Med, meta: LabelMeta, question: string, fi
         const cov = coverage(index, question, own);
         if (cov.any && cov.missing.length) continue; // the page doesn't mention everything that was asked
         calls++;
-        const r = webAnswer(await answerQuestion(index, asLabel(meta), question, { ...o.opts, sims: null, prefer: named }), cov.covered.length > 0, question);
+        const r = webAnswer(await answerQuestion(index, asLabel(meta), question, { ...o.opts, sims: null, prefer: named, quoteOnDecline: false }), cov.covered.length > 0, question);
         if (r) {
           const { site } = page;
           return done({

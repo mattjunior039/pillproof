@@ -1,0 +1,18 @@
+{
+ "note": "T7 (docs/v1.1.md): 20 drugs, 5 questions each. 'reuse_t3' drugs use the T3 label snapshot unchanged; the others are pinned set ids (prescription: chosen by labelfetch.resolve on 2026-11-25; OTC: the manufacturer's main product label), snapshotted at the version openFDA serves.",
+ "reuse_t3": ["atorvastatin", "warfarin", "metformin", "levothyroxine", "lisinopril", "sertraline", "omeprazole", "amlodipine"],
+ "new": {
+  "rosuvastatin": {"brand": "Crestor", "set_id": "4ccbaa83-d57a-421e-88a8-1cee42d4207b"},
+  "escitalopram": {"brand": "Lexapro", "set_id": "13bb8267-1cab-43e5-acae-55a4d957630a"},
+  "amoxicillin": {"brand": "Amoxil", "set_id": "13bd4214-9b7f-425b-af5f-fc1ddc678230"},
+  "meloxicam": {"brand": "Mobic", "set_id": "6c015f72-5ce3-4f56-8237-776fc2165b0c"},
+  "allopurinol": {"brand": "Zyloprim", "set_id": "bdbf5ad4-86f2-4e9c-a51a-fb0c7220c480"},
+  "prednisone": {"brand": null, "set_id": "10fe5a3b-84dc-4600-87c2-b80c97ce18cf"},
+  "duloxetine": {"brand": "Cymbalta", "set_id": "caef6f50-1571-4ec7-8f8c-42b924d323ee"},
+  "glipizide": {"brand": "Glucotrol XL", "set_id": "eed99b60-d043-4249-9b2a-f05e46fb588d"},
+  "loratadine": {"brand": "Claritin", "set_id": "660ac9df-f1b1-4c89-94dd-9fae0a013f3c", "otc": true},
+  "naproxen": {"brand": "Aleve", "set_id": "00ef5b30-71d0-4cb4-84a3-48c67d1cea2a", "otc": true},
+  "famotidine": {"brand": "Pepcid AC", "set_id": "54f4086f-e443-4e7e-8c7e-94e152e1c256", "otc": true},
+  "acetaminophen": {"brand": "Tylenol Extra Strength", "set_id": "103d109d-f520-409c-8da2-eb6b0fbec891", "otc": true}
+ }
+}
