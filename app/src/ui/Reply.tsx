@@ -1,7 +1,7 @@
 import type { ComponentChildren } from "preact";
 import { ADVICE_LINE, NOT_COVERED, POISON_HELP, STANDING_LINE } from "../lib/router.ts";
 import { labelDate, dailyMedUrl } from "../lib/openfda.ts";
-import { notMentioned, type Quote } from "../lib/answer.ts";
+import { notMentioned, showMissingNote, type Quote } from "../lib/answer.ts";
 import { noneMention, type BackupOutcome } from "../lib/backup.ts";
 import { shortName } from "../lib/schedule.ts";
 import type { Med } from "../lib/types.ts";
@@ -117,7 +117,7 @@ function LabelAnswer({ reply }: { reply: Extract<Reply, { kind: "label" }> }) {
       {s.kind === "not-found" && (
         <Box tone="note"><p class="lead">{notMentioned(s.missing, result.near)}</p>{ask}</Box>
       )}
-      {result.missing && s.kind !== "not-found" && s.kind !== "decline" && <p class="missing">{notMentioned(result.missing, result.near)}</p>}
+      {showMissingNote(result) && <p class="missing">{notMentioned(result.missing!, result.near)}</p>}
       {s.kind === "answer" && <p class="plain">{s.restatement}</p>}
       {s.kind === "quotes" && <p class="plain">Here is what the label says:</p>}
       {s.kind === "decline" && (

@@ -106,7 +106,8 @@ test("v1.1 quoteOnDecline: a decline or withheld reply quotes the covered topic 
     assert.ok(r.shown.kind === "passages" && r.shown.why === "declined" && r.shown.quotes.length >= 1 && r.shown.quotes.length <= 3, reply);
     if (r.shown.kind === "passages") for (const x of r.shown.quotes) assert.match(x.text, /grapefruit/i);
     assert.deepEqual(r.missing, ["kombucha"]);
-    assert.match(plainText(r, false, "", "", "NOT COVERED"), /does not mention “kombucha”\. That does not mean it is safe or unsafe\. Your label says: .*grapefruit/i);
+    // v1.1.1: no "does not mention" note beside the quotes (display only; the result still records it).
+    assert.match(plainText(r, false, "", "", "NOT COVERED"), /^Your label says: .*grapefruit/i);
   }
   // v1.0 for a withheld reply: up to 2 "closest sentences".
   const old = await run("Can I drink grapefruit juice?", "SENTENCES: 999\nANSWER: whatever", false);
@@ -119,6 +120,36 @@ test("v1.1 quoteOnDecline: a decline or withheld reply quotes the covered topic 
   const r = retrieve(idx, label.title, "Can I drink grapefruit juice?", null, PHONE);
   const n = Number(Object.entries(r.sentences).find(([, s]: any) => /grapefruit/i.test(s))![0]);
   assert.equal((await run("Can I drink grapefruit juice?", `SENTENCES: ${n}\nANSWER: Avoid large amounts of grapefruit juice.`, true)).shown.kind, "answer");
+});
+
+test("v1.1.1 display: the missing-topic note is hidden beside on-topic label quotes, kept when nothing relevant is found", async () => {
+  const { answerQuestion, plainText, showMissingNote } = await import("../src/lib/answer.ts");
+  const idx = new LabelIndex(chunkLabel(rec));
+  const label: any = { title: "Atorvastatin calcium", brandNames: [], genericNames: ["ATORVASTATIN CALCIUM"], effective: "" };
+  const lexicon = new Set(["atorvastatin"]);
+  const run = (q: string, reply: string | null, quoteOnDecline = true) =>
+    answerQuestion(idx, label, q, { tier: "phone", lexicon, quoteOnDecline, generate: reply === null ? undefined : async () => reply });
+  const text = (r: any) => plainText(r, false, "", "", "NOT COVERED");
+  // Quotes shown for a declined or withheld reply: no contradicting note.
+  for (const reply of ["NOT IN LABEL", "SENTENCES: 999\nANSWER: whatever"]) {
+    const r = await run("Can I drink grapefruit juice or kombucha?", reply);
+    assert.ok(r.shown.kind === "passages" && r.shown.why === "declined");
+    assert.deepEqual(r.missing, ["kombucha"]);
+    assert.equal(showMissingNote(r), false);
+    assert.doesNotMatch(text(r), /does not mention/);
+  }
+  // Nothing relevant on the label: still declines with the note, and the backup sources run.
+  const none = await run("Can I drink kombucha?", "NOT IN LABEL");
+  assert.equal(none.shown.kind, "not-found");
+  assert.match(text(none), /^The label does not mention “kombucha”\. That does not mean it is safe or unsafe\. Ask your pharmacist\./);
+  const { unanswered } = await import("../src/lib/backup.ts");
+  assert.ok(unanswered(none));
+  // Other partial answers keep the note: closest sentences with no model, and v1.0's withheld reply.
+  for (const r of [await run("Can I drink grapefruit juice or kombucha?", null), await run("Can I drink grapefruit juice or kombucha?", "SENTENCES: 999\nANSWER: whatever", false)]) {
+    assert.ok(r.shown.kind === "passages" && r.shown.why !== "declined");
+    assert.equal(showMissingNote(r), true);
+    assert.match(text(r), /does not mention “kombucha”/);
+  }
 });
 
 test("OTC Drug Facts: run-together list items are split; Rx chunking is unchanged", () => {

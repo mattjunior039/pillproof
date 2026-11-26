@@ -49,7 +49,7 @@ export interface AnswerOpts {
   /** General sources (FDA pages, DDInter): sentences matching this, e.g. the drug's name, rank higher. */
   prefer?: RegExp;
   /** v1.1 (docs/v1.1.md), the user's own label only: when the model declines or its reply is withheld,
-   * quote the on-topic label sentences even if some asked topics are missing (the note says which). */
+   * quote the on-topic label sentences even if some asked topics are missing (v1.1.1: no note beside them). */
   quoteOnDecline?: boolean;
 }
 
@@ -254,12 +254,21 @@ export const notMentioned = (missing: string[], near?: string[]) =>
   (near?.length ? ` It does mention ${listWords(near.map((m) => `“${m}”`))}, which ${near.length > 1 ? "are" : "is"} different.` : "") +
   " That does not mean it is safe or unsafe.";
 
+/** Whether to show the "label does not mention …" note beside a partial answer. v1.1.1 (display only):
+ * not when v1.1 quotes on-topic label sentences for a declined or withheld reply, where it read as a
+ * contradiction ("does not mention metal" above a metallic-taste sentence). The not-found note is separate. */
+export const showMissingNote = (res: AnswerResult): boolean => {
+  const s = res.shown;
+  if (!res.missing?.length || s.kind === "not-found" || s.kind === "decline") return false;
+  return !(s.kind === "passages" && s.why === "declined" && s.quotes.length > 0);
+};
+
 export function plainText(res: AnswerResult, advice: boolean, adviceLine: string, standing: string, notCovered: string): string {
   const s = res.shown;
   const parts: string[] = [];
   if (advice) parts.push(adviceLine);
   if (s.kind === "not-found") parts.push(notMentioned(s.missing, res.near), "Ask your pharmacist.");
-  else if (res.missing?.length && s.kind !== "decline") parts.push(notMentioned(res.missing, res.near));
+  else if (showMissingNote(res)) parts.push(notMentioned(res.missing!, res.near));
   if (s.kind === "answer") parts.push(s.restatement, "The label says: " + s.quotes.map((q) => q.text).join(" "));
   else if (s.kind === "quotes") parts.push("The label says: " + s.quotes.map((q) => q.text).join(" "));
   else if (s.kind === "decline") parts.push(notCovered);
