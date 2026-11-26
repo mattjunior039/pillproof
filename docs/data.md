@@ -113,10 +113,10 @@ The output format for the model is in [output-format.md](output-format.md).
   - **Team review sheets** (fill in `user_verdict`, `user_notes`; seed 2026). The AI note is folded in the `.md` so the reviewer can decide first.
     - `audit/audit_review_20.{md,csv}`: all 20 non-ok items still in the r3 training data, plus 3 random AI-`ok` items (23 rows). There were more non-ok items than fit in 20, so the 7 already removed from training are left out.
     - `audit/decline_review_20.{md,csv}`: all 18 non-ok items plus 2 random AI-`ok` items.
-  - **Human review (2026-11-24).** Both review sheets were marked by hand on the shared annotation workbook ([annotation.md](annotation.md)) by **reviewer B**, a team member ([annotation.md](annotation.md#returned-file-2026-11-24)), who used no AI tools and did not see the AI notes. Agreement is computed on ok vs not ok: for the audit, `ok` vs any other verdict; for the decline check, `not_in_label` vs any other.
+  - **Human review (2026-11-24).** Both review sheets were marked by hand on the shared annotation workbook ([annotation.md](annotation.md)) by **the team**, without AI tools and without seeing the AI notes. Agreement is computed on ok vs not ok: for the audit, `ok` vs any other verdict; for the decline check, `not_in_label` vs any other.
     - **Audit: 7 / 23 agree, κ = −0.14** (non-ok: 6 / 20; ok: 1 / 3). The two disagree in both directions:
       - The human accepted 14 of the AI's 20 flags as ok. Most were answers drawing on an uncited neighbouring sentence, or a small added gloss.
-      - The human flagged 2 of the 3 AI-ok items. Both are declines the reviewer judged answerable.
+      - The human flagged 2 of the 3 AI-ok items. Both are declines the team judged answerable.
     - **Decline check: 19 / 20 agree, κ = 0.64** (non-ok: 18 / 18; ok: 1 / 2). The exact verdict matched on 18 of 20. Every disagreement is one where the human found part of the answer still in the label.
   - **Humans call 8 of the 23 reviewed training items wrong** (34.8%, 95% Wilson interval 18.8% to 55.1%). They are 6 of the 20 AI-flagged items and 2 of the 3 AI-ok ones:
     - **5 declines that the human says should be answered.** That is every decline item in the sample: audit n 12, 20, 27, 33 and 89.

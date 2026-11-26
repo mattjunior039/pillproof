@@ -127,27 +127,27 @@ A `--dry-run` came first. It found no invalid values and no conflicts. Running t
 
 Apart from the marks, Google Sheets changed two cells that merge doesn't read: a source URL on T6-03 became a link chip, and one `target` cell on the Training audit tab was blanked. The source sheets are unaffected.
 
-**Who marked what.** The markers were members of the team, shown here as reviewers A, B and C, plus a licensed pharmacist. Nobody used AI tools, and nobody saw system outputs.
+**Who marked what.** The task tabs were marked by the team, and the Second check by a second team member who had not given the first mark on those items. The pharmacist tab was marked by a licensed pharmacist. Nobody used AI tools, and nobody saw system outputs.
 
 | Tab | Marked by | Rows marked |
 |---|---|---|
-| Markers – T5 | Reviewer A | 149 / 150 (T5-085 blank) |
-| Markers – T3 | Reviewer C | 143 / 143 |
-| Markers – T6 | Reviewer B | 30 / 30 |
-| Markers – Training audit | Reviewer B | 23 / 23 |
-| Markers – Decline check | Reviewer B | 20 / 20 |
-| Second check | Reviewer B | 24 / 56 (all T5). The 21 T3, 5 T6 and 6 T5 rows were left blank. |
+| Markers – T5 | the team | 149 / 150 (T5-085 blank) |
+| Markers – T3 | the team | 143 / 143 |
+| Markers – T6 | the team | 30 / 30 |
+| Markers – Training audit | the team | 23 / 23 |
+| Markers – Decline check | the team | 20 / 20 |
+| Second check | a second team member | 24 / 56 (all T5). The 21 T3, 5 T6 and 6 T5 rows were left blank. |
 | Pharmacist | a licensed pharmacist (name cell left blank; recorded as `pharmacist (licensed)`) | 30 / 30 |
 | Testers – usability | none yet | 0 sessions |
 
 **Agreement:**
-- **T5, first mark vs Second check** (reviewer A vs reviewer B): n = 24, 70.8% agreement, κ = 0.42. Both marked 11 as reworded and 6 as meaning changed. Reviewer B called 6 of reviewer A's "meaning changed" items reworded; 1 went the other way. No pair was marked by the same person.
-- **Pharmacist vs T5 first mark** (reviewer A): n = 30, 86.7% agreement, κ = 0.68.
+- **T5, first mark vs Second check:** a second team member re-marked 24 items: 70.8% agreement, κ = 0.42. Both marks said reworded on 11 and meaning changed on 6. The second mark called 6 of the first mark's "meaning changed" items reworded; 1 went the other way. No pair was marked by the same person.
+- **Pharmacist vs T5 first mark:** n = 30, 86.7% agreement, κ = 0.68.
 - **T3, T6:** none, because the Second check rows for them are blank.
 
 **Caveats:**
-- Reviewer A left `only_formatting` blank on every T5 row, so those marks give no formatting-only estimate.
-- On the Second check, reviewer B answered `only_formatting` on 11 of 24 rows (8 y, 3 n).
+- The T5 first mark left `only_formatting` blank on every row, so it gives no formatting-only estimate.
+- On the Second check, `only_formatting` was answered on 11 of 24 rows (8 y, 3 n).
 
 The results per task are in [t3.md](t3.md), [t6.md](t6.md), [label-changes.md](label-changes.md) (Gate 3) and [data.md](data.md) (training audit and decline check).
 
