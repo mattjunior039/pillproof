@@ -6,7 +6,7 @@
 
 ## Headline
 
-- **T1, controlled, label-only (FDARxBench test, 2,638 items, phone retrieval).** The fine-tune plus checks (C) is correct on 83.0% [81.3, 84.7] against 56.0% for the base model with the same passages (B). Wrong answers are 12.6% against 41.7% (−29.0 points [−31.5, −26.4]). The 0.8B C is correct on 79.8%, but **its wrong rate is higher than B-0.8B's** (16.8% vs 11.7%), because B-0.8B declines 79% of answerable questions.
+- **T1, controlled, label-only (FDARxBench test, 2,638 items, phone retrieval).** The fine-tune plus checks (C) is correct on 83.0% [81.3, 84.7] against 56.0% for the base model with the same passages (B). Wrong answers are 12.6% against 41.7% (−29.0 points [−31.5, −26.4]). C-2B also beats B-2B with desktop (−34.8 wrong) and oracle (−20.4 wrong) passages. The 0.8B C is correct on 79.8%, but **its wrong rate is higher than B-0.8B's** (16.8% vs 11.7%), because B-0.8B declines 79% of answerable questions.
 - **T3, consumer questions (143), AI grader.** The full app (F-2B) gives an acceptable answer on **55.2%** [48.9, 62.0]: correct, or declined where the label is silent. **This is worse than B** (65.7%) and the passage-only fallback D (69.9%). It is far behind the large chatbot E (96.5%, which uses no label). The fine-tune over-declines consumer-phrased questions: C answered only 40% of answerable T3 items correctly, against 52% for B.
 - **T2 (MedicationQA, 268), AI grader.** F-2B is correct on 19.8%, against 27.6% for B-2B on desktop and 83.5% for E.
 - **T6 (label-silent questions, 29), web on.** F answers 31.0% usefully and correctly, against 20.7% for label-only C (+10.3 [0, +26.7]). E manages 96.6% without the web.
@@ -139,7 +139,32 @@ Gate 2 grader, 2,638 primary items (1,597 answerable, 739 decline, 302 retrieval
 - **Refusal items.** FDARxBench's own refusal items (549, no gold sentences) are declined correctly by every run (≈100%).
 - **Hygiene item.** Dropping the one T1 item seen before the final run (`bc83097f554e73b0`, [Gate 2](gate2.md#data-hygiene)) changes no number by more than 0.1 point.
 
-<!-- T1_DESKTOP_ORACLE -->
+#### Desktop and oracle retrieval (secondary)
+
+These use the same grader and the same items, with different passages (as in [Gate 2](gate2.md)). Item counts differ only in prompt construction:
+- Oracle has no retrieval misses by design.
+- Desktop retrieves the answer more often than phone.
+- The 50%-coverage rule drops 10 desktop decline items, against 1 on phone.
+
+| Run (2B unless noted) | n | Correct | Wrong | Answerable correct | False decline | Decline correct | Blocked |
+|---|---|---|---|---|---|---|---|
+| C, desktop | 2,629 | 80.4 [78.5, 82.3] | 16.5 [14.7, 18.3] | 78.9 | 4.7 | 89.6 | 4.5 |
+| B, desktop | 2,629 | 45.3 [42.8, 47.8] | 51.3 [48.7, 53.9] | 37.6 | 5.3 | 64.7 | 15.6 |
+| C, oracle | 2,639 | 85.6 [83.9, 87.2] | 10.3 [9.1, 11.5] | 82.2 | 5.8 | 94.3 | 4.4 |
+| B, oracle | 2,639 | 62.1 [60.0, 64.3] | 30.6 [28.5, 32.6] | 57.4 | 10.1 | 74.5 | 9.9 |
+| C-0.8B, oracle | 2,639 | 82.6 [80.7, 84.3] | 13.9 [12.5, 15.5] | 79.3 | 4.8 | 91.1 | 5.4 |
+| B-0.8B, oracle | 2,639 | 28.7 [26.8, 30.6] | 5.8 [4.9, 6.8] | 1.6 | 91.1 | 98.1 | 17.5 |
+
+| Paired difference | Correct | Wrong |
+|---|---|---|
+| C-2B − B-2B, desktop (n = 2,629) | **+35.2** [+32.6, +37.7] | **−34.8** [−37.5, −32.2] |
+| C-2B − B-2B, oracle (n = 2,639) | **+23.4** [+21.2, +25.6] | **−20.4** [−22.4, −18.2] |
+| C-0.8B − B-0.8B, oracle (n = 2,639) | +53.9 [+51.7, +55.9] | **+8.1 [+6.2, +10.1]** (loss) |
+
+- **The 2B result holds in every setting.** C beats B on both correct and wrong answers with phone, desktop and oracle passages.
+- **The 0.8B wrong-rate loss also holds with oracle passages.** B-0.8B answers only 1.6% of answerable questions, so its low wrong rate comes from almost never answering.
+- **Desktop passages do not help C.** Its wrong rate is 16.5% on desktop against 12.6% on phone. The longer desktop prompts add more distractor sentences, as in Gate 2 (19.5% vs 14.0%). The checks remove 1.3 points of wrong answers on desktop and 2.2 on oracle (without the checks: 17.8% and 12.5%).
+- **The app's F-2B and C-2B desktop rows (T3, T2, T6) use desktop retrieval.** This T1 desktop row is the closest benchmark match for them.
 
 ### Retrieval (T1 answerable items, n = 1,899)
 
@@ -407,7 +432,7 @@ No voice recordings were made, so T4 does not exist. **Drug-name accuracy from v
 
 1. **T3, C vs B, both graders.** The fine-tune does worse than the base model given the same passages: −11.9 [−20.1, −2.9] acceptable on phone and −14.0 on desktop by the AI grader, and −9.1 correct on phone by the Gate 2 grader. It over-declines consumer phrasing.
 2. **T2, C vs B.** −9.3 [−13.8, −5.0] correct (phone).
-3. **T1, 0.8B wrong rate.** C-0.8B gives more wrong answers than B-0.8B, +5.1 [+2.8, +7.4]. B-0.8B gets its low wrong rate by declining 79% of answerable questions.
+3. **T1, 0.8B wrong rate.** C-0.8B gives more wrong answers than B-0.8B: +5.1 [+2.8, +7.4] with phone passages and +8.1 [+6.2, +10.1] with oracle passages. B-0.8B gets its low wrong rate by declining 79% (phone) and 91% (oracle) of answerable questions.
 4. **T1 sample, AI grader.** C-2B is below B-2B, −4.8 [−8.3, −1.4], although the Gate 2 grader has C 27 points ahead on the same items. Counting correct declines, they tie (83.6% each), so without correct citations, the fine-tune's T1 advantage disappears.
 5. **E beats C and F on every set.**
    - T1 sample: 84.6 vs 71.6.
@@ -421,6 +446,7 @@ No voice recordings were made, so T4 does not exist. **Drug-name accuracy from v
 10. **T5.** The fine-tune fails as a change judge (100% false flags). The base model does not beat the similarity rule.
 11. **T4 not done.** Voice was not evaluated.
 12. **The 2B model does not run on the target phone** (Gate 1). Phones get the 0.8B, which is 3.2 points less correct on T1.
+13. **Desktop passages make C worse on T1, not better.** The wrong rate is 16.5% on desktop against 12.6% on phone, so the laptop setting gives more wrong answers.
 
 ## Disclosures
 
