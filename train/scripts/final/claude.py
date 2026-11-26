@@ -16,7 +16,7 @@ from common import FINAL, env_key, jl, wjl
 
 MODEL = "claude-sonnet-5-5"
 PRICE_IN, PRICE_OUT = 2.0, 10.0  # USD per million tokens, list price; the Batch API bills half
-BUDGET = 25.0  # E + grader together (coordinator: $15, may be raised to $25 total)
+BUDGET = 26.44  # E + grader together (coordinator: $15, then $25 total; v1.1: stop at about $12 more than the $14.44 spent)
 OUT = FINAL / "claude"
 CACHE = OUT / "cache.jsonl"
 
