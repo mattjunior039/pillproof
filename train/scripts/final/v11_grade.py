@@ -60,9 +60,12 @@ def answers() -> list[dict]:
         p = V11 / f"t7_{s}.jsonl"
         if p.exists():
             out += [{"set": "t7", "id": r["id"], "system": s, "text": shown(r, how)} for r in jl(p)]
+            if how == "F":  # label-only C = the first step of the F run (pre-registered as reported)
+                out += [{"set": "t7", "id": r["id"], "system": s.replace("_F", "_C"), "text": r["label_text"]} for r in jl(p)]
     for s, (p, how) in T3_RUNS.items():
         if p.exists():
             out += [{"set": "t3", "id": r["id"], "system": s, "text": shown(r, how)} for r in jl(p)]
+            out += [{"set": "t3", "id": r["id"], "system": s.replace("_F", "_C"), "text": r["label_text"]} for r in jl(p)]
     p = V11 / "t1_refusal_replay.jsonl"
     if p.exists():
         for r in jl(p):
@@ -162,8 +165,10 @@ def summary():
                        "unparsed": sum(1 for r in rows if r["system"] == sy and not r["verdict"])}
                   for sy in sorted({r["system"] for r in rows})}
     pairs = {"t7": [("v11_F2b", "v10_F2b"), ("v11_F08", "v10_F08"), ("v11_F2b", "B2b_phone"), ("v11_F08", "B08_phone"),
-                    ("v11_F2b", "D_phone"), ("v10_F2b", "D_phone")],
-             "t3": [("v11_F2b", "v10_F2b"), ("v11_F08", "v10_F08")], "t1r": [("v11", "v10")]}
+                    ("v11_F2b", "D_phone"), ("v10_F2b", "D_phone"), ("v11_C2b", "v10_C2b"), ("v11_C08", "v10_C08"),
+                    ("v11_C2b", "B2b_phone"), ("v11_C08", "B08_phone")],
+             "t3": [("v11_F2b", "v10_F2b"), ("v11_F08", "v10_F08"), ("v11_C2b", "v10_C2b"), ("v11_C08", "v10_C08")],
+             "t1r": [("v11", "v10")]}
     d = {}
     for s, ps in pairs.items():
         if s not in rows_by:
