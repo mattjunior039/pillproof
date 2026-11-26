@@ -277,20 +277,21 @@ async function answerFor(med: Med, question: string, advice: boolean, onStatus?:
   const useModel = state.settings.answerMode === "model" && state.model.status === "ready" && !state.crash;
   const key = llm.loadedModel() || undefined;
   const base = { tier, sims, lexicon, modelKey: key };
+  const own = { ...base, quoteOnDecline: true }; // v1.1: the user's own label only (docs/v1.1.md)
   const generate = async (user: string) => {
     guard.start(key || "model");
     try { return await llm.generate(user, tier); } finally { guard.stop(); }
   };
   let result: AnswerResult;
   let modelOk = useModel;
-  if (!useModel) result = await answerQuestion(entry.index, entry.label.meta, question, base);
+  if (!useModel) result = await answerQuestion(entry.index, entry.label.meta, question, own);
   else {
     onStatus?.("Reading the label…");
     try {
-      result = await answerQuestion(entry.index, entry.label.meta, question, { ...base, generate });
+      result = await answerQuestion(entry.index, entry.label.meta, question, { ...own, generate });
     } catch (e) {
       if (isFatalGpuError(e)) crashed(key || "model", "The model stopped working on this device (out of graphics memory). Showing label passages instead.");
-      result = await answerQuestion(entry.index, entry.label.meta, question, base);
+      result = await answerQuestion(entry.index, entry.label.meta, question, own);
       if (result.shown.kind === "passages") result.shown.why = "error";
       modelOk = false;
     }

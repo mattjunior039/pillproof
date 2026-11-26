@@ -48,6 +48,9 @@ export interface AnswerOpts {
   passageCount?: number;
   /** General sources (FDA pages, DDInter): sentences matching this, e.g. the drug's name, rank higher. */
   prefer?: RegExp;
+  /** v1.1 (docs/v1.1.md), the user's own label only: when the model declines or its reply is withheld,
+   * quote the on-topic label sentences even if some asked topics are missing (the note says which). */
+  quoteOnDecline?: boolean;
 }
 
 const heading = (index: any, c: number) => sectionName(index.passages[c][0] || "") || "Label";
@@ -212,18 +215,23 @@ export async function answerQuestion(index: any, label: LabelMeta, question: str
     const i = at && unitOf.get(`${at[0]},${at[1]}`);
     return i !== undefined && cov.keep(i);
   });
+  // Over-declining: when the gate found sentences about the asked topic, quote them instead
+  // (only then: with no topic words, or none in the label, unrelated sentences are never shown).
+  // v1.0 needs every topic covered (for "stop suddenly" a sentence about stopping is not the answer);
+  // v1.1 quotes the covered part and the missing-topic note says the rest is not in the label.
+  const labelSays = (): Shown | null => {
+    if (!cov.any || !cov.covered.length || (cov.missing.length && !o.quoteOnDecline)) return null;
+    const q = passages("declined", MAX_QUOTES);
+    return q.kind === "passages" && q.quotes.length ? q : null;
+  };
+  // v1.0 when the reply is withheld: the closest sentences, then backup sources.
+  const withheld = (): Shown => (o.quoteOnDecline && labelSays()) || passages("invalid");
   let shown: Shown;
-  if (chk.status === "decline") {
-    // Over-declining: when the gate found sentences about the asked topic, quote them instead
-    // (only then: with no topic words, or none in the label, unrelated sentences are never shown).
-    // Every topic must be covered: for "stop suddenly" a sentence about stopping is not the answer.
-    const q = cov.any && cov.covered.length && !cov.missing.length ? passages("declined", MAX_QUOTES) : null;
-    shown = q && q.kind === "passages" && q.quotes.length ? q : { kind: "decline" };
-  }
+  if (chk.status === "decline") shown = labelSays() ?? { kind: "decline" };
   else if (chk.status === "answer" && chk.quotes.length && cov.any && !onTopic(chk.quotes)) {
     // The model cited only sentences that don't mention what was asked ("used for" answered from a
     // varicella sentence): its answer is not grounded, so show the on-topic sentences instead.
-    shown = passages("invalid");
+    shown = withheld();
   }
   else if (chk.status === "answer" && chk.quotes.length) {
     const qs = quotes();
@@ -232,7 +240,7 @@ export async function answerQuestion(index: any, label: LabelMeta, question: str
     const glossRisk = o.tier === "phone" && cov.covered.some((c) => c.name === USED_FOR);
     const said = glossRisk ? null : completeSentences(chk.restatement || "");
     shown = chk.blocked || !said || wrongExpansion(said, qs.map((x) => x.text)) ? { kind: "quotes", quotes: qs } : { kind: "answer", restatement: said, quotes: qs };
-  } else shown = passages("invalid");
+  } else shown = withheld();
   return { ...base, shown, ms: Date.now() - t0 };
 }
 

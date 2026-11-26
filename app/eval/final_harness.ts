@@ -130,7 +130,8 @@ for (const it of items) {
   const tq = Date.now();
   const sims = sentenceSims(await embedQ(it.question), lab.vectors);
   const base = { tier, sims, lexicon, modelKey };
-  const first: AnswerResult = await answerQuestion(lab.index, meta, it.question, genUrl ? { ...base, generate } : base);
+  const own = { ...base, quoteOnDecline: true }; // v1.1, as in store.ts; the v1.0 runs use the frozen tag's code
+  const first: AnswerResult = await answerQuestion(lab.index, meta, it.question, genUrl ? { ...own, generate } : own);
   const labelCalls = calls.length;
   let backup: BackupOutcome | undefined, backupError: string | undefined;
   if (backups && unanswered(first)) {

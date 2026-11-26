@@ -111,6 +111,21 @@ test("a model decline still shows the matching sentences: other labels as 'Your 
   assert.match((out2.hit!.result.shown as any).quotes[0].text, /fexofenadine/i);
 });
 
+test("v1.1 quoteOnDecline applies to the user's own label only: backup sources behave as in v1.0", async () => {
+  const m = med({ ingredient: "fexofenadine hydrochloride" });
+  const q = "Can I drink grapefruit juice?";
+  const other = { openfda: { generic_name: ["FEXOFENADINE HYDROCHLORIDE"] }, set_id: "set-2", effective_time: "20250101",
+    indications_and_usage: ["Fexofenadine is used for allergies. Do not take with grapefruit juice."] };
+  const run = async (quoteOnDecline: boolean) => {
+    const o = { ...opts, opts: { ...opts.opts, quoteOnDecline, generate: async () => "SENTENCES: 999\nANSWER: whatever" } };
+    const first = await answerQuestion(plainLabel("fexofenadine"), meta("Fexofenadine"), q, o.opts);
+    return runBackups(m, meta("Fexofenadine"), q, first, deps({ otherLabels: async () => [other] }), o);
+  };
+  const on = await run(true), off = await run(false);
+  assert.deepEqual(JSON.parse(JSON.stringify(on, (k, v) => (k === "ms" || k === "fetched" ? 0 : v))), JSON.parse(JSON.stringify(off, (k, v) => (k === "ms" || k === "fetched" ? 0 : v))));
+  assert.ok(on.hit?.source.kind === "label" && on.hit.result.shown.kind === "passages" && on.hit.result.shown.why === "invalid");
+});
+
 test("matching sentences without an answer don't stop the search: a later checked answer wins; ER labels are skipped for an ordinary tablet", async () => {
   const m = med({ ingredient: "fexofenadine hydrochloride", form: "Oral Tablet" });
   const first = await answerQuestion(plainLabel("fexofenadine"), meta("Fexofenadine"), "Can I drink grapefruit juice?", opts.opts);
