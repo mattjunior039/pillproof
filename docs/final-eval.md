@@ -63,7 +63,7 @@
 | T2 | 268 | MedicationQA consumer questions with a DailyMed source label | 22 excluded because their set id is no longer current in openFDA (`t2_fetch.py`) |
 | T3 | 143 (100 answerable, 43 label-silent) | Consumer-phrased questions about 20 common medicines, with gold label sentences and reference answers | `~/waicy-work/data/build/t3/t3_draft.csv`, final status, edits applied |
 | T4 | — | Voice | **Not recorded; not done** |
-| T5 | 149 | Old/new label sentence pairs marked by hand | `t5_sheet.csv` (Reviewer A); pharmacist subset (30); Reviewer B's second check (24) |
+| T5 | 149 | Old/new label sentence pairs marked by hand | `t5_sheet.csv` (the team's marks); pharmacist subset (30); a second team member's check (24) |
 | T6 | 29 | Questions the label does not answer (food, alcohol, coffee, supplements) | `~/waicy-work/data/build/t6/t6_draft.csv`, final status `keep` |
 
 CIs are 95% bootstrap intervals from 2,000 resamples of **whole drugs**. For T1, whole labels are resampled, as in Gate 2. Paired differences resample the same drugs for both systems.
@@ -102,7 +102,7 @@ The AI grader was checked against the only human answer-level verdicts available
 
 - **Unsupported answers:** the AI caught 24 of the human's 29 U verdicts. 14 of its 38 U verdicts were not U to the human.
 - **Truncation fix before any test grading.** A first calibration pass, with a 220-token cap, truncated 36 verdicts (κ 0.39). The cap was raised to 1,024 before any test item was graded. Both passes are in `summary.json`.
-- **Reviewer B's T6 verdicts and Reviewer C's T3 verdicts could not be used.** They judge whether a *test item* is well-formed (keep / edit / drop, reference answer right), not whether a *system answer* is right.
+- **The team's T6 and T3 audit verdicts could not be used.** They judge whether a *test item* is well-formed (keep / edit / drop, reference answer right), not whether a *system answer* is right.
 
 Agreement between the AI grader and the Gate 2 sentence grader, on the same items:
 
@@ -348,9 +348,9 @@ Paired differences:
 
 ## T5: label-change detection
 
-149 old/new sentence pairs marked by hand. Reviewer A's marks are primary: 89 "meaning changed", 60 "reworded". The pharmacist's 30 and Reviewer B's 24 are checks. The judge harness is `datapipe medlabel_data.changes.judge`, MLX, 2B, greedy. The hidden key (`t5_key_hidden.jsonl`) was opened only for scoring.
+149 old/new sentence pairs marked by hand. The team's marks are primary: 89 "meaning changed", 60 "reworded". The pharmacist's 30 and a second team member's 24 are checks. The judge harness is `datapipe medlabel_data.changes.judge`, MLX, 2B, greedy. The hidden key (`t5_key_hidden.jsonl`) was opened only for scoring.
 
-| Method | Recall on meaning changes (Reviewer A, n = 89) | False flags on rewordings (Reviewer A, n = 60) | Pharmacist (22 / 8): recall, false flags | Reviewer B (7 / 17): recall, false flags |
+| Method | Recall on meaning changes (team marks, n = 89) | False flags on rewordings (team marks, n = 60) | Pharmacist (22 / 8): recall, false flags | Second team member (7 / 17): recall, false flags |
 |---|---|---|---|---|
 | **Similarity rule** (θ = 0.75, shipped) | **85.4** [78.5, 92.0] | **31.7** [16.4, 46.8] | 81.8, 37.5 | 85.7, 17.6 |
 | Base Qwen3.5-2B | 89.9 [83.7, 95.6] | 35.0 [27.1, 43.4] | 81.8, 25.0 | 85.7, 29.4 |
@@ -362,7 +362,7 @@ Paired differences:
 - **The base 2B is no better than the rule.** It is within the CIs on both measures.
 - **What the app ships.** The similarity rule, with dates and old/new text and **no model-written explanations**. This is the plan's fallback, and it was already the case at the freeze (`app/data/label_changes.json`: all 414 entries `judged_by: baseline`, `plain_language: null`).
 - **Plain-language explanations.** The plan's measure (how many the pharmacist marks accurate) was not done: the pharmacist was not asked to grade explanations, and the shipped app shows none. The fine-tune produced explanations for 147 of 149 pairs, against 55 for the base model. Given the label errors above, they were not reviewed.
-- **Human agreement with Reviewer A:** pharmacist 26/30, Reviewer B 17/24.
+- **Human agreement with the team's marks:** pharmacist 26/30, a second team member 17/24.
 - **Gate 3** (≤ 1 in 5 flags formatting only) is reported in [label-changes.md](label-changes.md#second-estimate-human-marks-on-t5-2026-11-24) and unchanged here: the pharmacist's estimate is 10.0% [3.5, 25.6].
 
 ## T4: voice: not done
